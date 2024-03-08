@@ -11,7 +11,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - DragCardArea
   - 
   - 
   - 
@@ -40,4 +40,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Toekn
+    uniqueID: 986086803
+    locked: 0
+  - name: Card
+    uniqueID: 1542200695
     locked: 0
