@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 
@@ -30,6 +31,7 @@ public class CardManager : MonoBehaviour
     public List<CardOnFeild> hand;
     public List<CardOnFeild> selection;
 
+    public CardOnFeild playerCard;
     public CardOnFeild chosenHand;
     public CardOnFeild chosenSelection;
     bool isMyCardDrag;
@@ -46,6 +48,7 @@ public class CardManager : MonoBehaviour
     public Transform mainCardPosition;
 
     public Transform playerPosition;
+    public Transform playerBattlePosition;
     public Transform playerWeapon;
     public Transform playerEquipment;
     public Transform playerAccessory;
@@ -58,6 +61,12 @@ public class CardManager : MonoBehaviour
 
     System.Random random = new System.Random();
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
+    WaitForSeconds delay03 = new WaitForSeconds(0.3f);
+
+    private void Start() 
+    {
+        CardMoveTo(playerCard, playerPosition);
+    }
 
     private void Update()
     {
@@ -72,10 +81,10 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    //AddSelect Ä«µå Á¾·ù (main, skill, equip
+    //AddSelect Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (main, skill, equip
     //PutCardOnSelection(Card)
-    //destroy ´ë½Å¿¡ ¹¦Áö·Î ÀÌµ¿(³¡¿¡ ÆÄ±«) CardOnFeild.To¹¦Áö -> move ÈÄ destroy
-    //³» Ä«µå skill, Àåºñ µîÀº »óÈ²¿¡ ¸ÂÃç¼­ µîÀå, Áý¾î³Ö±â
+    //destroy ï¿½ï¿½Å¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½(ï¿½ï¿½ï¿½ï¿½ ï¿½Ä±ï¿½) CardOnFeild.Toï¿½ï¿½ï¿½ï¿½ -> move ï¿½ï¿½ destroy
+    //ï¿½ï¿½ Ä«ï¿½ï¿½ skill, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È²ï¿½ï¿½ ï¿½ï¿½ï¿½ç¼­ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½Ö±ï¿½
 
     public void SetBattlePosition()
     {
@@ -92,7 +101,7 @@ public class CardManager : MonoBehaviour
 
     public void SelectToMain(CardOnFeild cof)
     {
-        if (selection.Count < 3) //ÇÃ·¹ÀÌ¾î µ¥ÀÌÅÍ È®ÀÎ
+        if (selection.Count < 3) //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
             return;
 
         for (int i = 0; i < selection.Count; i++)
@@ -133,7 +142,7 @@ public class CardManager : MonoBehaviour
             selectionCards.Add(GetRandomCard(mainCardData.type));
         }
 
-        PutCardInSelection(selectionCards, true);
+        StartCoroutine(PutCardInSelection(selectionCards, false));
     }
 
     public void ShowSkillCards()
@@ -154,11 +163,6 @@ public class CardManager : MonoBehaviour
             StartCoroutine(PutHandInInven());
     }
 
-    public void PutCardInHand(List<Card> cardList)
-    {
-        StartCoroutine(PutCardInAlignment(cardList, hand, handLeftPoint, handRightPoint, handSpawnPoint));
-    }
-
     IEnumerator PutCardInHand(List<Card> CardList)
     {
         GameManager.instance.controlBlock += 1;
@@ -174,7 +178,7 @@ public class CardManager : MonoBehaviour
         }
 
         hand.Clear();
-        //yield return delay03;
+        yield return delay03;
 
         foreach (Card card in CardList)
         {
@@ -204,12 +208,30 @@ public class CardManager : MonoBehaviour
         GameManager.instance.controlBlock -= 1;
     }
 
-    public void PutCardInSelection(List<Card> cardList, bool isFlipped)
+    IEnumerator PutCardInSelection(List<Card> cardList, bool isFront)
     {
-        if (isFlipped)
-            StartCoroutine(PutCardInAlignment(cardList, selection, selectionLeftPointFlipped, selectionRightPointFlipped, cardSpawnPoint));
-        else
-            StartCoroutine(PutCardInAlignment(cardList, selection, selectionLeftPoint, selectionRightPoint, cardSpawnPoint));
+        GameManager.instance.controlBlock += 1;
+
+        foreach (Card card in cardList)
+        {
+            CardOnFeild cof = DrawCard(card, cardSpawnPoint);
+            selection.Add(cof);
+
+            SetOriginOrder(selection);
+            if (isFront)
+            {
+                cof.isMinimized = true;
+                CardAlignment(selection, selectionLeftPoint, selectionRightPoint);
+            }
+            else
+            {
+                cof.isMinimized = false;
+                CardAlignment(selection, selectionLeftPointFlipped, selectionRightPointFlipped);
+            }
+            yield return delay03;
+        }
+
+        GameManager.instance.controlBlock -= 1;
     }
 
     IEnumerator PutCardInAlignment(List<Card> cardList, List<CardOnFeild> target, Transform leftPoint, Transform rightPoint, Transform spawnPoint)
@@ -391,36 +413,42 @@ public class CardManager : MonoBehaviour
 
     public void CardMouseDown(CardOnFeild cof)
     {
-        if (onMyCardArea)
+        switch (cof.card.type)
         {
-            chosenHand = cof;
-        }
-        else
-        {
-            chosenSelection = cof;
-        }
-
-        //ÅÏ¿¡µû¶ó cof.selected effect or cardmove main
-
-        if (TurnManager.instance.currentState == GameState.PathSelection)
-        {
-            if (selection.Count < 3) //ÇÃ·¹ÀÌ¾î µ¥ÀÌÅÍ È®ÀÎ
+            case(CardType.Event):
+                if (TurnManager.instance.currentState == GameState.PathSelection)
+                {
+                    SelectToMain(cof);
+                    TurnManager.instance.ChangeTurnTo(GameState.Event);
+                }
+                cof.NextDialogue();
                 return;
 
-            SelectToMain(cof);
+            case(CardType.Enemy):
+                if (TurnManager.instance.currentState == GameState.PathSelection)
+                {
+                    SelectToMain(cof);
+                    TurnManager.instance.ChangeTurnTo(GameState.Battle);
+                }
+                else if (TurnManager.instance.currentState == GameState.Event)
+                {
+                    cof.NextDialogue();
+                }
+                    return;
 
-            if (cof.card.type == CardType.Enemy)
-            {
-                TurnManager.instance.ChangeTurnTo(GameState.Battle);
-                //ÀüÅõ ÄÚµå
-            }
-            else if (cof.card.type == CardType.Event || cof.card.type == CardType.Quest)
-            {
-                TurnManager.instance.ChangeTurnTo(GameState.Event);
-                //´ëÈ­ÄÚµå
-            }
-
+            default:
+                Debug.Log("unkown card type");
+                return;
         }
+
+        // if (onMyCardArea)
+        // {
+        //     chosenHand = cof;
+        // }
+        // else
+        // {
+        //     chosenSelection = cof;
+        // }
     }
 
     void DetectCardArea()
@@ -447,7 +475,7 @@ public class CardManager : MonoBehaviour
             cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 2f), false);
         }
         else
-            cof.MoveTransform(cof.originPRS, true, 0.3f); //Ä«µå µÇµ¹¾Æ°¡±â È°¼ºÈ­/ºñÈ°¼ºÈ­
+            cof.MoveTransform(cof.originPRS, true, 0.3f); //Ä«ï¿½ï¿½ ï¿½Çµï¿½ï¿½Æ°ï¿½ï¿½ï¿½ È°ï¿½ï¿½È­/ï¿½ï¿½È°ï¿½ï¿½È­
 
         cof.GetComponent<RenderOrder>().setMostFrontOrder(isEnlarge);
     }

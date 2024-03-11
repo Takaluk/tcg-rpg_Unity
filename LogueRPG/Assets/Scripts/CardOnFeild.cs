@@ -33,10 +33,10 @@ public class CardOnFeild : MonoBehaviour
         this.card = card;
 
         cardSprite.sprite = cardFront;
-        //Á¾·ù¿¡µû¶ó ÇÁ·ÐÆ® º¯°æ
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
         characterSprite.sprite = card.sprite;
         backgroundSprite.sprite = background[0];
-        //if turn == 10, back[1]... ÅÏ ³Ñ±æ¶§¸¶´Ù ¹è°æÀÌ ´Þ¶óÁü 10Ãþ, 100Ãþ..
+        //if turn == 10, back[1]... ï¿½ï¿½ ï¿½Ñ±æ¶§ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¶ï¿½ï¿½ï¿½ 10ï¿½ï¿½, 100ï¿½ï¿½..
 
         string name = card.name.Replace("\\n", "\n");
         nameTMP.text = name;
@@ -101,11 +101,6 @@ public class CardOnFeild : MonoBehaviour
             return;
 
         CardManager.instance.CardMouseDown(this);
-
-        if (card.type == CardType.Event || TurnManager.instance.currentState == GameState.Event)
-        {
-            NextDialogue();
-        }
     }
 
     #region Dialogue

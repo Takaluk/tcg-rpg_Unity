@@ -3,6 +3,7 @@ using UnityEngine;
 public enum CardType
 {
     None = 0,
+    Player,
     Enemy,
     Event,
     Quest,
@@ -25,17 +26,17 @@ public class SkillCard : Card
 {
     public int acc;
     public SkillEffect[] skillEffects;
-    //¿µÇâ¹Þ´Â ½ºÅÈ Å¸ÀÔ
-    //°è¼ö
-    //¸íÁß·ü
+    //ï¿½ï¿½ï¿½ï¿½Þ´ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½
+    //ï¿½ï¿½ï¿½
+    //ï¿½ï¿½ï¿½ß·ï¿½
 }
 
-//ÅäÅÛ Ä«µå
+//ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½ï¿½
 
 [System.Serializable]
 public class EnemyCard : Card
 {
-    //enemy ½ºÅÈ °è¼ö
+    //enemy ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     public SkillCard[] enemySkills;
     //public equip enemyEquip;
 }
@@ -45,7 +46,7 @@ public class EnemyCard : Card
 public class EventCard : Card
 {
     public CardType rewardType;
-    //buff, debuff skill (ÅÏ)
+    //buff, debuff skill (ï¿½ï¿½)
 }
 
 [CreateAssetMenu(fileName = "CardSO", menuName = "Scriptable Object/CardSO")]
@@ -53,7 +54,7 @@ public class CardSO : ScriptableObject
 {
     public Card[] mainCardTypes;
     public EventCard[] events;
-    public EnemyCard[] enemies; //ÀûÁ¤º¸¿¡ ½ºÅ³°ú Àåºñ ¹Ì¸® ÀÔ·Â
+    public EnemyCard[] enemies; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å³ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ ï¿½Ô·ï¿½
     public Card[] quests;
 
 

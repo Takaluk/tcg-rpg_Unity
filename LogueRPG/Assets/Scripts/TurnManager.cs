@@ -31,19 +31,13 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
-        //Ã³À½ ½ÃÀÛ, ¿ÀÇÁ´× Ä«µå ¸ÞÀÎ
+        //Ã³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         currentState = GameState.PathSelection;
         ChangeTurnTo(currentState);
     }
 
     public void ChangeTurnTo(GameState gameState)
     {
-        CardOnFeild mainCof = null;
-        if (CardManager.instance.main.Count > 0)
-        {
-            mainCof = CardManager.instance.main[0];
-        }
-
         switch (gameState)
         {
             case GameState.PathSelection:
@@ -55,20 +49,20 @@ public class TurnManager : MonoBehaviour
             case GameState.Battle:
                 currentState = GameState.Battle;
                 CardManager.instance.ShowSkillCards();
-                EntityController.instance.enemy.FullRecover();//ÃßÈÄ »èÁ¦
-                //ÀüÅõ ¸Å´ÏÀú
+                EntityController.instance.enemy.FullRecover();//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+                //ï¿½ï¿½ï¿½ï¿½ ï¿½Å´ï¿½ï¿½ï¿½
                 return;
 
             case GameState.Event:
                 currentState = GameState.Event;
                 CardManager.instance.EmptyHand();
-                //ÀÌº¥Æ® ¸Å´ÏÀú
+                //ï¿½Ìºï¿½Æ® ï¿½Å´ï¿½ï¿½ï¿½
                 return;
 
             //case GameState.Reward:
                 //currentState = GameState.Reward;
-                //ÇöÀç battle, event Ä«µå¿¡¼­ Á¤º¸¸¦ °¡Á®¿Â ÈÄ, reward ¼±ÅÃÀûÀ¸·Î º¸¿©ÁÖ±â
-                //or reward ¸Å´ÏÀú?
+                //ï¿½ï¿½ï¿½ï¿½ battle, event Ä«ï¿½å¿¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, reward ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½
+                //or reward ï¿½Å´ï¿½ï¿½ï¿½?
                 //return;
             default:
                 Debug.LogError("Unknown state");
