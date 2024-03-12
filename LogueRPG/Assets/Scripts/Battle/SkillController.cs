@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum SkillType
 {
-    Deal, //¹°¸®°ø°Ý, ¸¶¹ý°ø°Ý, º¸Á¶°ø°Ý, Æê(Å©¸®ÃÄ) °ø°Ý µîµî
+    Deal, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½(Å©ï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     Dot,
     Heal,
     AttackBuff,
@@ -23,7 +23,7 @@ public class SkillEffect
 
 public class SkillController : MonoBehaviour
 {
-    //½ºÅ³ÀÇ ÆÄ¿ö Å¸ÀÔ, °è¼ö, ¸íÁß·ü, Á¾·ù µîÀ» ºÐ¼®
+    //ï¿½ï¿½Å³ï¿½ï¿½ ï¿½Ä¿ï¿½ Å¸ï¿½ï¿½, ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ß·ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¼ï¿½
 
     public void UseSkill(SkillCard skill, Entity target, Entity user)
     {

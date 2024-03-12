@@ -26,13 +26,7 @@ public class BattleManager : MonoBehaviour
         }
     }
     #endregion
-
     
-
     public BattleState battleState;
 
-    public void SetBattle()
-    {
-        
-    }
 }

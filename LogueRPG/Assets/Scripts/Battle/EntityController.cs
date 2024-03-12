@@ -57,6 +57,7 @@ public class Entity
 
         if (isPlayer)
         {
+            Debug.Log("player died");
             return;
         }
         else

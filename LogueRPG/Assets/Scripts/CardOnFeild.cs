@@ -33,11 +33,8 @@ public class CardOnFeild : MonoBehaviour
         this.card = card;
 
         cardSprite.sprite = cardFront;
-        //���������� ����Ʈ ����
         characterSprite.sprite = card.sprite;
         backgroundSprite.sprite = background[0];
-        //if turn == 10, back[1]... �� �ѱ涧���� ����� �޶��� 10��, 100��..
-
         string name = card.name.Replace("\\n", "\n");
         nameTMP.text = name;
 
@@ -126,14 +123,9 @@ public class CardOnFeild : MonoBehaviour
     {
         GameManager.instance.controlBlock += 1;
 
-        if (card.type == CardType.Event && lineIndex == 0)
+        if (lineIndex == 0)
         {
             yield return new WaitForSeconds(0.4f);
-        }
-
-        else if (card.type == CardType.Enemy && GameManager.instance.controlBlock > 1)
-        {
-            yield return new WaitForSeconds(0.4f * (GameManager.instance.controlBlock - 2));
         }
 
         line = line.Replace("\\n", "\n");

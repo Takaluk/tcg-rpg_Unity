@@ -26,17 +26,12 @@ public class SkillCard : Card
 {
     public int acc;
     public SkillEffect[] skillEffects;
-    //����޴� ���� Ÿ��
-    //���
-    //���߷�
 }
 
-//���� ī��
 
 [System.Serializable]
 public class EnemyCard : Card
 {
-    //enemy ���� ���
     public SkillCard[] enemySkills;
     //public equip enemyEquip;
 }

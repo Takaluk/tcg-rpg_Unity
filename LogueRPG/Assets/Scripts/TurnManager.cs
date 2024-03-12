@@ -31,7 +31,6 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
-        //ó�� ����, ������ ī�� ����
         currentState = GameState.PathSelection;
         ChangeTurnTo(currentState);
     }
@@ -49,13 +48,14 @@ public class TurnManager : MonoBehaviour
             case GameState.Battle:
                 currentState = GameState.Battle;
                 CardManager.instance.ShowSkillCards();
-                EntityController.instance.enemy.FullRecover();//���� ����
-                //���� �Ŵ���
+                EntityController.instance.enemy.FullRecover();
+                CardManager.instance.SetBattlePosition(true);
                 return;
 
             case GameState.Event:
                 currentState = GameState.Event;
                 CardManager.instance.EmptyHand();
+                CardManager.instance.SetBattlePosition(false);
                 //�̺�Ʈ �Ŵ���
                 return;
 

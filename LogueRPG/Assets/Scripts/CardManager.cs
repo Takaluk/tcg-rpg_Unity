@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ public class CardManager : MonoBehaviour
     public List<CardOnFeild> selection;
 
     public CardOnFeild playerCard;
+    public CardOnFeild enemyCard;
     public CardOnFeild chosenHand;
     public CardOnFeild chosenSelection;
     bool isMyCardDrag;
@@ -47,7 +49,7 @@ public class CardManager : MonoBehaviour
     public Transform handRightPoint;
     public Transform mainCardPosition;
 
-    public Transform playerPosition;
+    public Transform playerCardPosition;
     public Transform playerBattlePosition;
     public Transform playerWeapon;
     public Transform playerEquipment;
@@ -58,14 +60,20 @@ public class CardManager : MonoBehaviour
     public Transform enemyEquipment;
     public Transform enemyAccessory;
 
+    public GameObject dummyBackCard;
+    public GameObject EnemySkillPositions;
+    public GameObject PlayerSkillPositions;
 
     System.Random random = new System.Random();
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
     WaitForSeconds delay03 = new WaitForSeconds(0.3f);
 
-    private void Start() 
+    private void Start()
     {
-        CardMoveTo(playerCard, playerPosition);
+        playerCard = DrawCard(GetRandomCard(CardType.Enemy), handSpawnPoint);
+        CardMoveTo(playerCard, playerCardPosition);
+
+        
     }
 
     private void Update()
@@ -81,29 +89,29 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    //AddSelect ī�� ���� (main, skill, equip
-    //PutCardOnSelection(Card)
-    //destroy ��ſ� ������ �̵�(���� �ı�) CardOnFeild.To���� -> move �� destroy
-    //�� ī�� skill, ��� ���� ��Ȳ�� ���缭 ����, ����ֱ�
-
-    public void SetBattlePosition()
+    public void SetBattlePosition(bool on)
     {
-        if (TurnManager.instance.currentState != GameState.Battle)
-            return;
+        if (on)
+        {
+            CardMoveTo(playerCard, playerBattlePosition);
+            CardMoveTo(main[0], enemyPosition);
+            dummyBackCard.SetActive(false);
+            EnemySkillPositions.SetActive(true);
+            PlayerSkillPositions.SetActive(true);
+        }
+        else
+        {
+            CardMoveTo(playerCard, playerCardPosition);
+            CardMoveTo(main[0], mainCardPosition);
 
-        Card player = GetRandomCard(CardType.Enemy);
-        CardOnFeild playerCard = DrawCard(player, handSpawnPoint);
-        CardMoveTo(playerCard, playerPosition);
-        CardMoveTo(main[0], enemyPosition);
-
-
+            dummyBackCard.SetActive(true);
+            EnemySkillPositions.SetActive(false);
+            PlayerSkillPositions.SetActive(false);
+        }
     }
 
     public void SelectToMain(CardOnFeild cof)
     {
-        if (selection.Count < 3) //�÷��̾� ������ Ȯ��
-            return;
-
         for (int i = 0; i < selection.Count; i++)
         {
             if (cof == selection[i])
@@ -425,16 +433,31 @@ public class CardManager : MonoBehaviour
                 return;
 
             case(CardType.Enemy):
+                if (cof == playerCard)
+                {
+                    Debug.Log("player status");
+                    return;
+                }
+
                 if (TurnManager.instance.currentState == GameState.PathSelection)
                 {
+                    enemyCard = cof;
                     SelectToMain(cof);
                     TurnManager.instance.ChangeTurnTo(GameState.Battle);
+                }
+                else if (TurnManager.instance.currentState == GameState.Battle)
+                {
+                    Debug.Log("enemy status");
                 }
                 else if (TurnManager.instance.currentState == GameState.Event)
                 {
                     cof.NextDialogue();
                 }
-                    return;
+                return;
+
+            case (CardType.Player):
+                Debug.Log("enetity status");
+                return;
 
             default:
                 Debug.Log("unkown card type");
@@ -472,7 +495,7 @@ public class CardManager : MonoBehaviour
                     newX = 2.9f;
 
             Vector3 enlargePos = new Vector3(newX, newY, -50f);
-            cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 2f), false);
+            cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 1.5f), false);
         }
         else
             cof.MoveTransform(cof.originPRS, true, 0.3f); //ī�� �ǵ��ư��� Ȱ��ȭ/��Ȱ��ȭ
