@@ -72,8 +72,6 @@ public class CardManager : MonoBehaviour
     {
         playerCard = DrawCard(GetRandomCard(CardType.Enemy), handSpawnPoint);
         CardMoveTo(playerCard, playerCardPosition);
-
-        
     }
 
     private void Update()
@@ -93,20 +91,28 @@ public class CardManager : MonoBehaviour
     {
         if (on)
         {
-            CardMoveTo(playerCard, playerBattlePosition);
-            CardMoveTo(main[0], enemyPosition);
+            if (playerCard != null)
+            {
+                CardMoveTo(playerCard, playerBattlePosition);
+            }
+            if (enemyCard != null)
+                CardMoveTo(enemyCard, enemyPosition);
             dummyBackCard.SetActive(false);
-            EnemySkillPositions.SetActive(true);
-            PlayerSkillPositions.SetActive(true);
+            EnemySkillPositions.transform.DOMove(Vector3.zero, 0.3f);
+            PlayerSkillPositions.transform.DOMove(Vector3.zero, 0.3f);
         }
         else
         {
-            CardMoveTo(playerCard, playerCardPosition);
-            CardMoveTo(main[0], mainCardPosition);
+            if (playerCard != null)
+            {
+                CardMoveTo(playerCard, playerCardPosition);
+            }
+            if (enemyCard != null)
+                CardMoveTo(enemyCard, mainCardPosition);
 
             dummyBackCard.SetActive(true);
-            EnemySkillPositions.SetActive(false);
-            PlayerSkillPositions.SetActive(false);
+            EnemySkillPositions.transform.DOMove(Vector3.one * 15.5f, 0.3f);
+            PlayerSkillPositions.transform.DOMove(Vector3.one * -15.5f, 0.3f);
         }
     }
 
@@ -173,7 +179,7 @@ public class CardManager : MonoBehaviour
 
     IEnumerator PutCardInHand(List<Card> CardList)
     {
-        GameManager.instance.controlBlock += 1;
+        GameManager.instance.AddControlBlock();
         if (hand.Count > 0)
         {
             hand.Reverse();
@@ -199,11 +205,11 @@ public class CardManager : MonoBehaviour
             yield return delay01;
         }
 
-        GameManager.instance.controlBlock -= 1;
+        GameManager.instance.RemoveControlBlock();
     }
     IEnumerator PutHandInInven()
     {
-        GameManager.instance.controlBlock += 1;
+        GameManager.instance.AddControlBlock();
         hand.Reverse();
 
         foreach (CardOnFeild cof in hand)
@@ -213,12 +219,12 @@ public class CardManager : MonoBehaviour
         }
 
         hand.Clear();
-        GameManager.instance.controlBlock -= 1;
+        GameManager.instance.RemoveControlBlock();
     }
 
     IEnumerator PutCardInSelection(List<Card> cardList, bool isFront)
     {
-        GameManager.instance.controlBlock += 1;
+        GameManager.instance.AddControlBlock();
 
         foreach (Card card in cardList)
         {
@@ -239,12 +245,12 @@ public class CardManager : MonoBehaviour
             yield return delay03;
         }
 
-        GameManager.instance.controlBlock -= 1;
+        GameManager.instance.RemoveControlBlock();
     }
 
     IEnumerator PutCardInAlignment(List<Card> cardList, List<CardOnFeild> target, Transform leftPoint, Transform rightPoint, Transform spawnPoint)
     {
-        GameManager.instance.controlBlock += 1;
+        GameManager.instance.AddControlBlock();
         foreach (Card card in cardList)
         {
             CardOnFeild cof = DrawCard(card, spawnPoint);
@@ -255,7 +261,7 @@ public class CardManager : MonoBehaviour
             CardAlignment(target, leftPoint, rightPoint);
             yield return delay01;
         }
-        GameManager.instance.controlBlock -= 1;
+        GameManager.instance.RemoveControlBlock();
     }
 
     public CardOnFeild DrawCard(Card card, Transform spawnPoint)

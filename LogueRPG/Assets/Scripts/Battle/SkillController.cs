@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum SkillType
@@ -23,8 +22,6 @@ public class SkillEffect
 
 public class SkillController : MonoBehaviour
 {
-    //��ų�� �Ŀ� Ÿ��, ���, ���߷�, ���� ���� �м�
-
     public void UseSkill(SkillCard skill, Entity target, Entity user)
     {
         if (skill == null)
@@ -35,6 +32,25 @@ public class SkillController : MonoBehaviour
             return;
         }
 
+        StartCoroutine(ProcessSkillEffects(skill, target, user));
+    }
+
+    void DamageSkill(SkillEffect skillEffect, Entity target, Entity user)
+    {
+        int damage = skillEffect.pow * user.stat[skillEffect.skillStatType];
+
+        target.TakeDamage(damage);
+    }
+
+    void HealSkill(SkillEffect skillEffect, Entity target, Entity user)
+    {
+        int heal = skillEffect.pow * user.stat[skillEffect.skillStatType] - 352;
+
+        user.TakeHeal(heal);
+    }
+
+    IEnumerator ProcessSkillEffects(SkillCard skill, Entity target, Entity user)
+    {
         foreach (SkillEffect skillEffect in skill.skillEffects)
         {
             if (target.stat[EntityStat.currentHP] == 0)
@@ -46,13 +62,11 @@ public class SkillController : MonoBehaviour
             {
                 DamageSkill(skillEffect, target, user);
             }
+            else if (skillEffect.skillType == SkillType.Heal)
+                HealSkill(skillEffect, target, user);
+
+
+            yield return new WaitForSeconds(0.5f);
         }
-    }
-
-    void DamageSkill(SkillEffect skillEffect, Entity target, Entity user)
-    {
-        int damage = skillEffect.pow * user.stat[skillEffect.skillStatType];
-
-        target.TakeDamage(damage);
     }
 }

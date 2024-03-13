@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -21,5 +22,29 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    public int controlBlock = 0;
+    [SerializeField] TMP_Text turnCountTMP;
+
+    int controlBlock = 0;
+    int turnCount = 0;
+
+    public int GetControlBlockCount()
+    {
+        return controlBlock;
+    }
+
+    public void AddControlBlock()
+    {
+        controlBlock++;
+    }
+
+    public void RemoveControlBlock()
+    {
+        controlBlock--;
+    }
+
+    public void AddTurnCount()
+    {
+        turnCount++;
+        turnCountTMP.text = turnCount.ToString();
+    }
 }

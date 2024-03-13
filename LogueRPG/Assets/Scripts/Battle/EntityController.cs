@@ -1,6 +1,9 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum EntityStat
 {
@@ -25,6 +28,10 @@ public class Entity
     public void SetEntityStat(int level)
     {
         entityName = "defaultName";
+        if (isPlayer)
+        {
+            entityName = "player";
+        }
 
         stat.Add(EntityStat.level, level);
         stat.Add(EntityStat.maxHP, 100 + (50 * level));
@@ -34,6 +41,14 @@ public class Entity
 
     public void TakeDamage(int damage)
     {
+        string damageAmount = "<color=red><b>" + damage.ToString() + "<b>";
+        if (isPlayer)
+        {
+            EntityController.instance.PlayerPopUp(damageAmount);
+        }
+        else
+            EntityController.instance.EnemyPopUp(damageAmount);
+
         int afterHp = stat[EntityStat.currentHP] - damage;
 
         if (afterHp <= 0) 
@@ -44,6 +59,18 @@ public class Entity
         {
             stat[EntityStat.currentHP] = afterHp;
         }
+    }
+
+    public void TakeHeal(int heal)
+    {
+        string healAmount = "<color=green><b>" + heal.ToString() + "<b>";
+
+        if (isPlayer)
+        {
+            EntityController.instance.PlayerPopUp(healAmount);
+        }
+        else
+            EntityController.instance.EnemyPopUp(healAmount);
     }
 
     public void FullRecover()
@@ -87,11 +114,15 @@ public class EntityController : MonoBehaviour
     #endregion
     SkillController skillController = null;
 
+    public GameObject popUpPrefeb;
     public int initialPlayerLevel;
     public int initialEnemyLevel;
 
     public Entity player;
     public Entity enemy;
+
+    public Transform playerPopUpPosition;
+    public Transform enemyPopUpPosition;
 
     private void Start()
     {
@@ -103,5 +134,25 @@ public class EntityController : MonoBehaviour
     public void PlayerUseSkill(SkillCard skill)
     {
         skillController.UseSkill(skill, enemy, player);
+    }
+
+    public void PlayerPopUp(string line)
+    {
+        var popUp = Instantiate(popUpPrefeb, playerPopUpPosition);
+        TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
+        popUpTmp.text = line;
+        Vector3 dest = new Vector3(playerPopUpPosition.position.x, playerPopUpPosition.position.y + 2f, playerPopUpPosition.position.z);
+        popUp.gameObject.transform.DOMove(dest, 1f)
+            .OnComplete(() => Destroy(popUp));
+    }
+
+    public void EnemyPopUp(string line)
+    {
+        var popUp = Instantiate(popUpPrefeb, enemyPopUpPosition);
+        TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
+        popUpTmp.text = line;
+        Vector3 dest = new Vector3(enemyPopUpPosition.position.x, enemyPopUpPosition.position.y + 2f, enemyPopUpPosition.position.z);
+        popUp.gameObject.transform.DOMove(dest, 1f)
+            .OnComplete(() => Destroy(popUp));
     }
 }

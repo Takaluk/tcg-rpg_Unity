@@ -40,7 +40,9 @@ public class EnemyCard : Card
 [System.Serializable]
 public class EventCard : Card
 {
-    public CardType rewardType;
+    //public CardType rewardType;
+    public int eventLineIndex;
+    public SkillCard skill;
     //buff, debuff skill (��)
 }
 

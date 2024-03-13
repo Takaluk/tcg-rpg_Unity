@@ -41,7 +41,9 @@ public class TurnManager : MonoBehaviour
         {
             case GameState.PathSelection:
                 currentState = GameState.PathSelection;
+                GameManager.instance.AddTurnCount();
                 CardManager.instance.EmptyHand();
+                CardManager.instance.SetBattlePosition(false);
                 CardManager.instance.ShowMainCardSelection();
                 return;
 

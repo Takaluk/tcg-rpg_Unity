@@ -10,6 +10,7 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] SpriteRenderer characterSprite;
     [SerializeField] SpriteRenderer backgroundSprite;
     [SerializeField] TMP_Text nameTMP;
+    [SerializeField] TMP_Text cardTypeTMP;
     [SerializeField] TMP_Text descriptionTMP;
     [SerializeField] Sprite cardFront;
     [SerializeField] Sprite cardBack;
@@ -34,10 +35,25 @@ public class CardOnFeild : MonoBehaviour
 
         cardSprite.sprite = cardFront;
         characterSprite.sprite = card.sprite;
-        backgroundSprite.sprite = background[0];
         string name = card.name.Replace("\\n", "\n");
         nameTMP.text = name;
 
+        switch (card.type)
+        {
+            
+            case (CardType.Enemy):
+                backgroundSprite.sprite = background[1];
+                cardTypeTMP.text = "<color=red>Enemy";
+                return;
+            case (CardType.Skill):
+                backgroundSprite.sprite = background[0];
+                cardTypeTMP.text = "<color=blue>Skill";
+                return;
+            case (CardType.Event):
+                backgroundSprite.sprite = background[1];
+                cardTypeTMP.text = "<color=yellow>Event";
+                return;
+        }
         descriptionTMP.text = "defaultText";
     }    
 
@@ -46,10 +62,10 @@ public class CardOnFeild : MonoBehaviour
 
         if (useDotween)
         {
-            GameManager.instance.controlBlock += 1;
+            GameManager.instance.AddControlBlock();
             transform.DOMove(prs.pos, dotweenTime);
             transform.DORotateQuaternion(prs.rot, dotweenTime);
-            transform.DOScale(prs.scale, dotweenTime).OnComplete(() => GameManager.instance.controlBlock -= 1);
+            transform.DOScale(prs.scale, dotweenTime).OnComplete(() => GameManager.instance.RemoveControlBlock());
         }
         else
         {
@@ -61,18 +77,18 @@ public class CardOnFeild : MonoBehaviour
 
     public void DiscardTo(Transform discardPoint, Vector3 targetScale)
     {
-        GameManager.instance.controlBlock += 1;
+        GameManager.instance.AddControlBlock();
 
         Quaternion targetRotation = Quaternion.Euler(0f, -180f, 0f);
 
-        transform.DOMove(discardPoint.position, 0.3f).OnComplete(() => GameManager.instance.controlBlock -= 1);
+        transform.DOMove(discardPoint.position, 0.3f).OnComplete(() => GameManager.instance.RemoveControlBlock());
         transform.DORotateQuaternion(targetRotation, 0.3f);
         transform.DOScale(targetScale, 0.3f).OnComplete(() => Destroy(gameObject));
     }
 
     private void OnMouseDrag()
     {
-        if (GameManager.instance.controlBlock > 0)
+        if (GameManager.instance.GetControlBlockCount() > 0)
             return;
 
         if (isMinimized)
@@ -83,7 +99,7 @@ public class CardOnFeild : MonoBehaviour
 
     private void OnMouseUp()
     {
-        if (GameManager.instance.controlBlock > 0)
+        if (GameManager.instance.GetControlBlockCount() > 0)
             return;
 
         if (isMinimized)
@@ -94,7 +110,7 @@ public class CardOnFeild : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (GameManager.instance.controlBlock > 0)
+        if (GameManager.instance.GetControlBlockCount() > 0)
             return;
 
         CardManager.instance.CardMouseDown(this);
@@ -108,6 +124,16 @@ public class CardOnFeild : MonoBehaviour
         {
             TypeDescription(card.context[lineIndex]);
             lineIndex++;
+
+            if (card.type == CardType.Event)
+            {
+                EventCard ecard = (EventCard)card;
+
+                if (lineIndex == ecard.eventLineIndex)
+                {
+                    EntityController.instance.PlayerUseSkill(ecard.skill);
+                }
+            }
         }
         else
             TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
@@ -121,7 +147,7 @@ public class CardOnFeild : MonoBehaviour
 
     IEnumerator Type(string line)
     {
-        GameManager.instance.controlBlock += 1;
+        GameManager.instance.AddControlBlock();
 
         if (lineIndex == 0)
         {
@@ -130,14 +156,22 @@ public class CardOnFeild : MonoBehaviour
 
         line = line.Replace("\\n", "\n");
 
-        foreach (char c in line.ToCharArray())
+
+        if (line[0] == '<')
         {
-            descriptionTMP.text += c;
+            descriptionTMP.text += line;
             yield return new WaitForSeconds(textSpeed);
         }
+        else
+        {
+            foreach (char c in line.ToCharArray())
+            {
+                descriptionTMP.text += c;
+                yield return new WaitForSeconds(textSpeed);
+            }
+        }
 
-
-        GameManager.instance.controlBlock -= 1;
+        GameManager.instance.RemoveControlBlock();
     }
     #endregion
 }
