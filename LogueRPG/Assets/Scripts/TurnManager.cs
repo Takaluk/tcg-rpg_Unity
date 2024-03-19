@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum GameState
@@ -50,7 +47,7 @@ public class TurnManager : MonoBehaviour
             case GameState.Battle:
                 currentState = GameState.Battle;
                 CardManager.instance.ShowSkillCards();
-                EntityController.instance.enemy.FullRecover();
+                EntityController.instance.StartBattle();
                 CardManager.instance.SetBattlePosition(true);
                 return;
 
@@ -58,7 +55,6 @@ public class TurnManager : MonoBehaviour
                 currentState = GameState.Event;
                 CardManager.instance.EmptyHand();
                 CardManager.instance.SetBattlePosition(false);
-                //�̺�Ʈ �Ŵ���
                 return;
 
             //case GameState.Reward:

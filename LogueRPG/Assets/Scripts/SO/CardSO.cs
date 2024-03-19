@@ -24,6 +24,7 @@ public class Card
 [System.Serializable]
 public class SkillCard : Card
 {
+    public int cost;
     public int acc;
     public SkillEffect[] skillEffects;
 }

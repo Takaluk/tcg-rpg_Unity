@@ -47,4 +47,9 @@ public class GameManager : MonoBehaviour
         turnCount++;
         turnCountTMP.text = turnCount.ToString();
     }
+
+    public int GetTurnCount()
+    {
+        return turnCount;
+    }
 }

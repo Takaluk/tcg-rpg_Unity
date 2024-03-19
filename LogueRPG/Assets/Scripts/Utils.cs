@@ -35,7 +35,6 @@ public class Utils : MonoBehaviour
     {
         float probability = percent / 100f;
         float randomValue = Random.value;
-        Debug.Log(probability +" , " + randomValue);
         return randomValue <= probability;
     }
 }

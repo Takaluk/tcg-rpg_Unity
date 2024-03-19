@@ -68,23 +68,19 @@ public class CardManager : MonoBehaviour
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
     WaitForSeconds delay03 = new WaitForSeconds(0.3f);
 
-    private void Start()
-    {
-        playerCard = DrawCard(GetRandomCard(CardType.Enemy), handSpawnPoint);
-        CardMoveTo(playerCard, playerCardPosition);
-    }
-
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
-        }
-
-        if (isMyCardDrag)
+        if (isMyCardDrag && chosenHand != null)
         {
             CardDrag();
         }
+    }
+
+    public void SetPlayerCard()
+    {
+        playerCard = DrawCard(GetRandomCard(CardType.Enemy), handSpawnPoint);
+        playerCard.ShowHealthbar(true);
+        CardMoveTo(playerCard, playerCardPosition);
     }
 
     public void SetBattlePosition(bool on)
@@ -94,9 +90,13 @@ public class CardManager : MonoBehaviour
             if (playerCard != null)
             {
                 CardMoveTo(playerCard, playerBattlePosition);
+                EntityController.instance.player.entityPopUpPosition = playerBattlePosition;
             }
             if (enemyCard != null)
+            {
                 CardMoveTo(enemyCard, enemyPosition);
+                enemyCard.ShowHealthbar(true);
+            }
             dummyBackCard.SetActive(false);
             EnemySkillPositions.transform.DOMove(Vector3.zero, 0.3f);
             PlayerSkillPositions.transform.DOMove(Vector3.zero, 0.3f);
@@ -106,10 +106,13 @@ public class CardManager : MonoBehaviour
             if (playerCard != null)
             {
                 CardMoveTo(playerCard, playerCardPosition);
+                EntityController.instance.player.entityPopUpPosition = playerCardPosition;
             }
             if (enemyCard != null)
+            {
                 CardMoveTo(enemyCard, mainCardPosition);
-
+                enemyCard.ShowHealthbar(false);
+            }
             dummyBackCard.SetActive(true);
             EnemySkillPositions.transform.DOMove(Vector3.one * 15.5f, 0.3f);
             PlayerSkillPositions.transform.DOMove(Vector3.one * -15.5f, 0.3f);
@@ -179,7 +182,6 @@ public class CardManager : MonoBehaviour
 
     IEnumerator PutCardInHand(List<Card> CardList)
     {
-        GameManager.instance.AddControlBlock();
         if (hand.Count > 0)
         {
             hand.Reverse();
@@ -204,12 +206,9 @@ public class CardManager : MonoBehaviour
             CardAlignment(hand, handLeftPoint, handRightPoint);
             yield return delay01;
         }
-
-        GameManager.instance.RemoveControlBlock();
     }
     IEnumerator PutHandInInven()
     {
-        GameManager.instance.AddControlBlock();
         hand.Reverse();
 
         foreach (CardOnFeild cof in hand)
@@ -219,13 +218,10 @@ public class CardManager : MonoBehaviour
         }
 
         hand.Clear();
-        GameManager.instance.RemoveControlBlock();
     }
 
     IEnumerator PutCardInSelection(List<Card> cardList, bool isFront)
     {
-        GameManager.instance.AddControlBlock();
-
         foreach (Card card in cardList)
         {
             CardOnFeild cof = DrawCard(card, cardSpawnPoint);
@@ -244,13 +240,10 @@ public class CardManager : MonoBehaviour
             }
             yield return delay03;
         }
-
-        GameManager.instance.RemoveControlBlock();
     }
 
     IEnumerator PutCardInAlignment(List<Card> cardList, List<CardOnFeild> target, Transform leftPoint, Transform rightPoint, Transform spawnPoint)
     {
-        GameManager.instance.AddControlBlock();
         foreach (Card card in cardList)
         {
             CardOnFeild cof = DrawCard(card, spawnPoint);
@@ -261,7 +254,6 @@ public class CardManager : MonoBehaviour
             CardAlignment(target, leftPoint, rightPoint);
             yield return delay01;
         }
-        GameManager.instance.RemoveControlBlock();
     }
 
     public CardOnFeild DrawCard(Card card, Transform spawnPoint)
@@ -415,6 +407,8 @@ public class CardManager : MonoBehaviour
 
             EntityController.instance.PlayerUseSkill(skill);
         }
+
+        EntityController.instance.RemoveApChargeBlock();
     }
 
     private void CardDrag()
@@ -438,7 +432,11 @@ public class CardManager : MonoBehaviour
                 cof.NextDialogue();
                 return;
 
-            case(CardType.Enemy):
+            case (CardType.Skill):
+                EntityController.instance.AddApChargeBlock();
+                return;
+
+            case (CardType.Enemy):
                 if (cof == playerCard)
                 {
                     Debug.Log("player status");
@@ -459,10 +457,6 @@ public class CardManager : MonoBehaviour
                 {
                     cof.NextDialogue();
                 }
-                return;
-
-            case (CardType.Player):
-                Debug.Log("enetity status");
                 return;
 
             default:
@@ -504,7 +498,7 @@ public class CardManager : MonoBehaviour
             cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 1.5f), false);
         }
         else
-            cof.MoveTransform(cof.originPRS, true, 0.3f); //ī�� �ǵ��ư��� Ȱ��ȭ/��Ȱ��ȭ
+            cof.MoveTransform(cof.originPRS, false, 0.3f); //ī�� �ǵ��ư��� Ȱ��ȭ/��Ȱ��ȭ
 
         cof.GetComponent<RenderOrder>().setMostFrontOrder(isEnlarge);
     }

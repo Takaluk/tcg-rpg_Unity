@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using DG.Tweening;
 
 public class CardOnFeild : MonoBehaviour
 {
     [SerializeField] SpriteRenderer cardSprite;
-    [SerializeField] SpriteRenderer characterSprite;
     [SerializeField] SpriteRenderer backgroundSprite;
     [SerializeField] TMP_Text nameTMP;
     [SerializeField] TMP_Text cardTypeTMP;
@@ -15,11 +15,14 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] Sprite cardFront;
     [SerializeField] Sprite cardBack;
     [SerializeField] Sprite[] background;
+    [SerializeField] GameObject healthBar;
+    [SerializeField] Image healthbarSprite;
+    [SerializeField] Image[] manaGageSprites;
+    public SpriteRenderer characterSprite;
 
     public Card card;
     public PRS originPRS;
 
-    public bool isReactable = false;
     public int lineIndex = 0;
     public bool isMinimized = false;
     public float textSpeed = 0.3f;
@@ -81,7 +84,7 @@ public class CardOnFeild : MonoBehaviour
 
         Quaternion targetRotation = Quaternion.Euler(0f, -180f, 0f);
 
-        transform.DOMove(discardPoint.position, 0.3f).OnComplete(() => GameManager.instance.RemoveControlBlock());
+        transform.DOMove(discardPoint.position, 0.299f).OnComplete(() => GameManager.instance.RemoveControlBlock());
         transform.DORotateQuaternion(targetRotation, 0.3f);
         transform.DOScale(targetScale, 0.3f).OnComplete(() => Destroy(gameObject));
     }
@@ -174,4 +177,23 @@ public class CardOnFeild : MonoBehaviour
         GameManager.instance.RemoveControlBlock();
     }
     #endregion
+
+    public void ShowHealthbar(bool on)
+    {
+        healthBar.SetActive(on);
+    }
+
+    public void UpdateHealthbar(float maxHealth, float currentHealth)
+    {
+        float healthbarAmount = currentHealth / maxHealth;
+        healthbarSprite.fillAmount = healthbarAmount;
+    }
+
+    public void UpdateApGage(float maxHealth)
+    {
+        manaGageSprites[0].fillAmount = maxHealth;
+        manaGageSprites[1].fillAmount = maxHealth - 1;
+        manaGageSprites[2].fillAmount = maxHealth - 2;
+        manaGageSprites[3].fillAmount = maxHealth - 3;
+    }
 }

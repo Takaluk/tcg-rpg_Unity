@@ -29,6 +29,7 @@ public class SkillController : MonoBehaviour
 
         if (!Utils.CalculateProbability(skill.acc))
         {
+            target.EntityPopUp("<color=#606060>MISS");
             return;
         }
 
@@ -42,7 +43,7 @@ public class SkillController : MonoBehaviour
         target.TakeDamage(damage);
     }
 
-    void HealSkill(SkillEffect skillEffect, Entity target, Entity user)
+    void HealSkill(SkillEffect skillEffect, Entity user)
     {
         int heal = skillEffect.pow * user.stat[skillEffect.skillStatType] - 352;
 
@@ -53,20 +54,19 @@ public class SkillController : MonoBehaviour
     {
         foreach (SkillEffect skillEffect in skill.skillEffects)
         {
-            if (target.stat[EntityStat.currentHP] == 0)
-            {
-                break;
-            }
-
             if (skillEffect.skillType == SkillType.Deal)
             {
+                if (target.stat[EntityStat.currentHP] == 0)
+                {
+                    break;
+                }
                 DamageSkill(skillEffect, target, user);
             }
             else if (skillEffect.skillType == SkillType.Heal)
-                HealSkill(skillEffect, target, user);
+                HealSkill(skillEffect, user);
 
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.3f);
         }
     }
 }

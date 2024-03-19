@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public enum EntityStat
 {
@@ -14,85 +13,65 @@ public enum EntityStat
     attack,
     defense,
     maxExp,
-    currentExp
+    currentExp,
+    apCharge
 };
 
 [System.Serializable]
 public class Entity
 {
+    public CardOnFeild entityCard = null;
     public bool isPlayer;
-    public string entityName;
+    public Transform entityPopUpPosition;
     public Dictionary<EntityStat, int> stat = new Dictionary<EntityStat, int>();
     public List<SkillCard> skillCards;
 
+    public float actionPoint = 0;
+
     public void SetEntityStat(int level)
     {
-        entityName = "defaultName";
-        if (isPlayer)
-        {
-            entityName = "player";
-        }
-
+        stat.Clear();
         stat.Add(EntityStat.level, level);
         stat.Add(EntityStat.maxHP, 100 + (50 * level));
         stat.Add(EntityStat.currentHP, stat[EntityStat.maxHP]);
         stat.Add(EntityStat.attack, (int)((1 + 0.2 * level) * 10));
+        actionPoint = 0;
     }
 
     public void TakeDamage(int damage)
     {
-        string damageAmount = "<color=red><b>" + damage.ToString() + "<b>";
-        if (isPlayer)
-        {
-            EntityController.instance.PlayerPopUp(damageAmount);
-        }
-        else
-            EntityController.instance.EnemyPopUp(damageAmount);
+        EntityController.instance.DamageReaction(this);
+
+        string damageAmount = "<color=red>" + damage.ToString();
+        EntityPopUp(damageAmount);
 
         int afterHp = stat[EntityStat.currentHP] - damage;
 
         if (afterHp <= 0) 
         {
+            afterHp = 0;
             Die();
         }
-        else
-        {
-            stat[EntityStat.currentHP] = afterHp;
-        }
+        stat[EntityStat.currentHP] = afterHp;
+
+        entityCard.UpdateHealthbar(stat[EntityStat.maxHP], afterHp);
     }
 
     public void TakeHeal(int heal)
     {
-        string healAmount = "<color=green><b>" + heal.ToString() + "<b>";
-
-        if (isPlayer)
-        {
-            EntityController.instance.PlayerPopUp(healAmount);
-        }
-        else
-            EntityController.instance.EnemyPopUp(healAmount);
-    }
-
-    public void FullRecover()
-    {
-        stat[EntityStat.currentHP] = stat[EntityStat.maxHP];
+        string healAmount = "<color=green>" + heal.ToString();
+        EntityPopUp(healAmount);
     }
 
     public void Die()
     {
-        stat[EntityStat.currentHP] = 0;
-
-        if (isPlayer)
-        {
-            Debug.Log("player died");
-            return;
-        }
-        else
-        {
-            TurnManager.instance.ChangeTurnTo(GameState.Event);
-        }
+        EntityController.instance.EntityDied(this);
     }
 
+    public void EntityPopUp(string line)
+    {
+        EntityController.instance.EntityPopUp(line, entityPopUpPosition);
+    }
 }
 
 public class EntityController : MonoBehaviour
@@ -121,38 +100,118 @@ public class EntityController : MonoBehaviour
     public Entity player;
     public Entity enemy;
 
-    public Transform playerPopUpPosition;
-    public Transform enemyPopUpPosition;
+    public float apChargeSpeed = 2f;
+    public int apChargeBlock = 1;
+
+    public Material hitFlashMaterial;
 
     private void Start()
     {
         skillController = GetComponent<SkillController>();
+        SetPlayerStat();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            player.TakeDamage(100);
+        }
+
+        if (apChargeBlock == 0)
+        {
+            if (player.actionPoint < 4)
+                player.actionPoint += apChargeSpeed * Time.deltaTime;
+            else
+                player.actionPoint = 4f;
+
+            player.entityCard.UpdateApGage(player.actionPoint);
+        }
+    }
+
+    public void SetPlayerStat()
+    {
+        CardManager.instance.SetPlayerCard();
         player.SetEntityStat(initialPlayerLevel);
-        enemy.SetEntityStat(initialEnemyLevel);
+        player.entityCard = CardManager.instance.playerCard;
+    }
+
+    public void StartBattle()
+    {
+        enemy.SetEntityStat(initialEnemyLevel + GameManager.instance.GetTurnCount());
+        enemy.entityCard = CardManager.instance.enemyCard;
+
+        apChargeBlock = 0;
     }
 
     public void PlayerUseSkill(SkillCard skill)
     {
-        skillController.UseSkill(skill, enemy, player);
+        if (player.actionPoint >= skill.cost)
+        {
+            player.actionPoint -= skill.cost;
+            player.entityCard.UpdateApGage(player.actionPoint);
+            skillController.UseSkill(skill, enemy, player);
+        }
+        else
+            player.EntityPopUp("<color=blue>Not enough AP");
     }
 
-    public void PlayerPopUp(string line)
+    public void EntityPopUp(string line, Transform popUpPosition )
     {
-        var popUp = Instantiate(popUpPrefeb, playerPopUpPosition);
+        var popUp = Instantiate(popUpPrefeb, popUpPosition);
         TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
         popUpTmp.text = line;
-        Vector3 dest = new Vector3(playerPopUpPosition.position.x, playerPopUpPosition.position.y + 2f, playerPopUpPosition.position.z);
+        Vector3 dest = new Vector3(popUpPosition.position.x, popUpPosition.position.y + 1f, popUpPosition.position.z);
         popUp.gameObject.transform.DOMove(dest, 1f)
             .OnComplete(() => Destroy(popUp));
     }
 
-    public void EnemyPopUp(string line)
+    public void AddApChargeBlock()
     {
-        var popUp = Instantiate(popUpPrefeb, enemyPopUpPosition);
-        TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
-        popUpTmp.text = line;
-        Vector3 dest = new Vector3(enemyPopUpPosition.position.x, enemyPopUpPosition.position.y + 2f, enemyPopUpPosition.position.z);
-        popUp.gameObject.transform.DOMove(dest, 1f)
-            .OnComplete(() => Destroy(popUp));
+        apChargeBlock++;
+    }
+
+    public void RemoveApChargeBlock()
+    {
+        apChargeBlock--;
+        if (apChargeBlock < 0) 
+            apChargeBlock = 0;
+    }
+
+    public void EntityDied(Entity entity)
+    {
+        if (entity == enemy)
+        {
+            StartCoroutine(EndBattle());
+        }
+    }
+
+    public void DamageReaction(Entity entity)
+    {
+        StartCoroutine(DamageReactionEffect(entity));
+    }
+
+    IEnumerator DamageReactionEffect(Entity entity)
+    {
+        entity.entityCard.characterSprite.transform.DOShakePosition(0.1f);
+        Material org = entity.entityCard.characterSprite.material;
+        entity.entityCard.characterSprite.material = hitFlashMaterial;
+        yield return new WaitForSeconds(0.1f);
+        entity.entityCard.characterSprite.material = org;
+    }
+
+    IEnumerator EndBattle()
+    {
+        apChargeBlock += 1;
+        yield return new WaitForSeconds(0.3f);
+        enemy.EntityPopUp("<color=#606060>Died");
+        yield return new WaitForSeconds(0.3f);
+        TurnManager.instance.ChangeTurnTo(GameState.Event);
+        CardManager.instance.main[0].NextDialogue();
+    }
+
+    IEnumerator GameOver()
+    {
+        yield return new WaitForSeconds(0.2f);
     }
 }
