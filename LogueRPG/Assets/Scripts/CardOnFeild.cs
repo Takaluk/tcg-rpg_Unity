@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using System.Drawing;
 
 public class CardOnFeild : MonoBehaviour
 {
@@ -12,9 +13,12 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] TMP_Text nameTMP;
     [SerializeField] TMP_Text cardTypeTMP;
     [SerializeField] TMP_Text descriptionTMP;
+    [SerializeField] TMP_Text skillCostTMP;
     [SerializeField] Sprite cardFront;
     [SerializeField] Sprite cardBack;
     [SerializeField] Sprite[] background;
+    [SerializeField] TMP_Text currentHpTMP;
+    [SerializeField] TMP_Text maxHpTMP;
     [SerializeField] GameObject healthBar;
     [SerializeField] Image healthbarSprite;
     [SerializeField] Image[] manaGageSprites;
@@ -26,6 +30,7 @@ public class CardOnFeild : MonoBehaviour
     public int lineIndex = 0;
     public bool isMinimized = false;
     public float textSpeed = 0.3f;
+
 
     private void OnDestroy()
     {
@@ -43,22 +48,35 @@ public class CardOnFeild : MonoBehaviour
 
         switch (card.type)
         {
-            
+            //background
+            //0:skill
+            //1:demo_town
+            //2:equip
+            case (CardType.Player):
+                backgroundSprite.sprite = background[1];
+                cardTypeTMP.text = "<color=white>Player";
+                return;
             case (CardType.Enemy):
                 backgroundSprite.sprite = background[1];
                 cardTypeTMP.text = "<color=red>Enemy";
                 return;
             case (CardType.Skill):
                 backgroundSprite.sprite = background[0];
-                cardTypeTMP.text = "<color=blue>Skill";
+
+                SkillCard skill = (SkillCard)card;
+                skillCostTMP.text = "<color=#1E90FF>" + skill.cost.ToString();
+                cardTypeTMP.text = "<color=#1E90FF>Skill";
                 return;
             case (CardType.Event):
                 backgroundSprite.sprite = background[1];
                 cardTypeTMP.text = "<color=yellow>Event";
                 return;
+            case CardType.Equip:
+                backgroundSprite.sprite = background[2];
+                cardTypeTMP.text = "<color=grey>Equip";
+                return;
         }
-        descriptionTMP.text = "defaultText";
-    }    
+    }
 
     public void MoveTransform(PRS prs, bool useDotween, float dotweenTime = 0)
     {
@@ -84,7 +102,7 @@ public class CardOnFeild : MonoBehaviour
 
         Quaternion targetRotation = Quaternion.Euler(0f, -180f, 0f);
 
-        transform.DOMove(discardPoint.position, 0.299f).OnComplete(() => GameManager.instance.RemoveControlBlock());
+        transform.DOMove(discardPoint.position, 0.29f).OnComplete(() => GameManager.instance.RemoveControlBlock());
         transform.DORotateQuaternion(targetRotation, 0.3f);
         transform.DOScale(targetScale, 0.3f).OnComplete(() => Destroy(gameObject));
     }
@@ -185,15 +203,17 @@ public class CardOnFeild : MonoBehaviour
 
     public void UpdateHealthbar(float maxHealth, float currentHealth)
     {
+        maxHpTMP.text = "/ " + maxHealth.ToString();
+        currentHpTMP.text = currentHealth.ToString();
         float healthbarAmount = currentHealth / maxHealth;
         healthbarSprite.fillAmount = healthbarAmount;
     }
 
-    public void UpdateApGage(float maxHealth)
+    public void UpdateApGage(float actionPoints)
     {
-        manaGageSprites[0].fillAmount = maxHealth;
-        manaGageSprites[1].fillAmount = maxHealth - 1;
-        manaGageSprites[2].fillAmount = maxHealth - 2;
-        manaGageSprites[3].fillAmount = maxHealth - 3;
+        manaGageSprites[0].fillAmount = actionPoints;
+        manaGageSprites[1].fillAmount = actionPoints - 1;
+        manaGageSprites[2].fillAmount = actionPoints - 2;
+        manaGageSprites[3].fillAmount = actionPoints - 3;
     }
 }

@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,14 +8,17 @@ using UnityEngine;
 public enum EntityStat
 {
     None = 0,
-    level,
-    maxHP,
-    currentHP,
-    attack,
-    defense,
-    maxExp,
-    currentExp,
-    apCharge
+    Level,
+    MaxHP,
+    CurrentHP,
+    APCharge,
+
+    Str,
+    Int,
+    Def,
+    Wis,
+    DEX,
+    SAN
 };
 
 [System.Serializable]
@@ -23,18 +27,59 @@ public class Entity
     public CardOnFeild entityCard = null;
     public bool isPlayer;
     public Transform entityPopUpPosition;
-    public Dictionary<EntityStat, int> stat = new Dictionary<EntityStat, int>();
+    public Dictionary<EntityStat, int> entityStat = new Dictionary<EntityStat, int>();
     public List<SkillCard> skillCards;
+    public List<EquipmentCard> equipCards;
+
+    public int weaponLevel = 1;
+    public int armorLevel = 1;
+    public int artifactLevel = 1;
 
     public float actionPoint = 0;
 
+    public void UpdateEntity(CardOnFeild cof)
+    {
+        entityCard = cof;
+        EnemyCard entityData = (EnemyCard)cof.card;
+
+        skillCards.Clear();
+        equipCards.Clear();
+
+        foreach(SkillCard skill in entityData.enemySkills)
+        {
+            skillCards.Add(skill);
+        }
+
+        foreach (EquipmentCard equip in entityData.equipmentCards)
+        {
+            equipCards.Add(equip);
+        }
+
+        SetEntityStat(GameManager.instance.GetTurnCount()/2);
+
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
+    }
+
     public void SetEntityStat(int level)
     {
-        stat.Clear();
-        stat.Add(EntityStat.level, level);
-        stat.Add(EntityStat.maxHP, 100 + (50 * level));
-        stat.Add(EntityStat.currentHP, stat[EntityStat.maxHP]);
-        stat.Add(EntityStat.attack, (int)((1 + 0.2 * level) * 10));
+        foreach (EntityStat stat in Enum.GetValues(typeof(EntityStat)))
+        {
+            entityStat[stat] = 0;
+        }
+
+        entityStat[EntityStat.MaxHP] = 100;
+
+        foreach(EquipmentCard equip in equipCards)
+        {
+            foreach(EquipmentStats eStat in equip.equipStats)
+            {
+                entityStat[eStat.equipStat] += eStat.basePow;
+                entityStat[eStat.equipStat] += eStat.PowPL * level;
+            }
+        }
+
+        entityStat[EntityStat.CurrentHP] = entityStat[EntityStat.MaxHP];
+
         actionPoint = 0;
     }
 
@@ -45,16 +90,16 @@ public class Entity
         string damageAmount = "<color=red>" + damage.ToString();
         EntityPopUp(damageAmount);
 
-        int afterHp = stat[EntityStat.currentHP] - damage;
+        int afterHp = entityStat[EntityStat.CurrentHP] - damage;
 
         if (afterHp <= 0) 
         {
             afterHp = 0;
             Die();
         }
-        stat[EntityStat.currentHP] = afterHp;
+        entityStat[EntityStat.CurrentHP] = afterHp;
 
-        entityCard.UpdateHealthbar(stat[EntityStat.maxHP], afterHp);
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], afterHp);
     }
 
     public void TakeHeal(int heal)
@@ -94,8 +139,6 @@ public class EntityController : MonoBehaviour
     SkillController skillController = null;
 
     public GameObject popUpPrefeb;
-    public int initialPlayerLevel;
-    public int initialEnemyLevel;
 
     public Entity player;
     public Entity enemy;
@@ -108,7 +151,6 @@ public class EntityController : MonoBehaviour
     private void Start()
     {
         skillController = GetComponent<SkillController>();
-        SetPlayerStat();
     }
 
     private void Update()
@@ -129,17 +171,9 @@ public class EntityController : MonoBehaviour
         }
     }
 
-    public void SetPlayerStat()
-    {
-        CardManager.instance.SetPlayerCard();
-        player.SetEntityStat(initialPlayerLevel);
-        player.entityCard = CardManager.instance.playerCard;
-    }
-
     public void StartBattle()
     {
-        enemy.SetEntityStat(initialEnemyLevel + GameManager.instance.GetTurnCount());
-        enemy.entityCard = CardManager.instance.enemyCard;
+        enemy.UpdateEntity(CardManager.instance.enemyCard);
 
         apChargeBlock = 0;
     }
@@ -173,9 +207,12 @@ public class EntityController : MonoBehaviour
 
     public void RemoveApChargeBlock()
     {
-        apChargeBlock--;
-        if (apChargeBlock < 0) 
-            apChargeBlock = 0;
+        if (TurnManager.instance.currentState == GameState.Battle)
+        {
+            apChargeBlock--;
+            if (apChargeBlock < 0)
+                apChargeBlock = 0;
+        }
     }
 
     public void EntityDied(Entity entity)
@@ -202,7 +239,7 @@ public class EntityController : MonoBehaviour
 
     IEnumerator EndBattle()
     {
-        apChargeBlock += 1;
+        apChargeBlock += 5;
         yield return new WaitForSeconds(0.3f);
         enemy.EntityPopUp("<color=#606060>Died");
         yield return new WaitForSeconds(0.3f);

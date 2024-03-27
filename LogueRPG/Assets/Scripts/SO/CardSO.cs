@@ -11,6 +11,14 @@ public enum CardType
     Equip
 };
 
+public enum EquipType
+{
+    None = 0,
+    Weapon,
+    Armor,
+    Artifact
+}
+
 [System.Serializable]
 public class Card
 {
@@ -26,25 +34,45 @@ public class SkillCard : Card
 {
     public int cost;
     public int acc;
-    public SkillEffect[] skillEffects;
+    public List<SkillEffect> skillEffects;
 }
 
+[System.Serializable]
+public class SkillEffect
+{
+    public SkillType skillType;
+    public EntityStat skillStatType;
+    public int pow;
+    public GameObject vfx;
+}
 
 [System.Serializable]
 public class EnemyCard : Card
 {
-    public SkillCard[] enemySkills;
-    //public equip enemyEquip;
+    public List<EquipmentCard> equipmentCards;
+    public List<SkillCard> enemySkills;
 }
 
+[System.Serializable]
+public class EquipmentCard : Card
+{
+    public EquipType equipType;
+    public List<EquipmentStats> equipStats;
+}
+
+[System.Serializable]
+public class EquipmentStats
+{
+    public EntityStat equipStat;
+    public int basePow;
+    public int PowPL;
+}
 
 [System.Serializable]
 public class EventCard : Card
 {
-    //public CardType rewardType;
     public int eventLineIndex;
     public SkillCard skill;
-    //buff, debuff skill (��)
 }
 
 [CreateAssetMenu(fileName = "CardSO", menuName = "Scriptable Object/CardSO")]
@@ -55,8 +83,7 @@ public class CardSO : ScriptableObject
     public EnemyCard[] enemies; //�������� ��ų�� ��� �̸� �Է�
     public Card[] quests;
 
-
-    public SkillCard[] playerSkills;
+    public EnemyCard player;
     //n skillcard
     //r skill card
 }

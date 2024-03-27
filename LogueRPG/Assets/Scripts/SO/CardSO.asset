@@ -20,14 +20,14 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - name: Event
     context: []
-    weight: 1
+    weight: 0
     type: 3
     sprite: {fileID: 0}
   events:
   - name: Prayer
     context:
     - " \uC5B4\uC11C\uC624\uC138\uC694, \uC774\uBC29\uC778."
-    - "<color=green>*\uBE5B\uC774 \uB2F9\uC2E0\uC758 \uBAB8\uC744 \uAC10\uC2FC\uB2E4.</color>"
+    - "<color=green>*\uCCB4\uB825\uC774 \uD68C\uBCF5\uB418\uC5C8\uB2E4.</color>"
     - " \uC798\uAC00\uC138\uC694..."
     weight: 1
     type: 3
@@ -43,8 +43,9 @@ MonoBehaviour:
       acc: 100
       skillEffects:
       - skillType: 2
-        skillStatType: 4
+        skillStatType: 5
         pow: 30
+        vfx: {fileID: 101720521372148498, guid: e81dec0e559cf0041bfe40d4807a51ae, type: 3}
   enemies:
   - name: Sorcerer
     context:
@@ -52,61 +53,141 @@ MonoBehaviour:
     weight: 1
     type: 2
     sprite: {fileID: 21300000, guid: f614965f82cbca241afbd66cf2f3d068, type: 3}
-    enemySkills: []
-  - name: Knight
+    equipmentCards:
+    - name: "\uB0A1\uC740 \uCC45"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: e233ada80a15e754a80b909a432be4da, type: 3}
+      equipType: 1
+      equipStats:
+      - equipStat: 5
+        basePow: 50
+        PowPL: 3
+    - name: "\uB0A1\uC740 \uB85C\uBE0C"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: bc28869298956064dba54649eab4edc1, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 2
+        basePow: 512
+        PowPL: 128
+    - name: "\uC2A4\uC2B9\uC758 \uB450\uAC1C\uACE8"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 48ac426ad485c6f43947cfe29dcbe972, type: 3}
+      equipType: 3
+      equipStats: []
+    enemySkills:
+    - name: "\uBCA0\uAE30"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 39605b01c89417c4eafdea6fa3adff5f, type: 3}
+      cost: 1
+      acc: 100
+      skillEffects:
+      - skillType: 0
+        skillStatType: 5
+        pow: 150
+        vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
+    - name: "\uBD88\uD0DC\uC6B0\uAE30"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 657f8a2c3ee2d0340847425ef27508b6, type: 3}
+      cost: 2
+      acc: 100
+      skillEffects:
+      - skillType: 0
+        skillStatType: 5
+        pow: 500
+        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
+    - name: "\uD68C\uBCF5"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: db2dd78343cfaa247948e34de8bdeb06, type: 3}
+      cost: 3
+      acc: 100
+      skillEffects:
+      - skillType: 2
+        skillStatType: 5
+        pow: 200
+        vfx: {fileID: 101720521372148498, guid: e81dec0e559cf0041bfe40d4807a51ae, type: 3}
+  quests: []
+  player:
+    name: Player Name
     context:
     - .........!
     weight: 1
-    type: 2
+    type: 1
     sprite: {fileID: 21300000, guid: a9899da493bf9bb4395c303b7d8867a9, type: 3}
-    enemySkills: []
-  quests: []
-  playerSkills:
-  - name: "\uD718\uB450\uB974\uAE30"
-    context: []
-    weight: 0
-    type: 5
-    sprite: {fileID: 21300000, guid: 1d9f7ca3621dc1842b82666cb0421840, type: 3}
-    cost: 1
-    acc: 50
-    skillEffects:
-    - skillType: 0
-      skillStatType: 4
-      pow: 10
-  - name: "\uC774\uC5F0\uACA9"
-    context:
-    - "\uC800\uC8FC\uC758 \uB9D0\uB69D\uC744 \uAF42\uB294\uB2E4"
-    weight: 0
-    type: 5
-    sprite: {fileID: 21300000, guid: ea92ee10793edb34da645f380a2b777e, type: 3}
-    cost: 2
-    acc: 80
-    skillEffects:
-    - skillType: 0
-      skillStatType: 4
-      pow: 7
-    - skillType: 0
-      skillStatType: 4
-      pow: 7
-  - name: "\uC544\uBE0C\uB77C\uCE74\uD0C0\uBE0C\uB77C"
-    context: []
-    weight: 0
-    type: 5
-    sprite: {fileID: 21300000, guid: c38c9a6befc6eb341a2d362ea094a1f8, type: 3}
-    cost: 4
-    acc: 100
-    skillEffects:
-    - skillType: 0
-      skillStatType: 4
-      pow: 100
-  - name: Heal
-    context: []
-    weight: 0
-    type: 5
-    sprite: {fileID: 21300000, guid: c38c9a6befc6eb341a2d362ea094a1f8, type: 3}
-    cost: 3
-    acc: 100
-    skillEffects:
-    - skillType: 2
-      skillStatType: 4
-      pow: 30
+    equipmentCards:
+    - name: "\uB0A1\uC740 \uCC45"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: e233ada80a15e754a80b909a432be4da, type: 3}
+      equipType: 1
+      equipStats:
+      - equipStat: 5
+        basePow: 50
+        PowPL: 3
+    - name: "\uB0A1\uC740 \uB85C\uBE0C"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: bc28869298956064dba54649eab4edc1, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 2
+        basePow: 512
+        PowPL: 128
+    - name: "\uC2A4\uC2B9\uC758 \uB450\uAC1C\uACE8"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 48ac426ad485c6f43947cfe29dcbe972, type: 3}
+      equipType: 3
+      equipStats: []
+    enemySkills:
+    - name: "\uBCA0\uAE30"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 39605b01c89417c4eafdea6fa3adff5f, type: 3}
+      cost: 1
+      acc: 100
+      skillEffects:
+      - skillType: 0
+        skillStatType: 5
+        pow: 150
+        vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
+    - name: "\uBD88\uD0DC\uC6B0\uAE30"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 657f8a2c3ee2d0340847425ef27508b6, type: 3}
+      cost: 2
+      acc: 100
+      skillEffects:
+      - skillType: 0
+        skillStatType: 5
+        pow: 500
+        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
+    - name: "\uD68C\uBCF5"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: db2dd78343cfaa247948e34de8bdeb06, type: 3}
+      cost: 3
+      acc: 100
+      skillEffects:
+      - skillType: 2
+        skillStatType: 5
+        pow: 200
+        vfx: {fileID: 101720521372148498, guid: e81dec0e559cf0041bfe40d4807a51ae, type: 3}

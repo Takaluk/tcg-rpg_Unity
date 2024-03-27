@@ -12,14 +12,6 @@ public enum SkillType
     DefenseDebuff
 };
 
-[System.Serializable]
-public class SkillEffect
-{
-    public SkillType skillType;
-    public EntityStat skillStatType;
-    public int pow;
-}
-
 public class SkillController : MonoBehaviour
 {
     public void UseSkill(SkillCard skill, Entity target, Entity user)
@@ -38,35 +30,58 @@ public class SkillController : MonoBehaviour
 
     void DamageSkill(SkillEffect skillEffect, Entity target, Entity user)
     {
-        int damage = skillEffect.pow * user.stat[skillEffect.skillStatType];
+        float statBonusDamage = skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
+        int damage = 1 + (int)statBonusDamage;
 
         target.TakeDamage(damage);
     }
 
     void HealSkill(SkillEffect skillEffect, Entity user)
     {
-        int heal = skillEffect.pow * user.stat[skillEffect.skillStatType] - 352;
+        int heal = 1 + skillEffect.pow;
 
         user.TakeHeal(heal);
     }
 
+    float SkillVfxTiming(Entity target, GameObject skillPrefeb)
+    {
+        var vfx = Instantiate(skillPrefeb, target.entityCard.transform);
+        VfxData vData = vfx.GetComponent<VfxData>();
+        return vData.effectTiming;
+    }
+
     IEnumerator ProcessSkillEffects(SkillCard skill, Entity target, Entity user)
     {
+        GameManager.instance.AddControlBlock();
+
         foreach (SkillEffect skillEffect in skill.skillEffects)
         {
-            if (skillEffect.skillType == SkillType.Deal)
+            switch (skillEffect.skillType)
             {
-                if (target.stat[EntityStat.currentHP] == 0)
-                {
-                    break;
-                }
-                DamageSkill(skillEffect, target, user);
+                case SkillType.Deal:
+                    if (target.entityStat[EntityStat.CurrentHP] == 0)
+                    {
+                        break;
+                    }
+
+                    yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
+
+                    DamageSkill(skillEffect, target, user);
+
+                    yield return new WaitForSeconds(0.3f);
+                    continue;
+
+                case SkillType.Heal:
+
+                    yield return new WaitForSeconds(SkillVfxTiming(user, skillEffect.vfx));
+
+                    HealSkill(skillEffect, user);
+
+                    yield return new WaitForSeconds(0.3f);
+                    continue;
             }
-            else if (skillEffect.skillType == SkillType.Heal)
-                HealSkill(skillEffect, user);
-
-
-            yield return new WaitForSeconds(0.3f);
         }
+
+        GameManager.instance.RemoveControlBlock();
     }
 }

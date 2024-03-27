@@ -31,6 +31,8 @@ public class CardManager : MonoBehaviour
     public List<CardOnFeild> main;
     public List<CardOnFeild> hand;
     public List<CardOnFeild> selection;
+    public List<CardOnFeild> playerEquip;
+    public List<CardOnFeild> enemyEquip;
 
     public CardOnFeild playerCard;
     public CardOnFeild enemyCard;
@@ -51,14 +53,16 @@ public class CardManager : MonoBehaviour
 
     public Transform playerCardPosition;
     public Transform playerBattlePosition;
-    public Transform playerWeapon;
-    public Transform playerEquipment;
-    public Transform playerAccessory;
+    public Transform playerEquipSpawnPosition;
+    public Transform playerWeaponPosition;
+    public Transform playerArmorPosition;
+    public Transform playerArtifactPosition;
 
     public Transform enemyPosition;
-    public Transform enemyWeapon;
-    public Transform enemyEquipment;
-    public Transform enemyAccessory;
+    public Transform enemyEquipSpawnPosition;
+    public Transform enemyWeaponPosition;
+    public Transform enemyArmorPosition;
+    public Transform enemyArtifactPosition;
 
     public GameObject dummyBackCard;
     public GameObject EnemySkillPositions;
@@ -67,6 +71,11 @@ public class CardManager : MonoBehaviour
     System.Random random = new System.Random();
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
     WaitForSeconds delay03 = new WaitForSeconds(0.3f);
+
+    private void Start()
+    {
+        SetPlayerCard();
+    }
 
     private void Update()
     {
@@ -78,7 +87,8 @@ public class CardManager : MonoBehaviour
 
     public void SetPlayerCard()
     {
-        playerCard = DrawCard(GetRandomCard(CardType.Enemy), handSpawnPoint);
+        playerCard = DrawCard(cardSO.player, handSpawnPoint);
+        EntityController.instance.player.UpdateEntity(playerCard);
         playerCard.ShowHealthbar(true);
         CardMoveTo(playerCard, playerCardPosition);
     }
@@ -100,16 +110,31 @@ public class CardManager : MonoBehaviour
             dummyBackCard.SetActive(false);
             EnemySkillPositions.transform.DOMove(Vector3.zero, 0.3f);
             PlayerSkillPositions.transform.DOMove(Vector3.zero, 0.3f);
+
+            StartCoroutine(PutEquipCards());
         }
         else
         {
             if (playerCard != null)
             {
+                foreach (CardOnFeild cof in playerEquip)
+                {
+                    cof.DiscardTo(handSpawnPoint, Vector3.one);
+                }
+                playerEquip.Clear();
+
                 CardMoveTo(playerCard, playerCardPosition);
                 EntityController.instance.player.entityPopUpPosition = playerCardPosition;
+
             }
             if (enemyCard != null)
             {
+                foreach (CardOnFeild cof in enemyEquip)
+                {
+                    cof.DiscardTo(cardSpawnPoint, Vector3.one);
+                }
+                enemyEquip.Clear();
+
                 CardMoveTo(enemyCard, mainCardPosition);
                 enemyCard.ShowHealthbar(false);
             }
@@ -129,7 +154,6 @@ public class CardManager : MonoBehaviour
                 main[0].isMinimized = false;
 
                 CardMoveTo(main[0], mainCardPosition);
-                main[0].GetComponent<RenderOrder>().SetOriginOrder(-1);
             }
             else
             {
@@ -166,9 +190,21 @@ public class CardManager : MonoBehaviour
     {
         List<Card> cards = new List<Card>();
 
-        foreach (SkillCard skill in cardSO.playerSkills)
+        foreach (SkillCard skill in EntityController.instance.player.skillCards)
         {
             cards.Add(skill);
+        }
+
+        StartCoroutine(PutCardInHand(cards));
+    }
+
+    public void ShowEquipCards()
+    {
+        List<Card> cards = new List<Card>();
+
+        foreach (EquipmentCard equip in EntityController.instance.player.equipCards)
+        {
+            cards.Add(equip);
         }
 
         StartCoroutine(PutCardInHand(cards));
@@ -222,12 +258,12 @@ public class CardManager : MonoBehaviour
 
     IEnumerator PutCardInSelection(List<Card> cardList, bool isFront)
     {
+        GameManager.instance.AddControlBlock();
         foreach (Card card in cardList)
         {
             CardOnFeild cof = DrawCard(card, cardSpawnPoint);
             selection.Add(cof);
 
-            SetOriginOrder(selection);
             if (isFront)
             {
                 cof.isMinimized = true;
@@ -240,25 +276,54 @@ public class CardManager : MonoBehaviour
             }
             yield return delay03;
         }
+        GameManager.instance.RemoveControlBlock();
     }
 
-    IEnumerator PutCardInAlignment(List<Card> cardList, List<CardOnFeild> target, Transform leftPoint, Transform rightPoint, Transform spawnPoint)
+    IEnumerator PutEquipCards()
     {
-        foreach (Card card in cardList)
-        {
-            CardOnFeild cof = DrawCard(card, spawnPoint);
-            cof.isMinimized = true;
-            target.Add(cof);
+        GameManager.instance.AddControlBlock();
+        Entity player = EntityController.instance.player;
+        Entity enemy = EntityController.instance.player;
 
-            SetOriginOrder(target);
-            CardAlignment(target, leftPoint, rightPoint);
+        if (player.entityCard != null && enemy.entityCard != null)
+        {
+            for (int i = 0; i < player.equipCards.Count; i++)
+            {
+                playerEquip.Add(DrawCard(player.equipCards[i], playerEquipSpawnPosition));
+                playerEquip[i].gameObject.SetActive(false);
+            }
+            for (int i = 0; i < enemy.equipCards.Count; i++)
+            {
+                enemyEquip.Add(DrawCard(enemy.equipCards[i], enemyEquipSpawnPosition));
+                enemyEquip[i].gameObject.SetActive(false);
+            }
+
+
+            //변경 -> cof의 movetransform에 이동 시 gameobject active 추가..?
+            yield return delay03;
+            playerEquip[0].gameObject.SetActive(true);
+            CardMoveTo(playerEquip[0], playerWeaponPosition);
+            enemyEquip[0].gameObject.SetActive(true);
+            CardMoveTo(enemyEquip[0], enemyWeaponPosition);
             yield return delay01;
+            playerEquip[1].gameObject.SetActive(true);
+            CardMoveTo(playerEquip[1], playerArmorPosition);
+            enemyEquip[1].gameObject.SetActive(true);
+            CardMoveTo(enemyEquip[1], enemyArmorPosition);
+            yield return delay01;
+            playerEquip[2].gameObject.SetActive(true);
+            CardMoveTo(playerEquip[2], playerArtifactPosition);
+            enemyEquip[2].gameObject.SetActive(true);
+            CardMoveTo(enemyEquip[2], enemyArtifactPosition);
         }
+
+        GameManager.instance.RemoveControlBlock();
     }
 
     public CardOnFeild DrawCard(Card card, Transform spawnPoint)
     {
         var cardObject = Instantiate(cardPrefeb, spawnPoint.position, spawnPoint.rotation);
+        cardObject.transform.localScale = spawnPoint.localScale;
         var cardOnFeild = cardObject.GetComponent<CardOnFeild>();
         cardOnFeild.SetUp(card);
 
@@ -495,7 +560,7 @@ public class CardManager : MonoBehaviour
                     newX = 2.9f;
 
             Vector3 enlargePos = new Vector3(newX, newY, -50f);
-            cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 1.5f), false);
+            cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 1.8f), false);
         }
         else
             cof.MoveTransform(cof.originPRS, false, 0.3f); //ī�� �ǵ��ư��� Ȱ��ȭ/��Ȱ��ȭ

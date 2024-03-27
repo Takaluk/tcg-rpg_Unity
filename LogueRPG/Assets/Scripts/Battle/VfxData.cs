@@ -2,17 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Stat : MonoBehaviour
+public class VfxData : MonoBehaviour
 {
+    public float effectTiming;
     // Start is called before the first frame update
-    void Start()
+    public void DestroyAnimation()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Destroy(gameObject);
     }
 }
