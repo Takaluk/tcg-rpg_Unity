@@ -35,6 +35,8 @@ public class Entity
     public int armorLevel = 1;
     public int artifactLevel = 1;
 
+    public bool[] isEnchanted = {false, false, false};
+
     public float actionPoint = 0;
 
     public void UpdateEntity(CardOnFeild cof)
@@ -176,18 +178,35 @@ public class EntityController : MonoBehaviour
         enemy.UpdateEntity(CardManager.instance.enemyCard);
 
         apChargeBlock = 0;
+        player.isEnchanted[0] = false;
+        player.isEnchanted[1] = false;
+        player.isEnchanted[2] = false;
     }
 
-    public void PlayerUseSkill(SkillCard skill)
+    public bool PlayerUseSkill(SkillCard skill, int equipNum)
     {
+        if (equipNum < 3)
+        {
+            if (player.isEnchanted[equipNum])
+                return false;
+        }
+        //equipmentList에서 스킬 발동
+
         if (player.actionPoint >= skill.cost)
         {
+            player.isEnchanted[equipNum] = true;
+
             player.actionPoint -= skill.cost;
             player.entityCard.UpdateApGage(player.actionPoint);
             skillController.UseSkill(skill, enemy, player);
         }
         else
+        {
             player.EntityPopUp("<color=blue>Not enough AP");
+            return false;
+        }
+
+        return true;
     }
 
     public void EntityPopUp(string line, Transform popUpPosition )
@@ -195,12 +214,12 @@ public class EntityController : MonoBehaviour
         var popUp = Instantiate(popUpPrefeb, popUpPosition);
         TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
         popUpTmp.text = line;
-        Vector3 dest = new Vector3(popUpPosition.position.x, popUpPosition.position.y + 1f, popUpPosition.position.z);
+        Vector3 dest = new Vector3(popUpPosition.position.x, popUpPosition.position.y + 1f, popUpPosition.position.z - 20f);
         popUp.gameObject.transform.DOMove(dest, 1f)
             .OnComplete(() => Destroy(popUp));
     }
 
-    public void AddApChargeBlock()
+/*    public void AddApChargeBlock()
     {
         apChargeBlock++;
     }
@@ -213,7 +232,7 @@ public class EntityController : MonoBehaviour
             if (apChargeBlock < 0)
                 apChargeBlock = 0;
         }
-    }
+    }*/
 
     public void EntityDied(Entity entity)
     {

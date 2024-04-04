@@ -64,6 +64,7 @@ public class EquipmentCard : Card
 public class EquipmentStats
 {
     public EntityStat equipStat;
+    //enchant buff
     public int basePow;
     public int PowPL;
 }

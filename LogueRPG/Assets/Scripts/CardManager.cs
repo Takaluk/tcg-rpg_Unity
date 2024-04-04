@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 
 public class CardManager : MonoBehaviour
@@ -40,6 +41,9 @@ public class CardManager : MonoBehaviour
     public CardOnFeild chosenSelection;
     bool isMyCardDrag;
     bool onMyCardArea;
+    bool onMyWeaponArea;
+    bool onMyArmorArea;
+    bool onMyArtifactArea;
 
     public Transform cardSpawnPoint;
     public Transform selectionLeftPoint;
@@ -63,6 +67,14 @@ public class CardManager : MonoBehaviour
     public Transform enemyWeaponPosition;
     public Transform enemyArmorPosition;
     public Transform enemyArtifactPosition;
+
+    public Transform playerWeaponSkillPosition;
+    public Transform playerArmorSkillPosition;
+    public Transform playerArtifactSkillPosition;
+
+    public Transform enemyWeaponSkillPosition;
+    public Transform enemyArmorSkillPosition;
+    public Transform enemyArtifactSkillPosition;
 
     public GameObject dummyBackCard;
     public GameObject EnemySkillPositions;
@@ -139,8 +151,8 @@ public class CardManager : MonoBehaviour
                 enemyCard.ShowHealthbar(false);
             }
             dummyBackCard.SetActive(true);
-            EnemySkillPositions.transform.DOMove(Vector3.one * 15.5f, 0.3f);
-            PlayerSkillPositions.transform.DOMove(Vector3.one * -15.5f, 0.3f);
+            EnemySkillPositions.transform.DOMove(Vector3.one * 16.5f, 0.3f);
+            PlayerSkillPositions.transform.DOMove(Vector3.one * -16.5f, 0.3f);
         }
     }
 
@@ -236,6 +248,7 @@ public class CardManager : MonoBehaviour
         {
             CardOnFeild cof = DrawCard(card, handSpawnPoint);
             cof.isMinimized = true;
+            cof.isMoveable = true;
             hand.Add(cof);
 
             SetOriginOrder(hand);
@@ -291,33 +304,47 @@ public class CardManager : MonoBehaviour
             {
                 playerEquip.Add(DrawCard(player.equipCards[i], playerEquipSpawnPosition));
                 playerEquip[i].gameObject.SetActive(false);
-            }
-            for (int i = 0; i < enemy.equipCards.Count; i++)
-            {
+                playerEquip[i].isMinimized = true;
+
                 enemyEquip.Add(DrawCard(enemy.equipCards[i], enemyEquipSpawnPosition));
                 enemyEquip[i].gameObject.SetActive(false);
+                enemyEquip[i].isMinimized = true;
             }
-
-
-            //변경 -> cof의 movetransform에 이동 시 gameobject active 추가..?
             yield return delay03;
+
             playerEquip[0].gameObject.SetActive(true);
             CardMoveTo(playerEquip[0], playerWeaponPosition);
+            SetCardOriginPRS(playerEquip[0], playerWeaponPosition);
+
             enemyEquip[0].gameObject.SetActive(true);
             CardMoveTo(enemyEquip[0], enemyWeaponPosition);
+            SetCardOriginPRS(enemyEquip[0], enemyWeaponPosition);
             yield return delay01;
+
             playerEquip[1].gameObject.SetActive(true);
             CardMoveTo(playerEquip[1], playerArmorPosition);
+            SetCardOriginPRS(playerEquip[1], playerArmorPosition);
+
             enemyEquip[1].gameObject.SetActive(true);
             CardMoveTo(enemyEquip[1], enemyArmorPosition);
+            SetCardOriginPRS(enemyEquip[1], enemyArmorPosition);
             yield return delay01;
+
             playerEquip[2].gameObject.SetActive(true);
             CardMoveTo(playerEquip[2], playerArtifactPosition);
+            SetCardOriginPRS(playerEquip[2], playerArtifactPosition);
+
             enemyEquip[2].gameObject.SetActive(true);
             CardMoveTo(enemyEquip[2], enemyArtifactPosition);
+            SetCardOriginPRS(enemyEquip[2], enemyArtifactPosition);
         }
 
         GameManager.instance.RemoveControlBlock();
+    }
+
+    public void SetCardOriginPRS(CardOnFeild cof, Transform targetTransform)
+    {
+        cof.originPRS = new PRS(targetTransform.position, targetTransform.rotation, targetTransform.localScale);
     }
 
     public CardOnFeild DrawCard(Card card, Transform spawnPoint)
@@ -450,9 +477,6 @@ public class CardManager : MonoBehaviour
         return cards.Last();
     }
 
-
-    #region MyCardControl
-
     public void CardMouseDrag(CardOnFeild cof)
     {
         DetectCardArea();
@@ -466,19 +490,71 @@ public class CardManager : MonoBehaviour
         isMyCardDrag = false;
         EnLargeCard(false, cof);
 
-        if (!onMyCardArea && TurnManager.instance.currentState == GameState.Battle && cof.card.type == CardType.Skill)
+        if (!onMyCardArea && cof.isMoveable && TurnManager.instance.currentState == GameState.Battle && cof.card.type == CardType.Skill)
         {
-            SkillCard skill = (SkillCard) cof.card;
+            SkillCard skill = (SkillCard)cof.card;
 
-            EntityController.instance.PlayerUseSkill(skill);
+            int equipNum;
+            if (onMyWeaponArea)
+            {
+                equipNum = 0;
+            }
+            else if (onMyArmorArea)
+            {
+                equipNum = 1;
+            }
+            else if (onMyArtifactArea)
+            {
+                equipNum = 2;
+            }
+            else
+                return;
+
+            if (EntityController.instance.PlayerUseSkill(skill, equipNum))
+            {
+                SetPlayerSkillCard(cof, equipNum);
+            }
         }
+    }
 
-        EntityController.instance.RemoveApChargeBlock();
+    public void SetPlayerSkillCard(CardOnFeild cof, int equipNum)
+    {
+        Transform targetTransform = null;
+
+        if (equipNum == 0)
+            targetTransform = playerWeaponSkillPosition;
+        else if (equipNum == 1)
+            targetTransform = playerArmorSkillPosition;
+        else if (equipNum == 2)
+            targetTransform = playerArtifactSkillPosition;
+
+        PRS targetPRS = new PRS(targetTransform.position, targetTransform.rotation, targetTransform.localScale);
+        cof.MoveTransform(targetPRS, true, 0.1f);
+        cof.handPRS = cof.originPRS;
+        cof.originPRS = targetPRS;
+        cof.isMoveable = false;
+
+        StartCoroutine(UnsetSkillCard(cof, equipNum));
+    }
+
+    IEnumerator UnsetSkillCard(CardOnFeild cof, int equipNum)
+    {
+        SkillCard skill = (SkillCard)cof.card;
+
+        yield return new WaitForSeconds(skill.cost);
+
+        if (cof == null)
+            yield break;
+
+        cof.originPRS = cof.handPRS;
+        cof.MoveTransform(cof.originPRS, true, 0.1f);
+        cof.isMoveable = true;
+        EntityController.instance.player.isEnchanted[equipNum] = false;
     }
 
     private void CardDrag()
     {
-        if (!onMyCardArea)
+        if (!onMyCardArea && chosenHand.isMoveable)
         {
             chosenHand.MoveTransform(new PRS(Utils.MousePos, Utils.QI, chosenHand.originPRS.scale), false);
         }
@@ -498,7 +574,11 @@ public class CardManager : MonoBehaviour
                 return;
 
             case (CardType.Skill):
-                EntityController.instance.AddApChargeBlock();
+                //EntityController.instance.AddApChargeBlock();
+                return;
+
+            case (CardType.Equip):
+                //EntityController.instance.AddApChargeBlock();
                 return;
 
             case (CardType.Enemy):
@@ -542,8 +622,14 @@ public class CardManager : MonoBehaviour
     void DetectCardArea()
     {
         RaycastHit2D[] hits = Physics2D.RaycastAll(Utils.MousePos, Vector3.forward);
-        int layer = LayerMask.NameToLayer("DragCardArea");
-        onMyCardArea = Array.Exists(hits, x => x.collider.gameObject.layer == layer);
+        int hanLayer = LayerMask.NameToLayer("DragCardArea");
+        int weaponLayer = LayerMask.NameToLayer("WeapnoCardArea");
+        int armorLayer = LayerMask.NameToLayer("ArmorCardArea");
+        int artifactLayer = LayerMask.NameToLayer("ArtifactCardArea");
+        onMyCardArea = Array.Exists(hits, x => x.collider.gameObject.layer == hanLayer);
+        onMyWeaponArea = Array.Exists(hits, x => x.collider.gameObject.layer == weaponLayer);
+        onMyArmorArea = Array.Exists(hits, x => x.collider.gameObject.layer == armorLayer);
+        onMyArtifactArea = Array.Exists(hits, x => x.collider.gameObject.layer == artifactLayer);
     }
 
     void EnLargeCard(bool isEnlarge, CardOnFeild cof)
@@ -558,14 +644,20 @@ public class CardManager : MonoBehaviour
                     newX = -2.9f;
                 else
                     newX = 2.9f;
-
+            if (newY > 8.5f)
+            {
+                newY = 8.5f;
+            }
             Vector3 enlargePos = new Vector3(newX, newY, -50f);
             cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 1.8f), false);
+
+            Time.timeScale = 0f;
         }
         else
-            cof.MoveTransform(cof.originPRS, false, 0.3f); //ī�� �ǵ��ư��� Ȱ��ȭ/��Ȱ��ȭ
-
+        {
+            cof.MoveTransform(cof.originPRS, true, 0.1f);
+            Time.timeScale = 1f;
+        }
         cof.GetComponent<RenderOrder>().setMostFrontOrder(isEnlarge);
     }
-    #endregion
 }

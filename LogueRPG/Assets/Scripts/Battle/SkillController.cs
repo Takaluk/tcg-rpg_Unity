@@ -53,6 +53,7 @@ public class SkillController : MonoBehaviour
     IEnumerator ProcessSkillEffects(SkillCard skill, Entity target, Entity user)
     {
         GameManager.instance.AddControlBlock();
+        yield return new WaitForSeconds(0.1f);
 
         foreach (SkillEffect skillEffect in skill.skillEffects)
         {

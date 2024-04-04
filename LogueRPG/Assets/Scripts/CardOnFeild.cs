@@ -26,9 +26,11 @@ public class CardOnFeild : MonoBehaviour
 
     public Card card;
     public PRS originPRS;
+    public PRS handPRS;
 
     public int lineIndex = 0;
     public bool isMinimized = false;
+    public bool isMoveable = false;
     public float textSpeed = 0.3f;
 
 
@@ -98,6 +100,7 @@ public class CardOnFeild : MonoBehaviour
 
     public void DiscardTo(Transform discardPoint, Vector3 targetScale)
     {
+        CardManager.instance.CardMouseUp(this);
         GameManager.instance.AddControlBlock();
 
         Quaternion targetRotation = Quaternion.Euler(0f, -180f, 0f);
@@ -152,7 +155,7 @@ public class CardOnFeild : MonoBehaviour
 
                 if (lineIndex == ecard.eventLineIndex)
                 {
-                    EntityController.instance.PlayerUseSkill(ecard.skill);
+                    EntityController.instance.PlayerUseSkill(ecard.skill,3);
                 }
             }
         }
