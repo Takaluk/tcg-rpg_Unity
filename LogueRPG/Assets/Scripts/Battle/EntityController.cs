@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public enum EntityStat
 {
@@ -11,7 +12,7 @@ public enum EntityStat
     Level,
     MaxHP,
     CurrentHP,
-    APCharge,
+    APChargeSpeed,
 
     Str,
     Int,
@@ -31,10 +32,9 @@ public class Entity
     public List<SkillCard> skillCards;
     public List<EquipmentCard> equipCards;
 
-    public int weaponLevel = 1;
-    public int armorLevel = 1;
-    public int artifactLevel = 1;
-
+    public int[] entityEquipLevels = { 1, 1, 1 };
+    public int[] currentEquipDurabilities = { 0, 0, 0 };
+    public int[] maxEquipDurabilities = { 0, 0, 0 };
     public bool[] isEnchanted = {false, false, false};
 
     public float actionPoint = 0;
@@ -64,6 +64,12 @@ public class Entity
 
     public void SetEntityStat(int level)
     {
+        for (int i = 0; i < 3; i++)
+        {
+            entityEquipLevels[i] = level;
+            maxEquipDurabilities[i] = 0;
+        }
+
         foreach (EntityStat stat in Enum.GetValues(typeof(EntityStat)))
         {
             entityStat[stat] = 0;
@@ -71,9 +77,9 @@ public class Entity
 
         entityStat[EntityStat.MaxHP] = 100;
 
-        foreach(EquipmentCard equip in equipCards)
+        for (int i =0; i< 3; i++)
         {
-            foreach(EquipmentStats eStat in equip.equipStats)
+            foreach(EquipmentStats eStat in equipCards[i].equipStats)
             {
                 entityStat[eStat.equipStat] += eStat.basePow;
                 entityStat[eStat.equipStat] += eStat.PowPL * level;
@@ -82,14 +88,37 @@ public class Entity
 
         entityStat[EntityStat.CurrentHP] = entityStat[EntityStat.MaxHP];
 
+        for (int i = 0; i < 3; i++)
+        {
+            maxEquipDurabilities[i] += entityStat[EntityStat.MaxHP] * equipCards[i].Durability / 100;
+            currentEquipDurabilities[i] = maxEquipDurabilities[i];
+        }
+
         actionPoint = 0;
+        entityStat[EntityStat.APChargeSpeed] += 50;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(SkillType skillType, int damage, int equipNum = 3)
     {
         EntityController.instance.DamageReaction(this);
 
-        string damageAmount = "<color=red>" + damage.ToString();
+        string damageAmount = "";
+
+        switch (skillType)
+        {
+            case (SkillType.PscDamage):
+                damageAmount += "<color=red>" + damage.ToString();
+                if (equipNum < 3)
+                {
+                    TakeDurabilityDamage(equipNum, damage);
+                }
+                break;
+            case (SkillType.MgcDamage):
+                damageAmount += "<color=#7b68ee>" + damage.ToString();
+                break;
+        }
+
+
         EntityPopUp(damageAmount);
 
         int afterHp = entityStat[EntityStat.CurrentHP] - damage;
@@ -102,6 +131,32 @@ public class Entity
         entityStat[EntityStat.CurrentHP] = afterHp;
 
         entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], afterHp);
+    }
+
+    public void TakeDurabilityDamage(int equipNum, int damage)
+    {
+        if (currentEquipDurabilities[equipNum] == 0)
+            return;
+
+        currentEquipDurabilities[equipNum] -= damage;
+        EntityController.instance.EquipDamageReaction(this, equipNum);
+
+        if (currentEquipDurabilities[equipNum] <= 0)
+        {
+            currentEquipDurabilities[equipNum] = 0;
+            if (isPlayer)
+                CardManager.instance.playerEquip[equipNum].CardPopUp("<color=grey>파괴됨!");
+            else
+                CardManager.instance.enemyEquip[equipNum].CardPopUp("<color=grey>파괴됨!");
+        }
+
+        if (currentEquipDurabilities[0] == 0 && currentEquipDurabilities[1] == 0 && currentEquipDurabilities[2] == 0)
+            Debug.Log("all broken");
+
+        if (isPlayer)
+            CardManager.instance.playerEquip[equipNum].UpdateEquipDurability(maxEquipDurabilities[equipNum], currentEquipDurabilities[equipNum]);
+        else
+            CardManager.instance.enemyEquip[equipNum].UpdateEquipDurability(maxEquipDurabilities[equipNum], currentEquipDurabilities[equipNum]);
     }
 
     public void TakeHeal(int heal)
@@ -117,7 +172,7 @@ public class Entity
 
     public void EntityPopUp(string line)
     {
-        EntityController.instance.EntityPopUp(line, entityPopUpPosition);
+        entityCard.CardPopUp(line);
     }
 }
 
@@ -145,9 +200,6 @@ public class EntityController : MonoBehaviour
     public Entity player;
     public Entity enemy;
 
-    public float apChargeSpeed = 2f;
-    public int apChargeBlock = 1;
-
     public Material hitFlashMaterial;
 
     private void Start()
@@ -159,25 +211,29 @@ public class EntityController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            player.TakeDamage(100);
+            player.TakeDamage(SkillType.PscDamage,100);
         }
 
-        if (apChargeBlock == 0)
+        if (TurnManager.instance.currentState == GameState.Battle)
         {
-            if (player.actionPoint < 4)
-                player.actionPoint += apChargeSpeed * Time.deltaTime;
+            if (player.actionPoint < 4f)
+                player.actionPoint += (player.entityStat[EntityStat.APChargeSpeed] / 60f) * Time.deltaTime;
             else
                 player.actionPoint = 4f;
 
             player.entityCard.UpdateApGage(player.actionPoint);
+
+            if (enemy.actionPoint < 4f)
+                enemy.actionPoint += (enemy.entityStat[EntityStat.APChargeSpeed] / 60f) * Time.deltaTime;
+            else
+                enemy.actionPoint = 4f;
+            enemy.entityCard.UpdateApGage(enemy.actionPoint);
         }
     }
 
     public void StartBattle()
     {
         enemy.UpdateEntity(CardManager.instance.enemyCard);
-
-        apChargeBlock = 0;
         player.isEnchanted[0] = false;
         player.isEnchanted[1] = false;
         player.isEnchanted[2] = false;
@@ -198,7 +254,7 @@ public class EntityController : MonoBehaviour
 
             player.actionPoint -= skill.cost;
             player.entityCard.UpdateApGage(player.actionPoint);
-            skillController.UseSkill(skill, enemy, player);
+            skillController.UseSkill(skill, enemy, player, equipNum);
         }
         else
         {
@@ -209,7 +265,7 @@ public class EntityController : MonoBehaviour
         return true;
     }
 
-    public void EntityPopUp(string line, Transform popUpPosition )
+/*    public void EntityPopUp(string line, Transform popUpPosition )
     {
         var popUp = Instantiate(popUpPrefeb, popUpPosition);
         TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
@@ -217,21 +273,6 @@ public class EntityController : MonoBehaviour
         Vector3 dest = new Vector3(popUpPosition.position.x, popUpPosition.position.y + 1f, popUpPosition.position.z - 20f);
         popUp.gameObject.transform.DOMove(dest, 1f)
             .OnComplete(() => Destroy(popUp));
-    }
-
-/*    public void AddApChargeBlock()
-    {
-        apChargeBlock++;
-    }
-
-    public void RemoveApChargeBlock()
-    {
-        if (TurnManager.instance.currentState == GameState.Battle)
-        {
-            apChargeBlock--;
-            if (apChargeBlock < 0)
-                apChargeBlock = 0;
-        }
     }*/
 
     public void EntityDied(Entity entity)
@@ -247,6 +288,14 @@ public class EntityController : MonoBehaviour
         StartCoroutine(DamageReactionEffect(entity));
     }
 
+    public void EquipDamageReaction(Entity entity, int equipNum)
+    {
+        if (entity.isPlayer)
+            StartCoroutine(EquipDamageReactionEffect(CardManager.instance.playerEquip[equipNum]));
+        else
+            StartCoroutine(EquipDamageReactionEffect(CardManager.instance.enemyEquip[equipNum]));
+    }
+
     IEnumerator DamageReactionEffect(Entity entity)
     {
         entity.entityCard.characterSprite.transform.DOShakePosition(0.1f);
@@ -256,14 +305,23 @@ public class EntityController : MonoBehaviour
         entity.entityCard.characterSprite.material = org;
     }
 
+    IEnumerator EquipDamageReactionEffect(CardOnFeild equipCard)
+    {
+        equipCard.transform.DOShakePosition(0.1f);
+        yield return new WaitForSeconds(0.1f);
+    }
+
     IEnumerator EndBattle()
     {
-        apChargeBlock += 5;
+        GameManager.instance.AddControlBlock();
+
         yield return new WaitForSeconds(0.3f);
         enemy.EntityPopUp("<color=#606060>Died");
         yield return new WaitForSeconds(0.3f);
         TurnManager.instance.ChangeTurnTo(GameState.Event);
         CardManager.instance.main[0].NextDialogue();
+
+        GameManager.instance.RemoveControlBlock();
     }
 
     IEnumerator GameOver()

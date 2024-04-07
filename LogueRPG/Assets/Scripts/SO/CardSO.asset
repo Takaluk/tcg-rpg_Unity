@@ -64,6 +64,7 @@ MonoBehaviour:
       - equipStat: 5
         basePow: 50
         PowPL: 3
+      Durability: 20
     - name: "\uB0A1\uC740 \uB85C\uBE0C"
       context: []
       weight: 0
@@ -74,6 +75,7 @@ MonoBehaviour:
       - equipStat: 2
         basePow: 512
         PowPL: 128
+      Durability: 60
     - name: "\uC2A4\uC2B9\uC758 \uB450\uAC1C\uACE8"
       context: []
       weight: 0
@@ -81,6 +83,7 @@ MonoBehaviour:
       sprite: {fileID: 21300000, guid: 48ac426ad485c6f43947cfe29dcbe972, type: 3}
       equipType: 3
       equipStats: []
+      Durability: 10
     enemySkills:
     - name: "\uBCA0\uAE30"
       context: []
@@ -137,6 +140,16 @@ MonoBehaviour:
       - equipStat: 5
         basePow: 50
         PowPL: 3
+      - equipStat: 6
+        basePow: 50
+        PowPL: 3
+      - equipStat: 6
+        basePow: 50
+        PowPL: 3
+      - equipStat: 6
+        basePow: 50
+        PowPL: 3
+      Durability: 0
     - name: "\uB0A1\uC740 \uB85C\uBE0C"
       context: []
       weight: 0
@@ -147,6 +160,7 @@ MonoBehaviour:
       - equipStat: 2
         basePow: 512
         PowPL: 128
+      Durability: 0
     - name: "\uC2A4\uC2B9\uC758 \uB450\uAC1C\uACE8"
       context: []
       weight: 0
@@ -154,6 +168,7 @@ MonoBehaviour:
       sprite: {fileID: 21300000, guid: 48ac426ad485c6f43947cfe29dcbe972, type: 3}
       equipType: 3
       equipStats: []
+      Durability: 0
     enemySkills:
     - name: "\uBCA0\uAE30"
       context: []
@@ -167,6 +182,22 @@ MonoBehaviour:
         skillStatType: 5
         pow: 300
         vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
+      - skillType: 0
+        skillStatType: 5
+        pow: 300
+        vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
+    - name: "\uBD88\uD0DC\uC6B0\uAE30"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 657f8a2c3ee2d0340847425ef27508b6, type: 3}
+      cost: 2
+      acc: 100
+      skillEffects:
+      - skillType: 1
+        skillStatType: 6
+        pow: 800
+        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
     - name: "\uBD88\uD0DC\uC6B0\uAE30"
       context: []
       weight: 0
@@ -187,7 +218,19 @@ MonoBehaviour:
       cost: 3
       acc: 100
       skillEffects:
-      - skillType: 2
-        skillStatType: 5
+      - skillType: 3
+        skillStatType: 2
+        pow: 50
+        vfx: {fileID: 101720521372148498, guid: e81dec0e559cf0041bfe40d4807a51ae, type: 3}
+    - name: "\uD68C\uBCF5"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: db2dd78343cfaa247948e34de8bdeb06, type: 3}
+      cost: 3
+      acc: 100
+      skillEffects:
+      - skillType: 3
+        skillStatType: 2
         pow: 200
         vfx: {fileID: 101720521372148498, guid: e81dec0e559cf0041bfe40d4807a51ae, type: 3}

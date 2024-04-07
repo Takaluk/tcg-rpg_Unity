@@ -46,9 +46,9 @@ public class TurnManager : MonoBehaviour
 
             case GameState.Battle:
                 currentState = GameState.Battle;
+                EntityController.instance.StartBattle();
                 CardManager.instance.SetBattlePosition(true);
                 CardManager.instance.ShowSkillCards();
-                EntityController.instance.StartBattle();
                 return;
 
             case GameState.Event:

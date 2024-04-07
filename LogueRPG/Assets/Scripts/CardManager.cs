@@ -58,27 +58,17 @@ public class CardManager : MonoBehaviour
     public Transform playerCardPosition;
     public Transform playerBattlePosition;
     public Transform playerEquipSpawnPosition;
-    public Transform playerWeaponPosition;
-    public Transform playerArmorPosition;
-    public Transform playerArtifactPosition;
+    public Transform[] playerEquipPositions;
+    public Transform[] playerEquipSkillPositions;
 
     public Transform enemyPosition;
     public Transform enemyEquipSpawnPosition;
-    public Transform enemyWeaponPosition;
-    public Transform enemyArmorPosition;
-    public Transform enemyArtifactPosition;
-
-    public Transform playerWeaponSkillPosition;
-    public Transform playerArmorSkillPosition;
-    public Transform playerArtifactSkillPosition;
-
-    public Transform enemyWeaponSkillPosition;
-    public Transform enemyArmorSkillPosition;
-    public Transform enemyArtifactSkillPosition;
+    public Transform[] enemyEquipPositions;
+    public Transform[] enemyEquipSkillPositions;
 
     public GameObject dummyBackCard;
-    public GameObject EnemySkillPositions;
-    public GameObject PlayerSkillPositions;
+    public GameObject playerSkillBackground;
+    public GameObject enemySkillBackground;
 
     System.Random random = new System.Random();
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
@@ -120,8 +110,8 @@ public class CardManager : MonoBehaviour
                 enemyCard.ShowHealthbar(true);
             }
             dummyBackCard.SetActive(false);
-            EnemySkillPositions.transform.DOMove(Vector3.zero, 0.3f);
-            PlayerSkillPositions.transform.DOMove(Vector3.zero, 0.3f);
+            playerSkillBackground.transform.DOMove(Vector3.zero, 0.3f);
+            enemySkillBackground.transform.DOMove(Vector3.zero, 0.3f);
 
             StartCoroutine(PutEquipCards());
         }
@@ -151,8 +141,8 @@ public class CardManager : MonoBehaviour
                 enemyCard.ShowHealthbar(false);
             }
             dummyBackCard.SetActive(true);
-            EnemySkillPositions.transform.DOMove(Vector3.one * 16.5f, 0.3f);
-            PlayerSkillPositions.transform.DOMove(Vector3.one * -16.5f, 0.3f);
+            enemySkillBackground.transform.DOMove(Vector3.one * 16.5f, 0.3f);
+            playerSkillBackground.transform.DOMove(Vector3.one * -16.5f, 0.3f);
         }
     }
 
@@ -230,6 +220,7 @@ public class CardManager : MonoBehaviour
 
     IEnumerator PutCardInHand(List<Card> CardList)
     {
+        GameManager.instance.AddControlBlock();
         if (hand.Count > 0)
         {
             hand.Reverse();
@@ -255,9 +246,13 @@ public class CardManager : MonoBehaviour
             CardAlignment(hand, handLeftPoint, handRightPoint);
             yield return delay01;
         }
+
+        yield return delay03;
+        GameManager.instance.RemoveControlBlock();
     }
     IEnumerator PutHandInInven()
     {
+        GameManager.instance.AddControlBlock();
         hand.Reverse();
 
         foreach (CardOnFeild cof in hand)
@@ -267,6 +262,7 @@ public class CardManager : MonoBehaviour
         }
 
         hand.Clear();
+        GameManager.instance.RemoveControlBlock();
     }
 
     IEnumerator PutCardInSelection(List<Card> cardList, bool isFront)
@@ -296,47 +292,40 @@ public class CardManager : MonoBehaviour
     {
         GameManager.instance.AddControlBlock();
         Entity player = EntityController.instance.player;
-        Entity enemy = EntityController.instance.player;
+        Entity enemy = EntityController.instance.enemy;
 
         if (player.entityCard != null && enemy.entityCard != null)
         {
-            for (int i = 0; i < player.equipCards.Count; i++)
+            for (int i = 0; i < 3; i++)
             {
                 playerEquip.Add(DrawCard(player.equipCards[i], playerEquipSpawnPosition));
+                playerEquip[i].SetEquipDescription(player.entityEquipLevels[i]);
                 playerEquip[i].gameObject.SetActive(false);
                 playerEquip[i].isMinimized = true;
+                playerEquip[i].ShowEquipDurability(true);
 
                 enemyEquip.Add(DrawCard(enemy.equipCards[i], enemyEquipSpawnPosition));
+                enemyEquip[i].SetEquipDescription(enemy.entityEquipLevels[i]);
                 enemyEquip[i].gameObject.SetActive(false);
                 enemyEquip[i].isMinimized = true;
+                enemyEquip[i].ShowEquipDurability(true);
             }
+
+
             yield return delay03;
 
-            playerEquip[0].gameObject.SetActive(true);
-            CardMoveTo(playerEquip[0], playerWeaponPosition);
-            SetCardOriginPRS(playerEquip[0], playerWeaponPosition);
+            for (int i = 0; i < 3; i++)
+            {
+                playerEquip[i].gameObject.SetActive(true);
+                CardMoveTo(playerEquip[i], playerEquipPositions[i]);
+                SetCardOriginPRS(playerEquip[i], playerEquipPositions[i]);
 
-            enemyEquip[0].gameObject.SetActive(true);
-            CardMoveTo(enemyEquip[0], enemyWeaponPosition);
-            SetCardOriginPRS(enemyEquip[0], enemyWeaponPosition);
-            yield return delay01;
+                enemyEquip[i].gameObject.SetActive(true);
+                CardMoveTo(enemyEquip[i], enemyEquipPositions[i]);
+                SetCardOriginPRS(enemyEquip[i], enemyEquipPositions[i]);
 
-            playerEquip[1].gameObject.SetActive(true);
-            CardMoveTo(playerEquip[1], playerArmorPosition);
-            SetCardOriginPRS(playerEquip[1], playerArmorPosition);
-
-            enemyEquip[1].gameObject.SetActive(true);
-            CardMoveTo(enemyEquip[1], enemyArmorPosition);
-            SetCardOriginPRS(enemyEquip[1], enemyArmorPosition);
-            yield return delay01;
-
-            playerEquip[2].gameObject.SetActive(true);
-            CardMoveTo(playerEquip[2], playerArtifactPosition);
-            SetCardOriginPRS(playerEquip[2], playerArtifactPosition);
-
-            enemyEquip[2].gameObject.SetActive(true);
-            CardMoveTo(enemyEquip[2], enemyArtifactPosition);
-            SetCardOriginPRS(enemyEquip[2], enemyArtifactPosition);
+                yield return delay01;
+            }
         }
 
         GameManager.instance.RemoveControlBlock();
@@ -521,15 +510,10 @@ public class CardManager : MonoBehaviour
     {
         Transform targetTransform = null;
 
-        if (equipNum == 0)
-            targetTransform = playerWeaponSkillPosition;
-        else if (equipNum == 1)
-            targetTransform = playerArmorSkillPosition;
-        else if (equipNum == 2)
-            targetTransform = playerArtifactSkillPosition;
+        targetTransform = playerEquipSkillPositions[equipNum];
 
         PRS targetPRS = new PRS(targetTransform.position, targetTransform.rotation, targetTransform.localScale);
-        cof.MoveTransform(targetPRS, true, 0.1f);
+        cof.MoveTransform(targetPRS, true, 0.2f);
         cof.handPRS = cof.originPRS;
         cof.originPRS = targetPRS;
         cof.isMoveable = false;
@@ -539,13 +523,15 @@ public class CardManager : MonoBehaviour
 
     IEnumerator UnsetSkillCard(CardOnFeild cof, int equipNum)
     {
-        SkillCard skill = (SkillCard)cof.card;
+        yield return new WaitForSeconds(0.2f);
+        CameraEffectManager.instance.ShakeCam(0.1f, 0.5f, 30);
 
-        yield return new WaitForSeconds(skill.cost);
+        SkillCard skill = (SkillCard)cof.card;
+        cof.StartCoolDown(skill.cost * 3);
+        yield return new WaitForSeconds(skill.cost * 3);
 
         if (cof == null)
             yield break;
-
         cof.originPRS = cof.handPRS;
         cof.MoveTransform(cof.originPRS, true, 0.1f);
         cof.isMoveable = true;
@@ -574,11 +560,9 @@ public class CardManager : MonoBehaviour
                 return;
 
             case (CardType.Skill):
-                //EntityController.instance.AddApChargeBlock();
                 return;
 
             case (CardType.Equip):
-                //EntityController.instance.AddApChargeBlock();
                 return;
 
             case (CardType.Enemy):
@@ -608,15 +592,6 @@ public class CardManager : MonoBehaviour
                 Debug.Log("unkown card type");
                 return;
         }
-
-        // if (onMyCardArea)
-        // {
-        //     chosenHand = cof;
-        // }
-        // else
-        // {
-        //     chosenSelection = cof;
-        // }
     }
 
     void DetectCardArea()

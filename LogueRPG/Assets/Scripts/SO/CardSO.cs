@@ -58,6 +58,7 @@ public class EquipmentCard : Card
 {
     public EquipType equipType;
     public List<EquipmentStats> equipStats;
+    public int Durability;
 }
 
 [System.Serializable]

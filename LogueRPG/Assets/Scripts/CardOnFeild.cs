@@ -20,8 +20,11 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] TMP_Text currentHpTMP;
     [SerializeField] TMP_Text maxHpTMP;
     [SerializeField] GameObject healthBar;
+    [SerializeField] GameObject equipDurability;
     [SerializeField] Image healthbarSprite;
+    [SerializeField] Image durabilitySprite;
     [SerializeField] Image[] manaGageSprites;
+    [SerializeField] Image coolDownSprite;
     public SpriteRenderer characterSprite;
 
     public Card card;
@@ -32,6 +35,8 @@ public class CardOnFeild : MonoBehaviour
     public bool isMinimized = false;
     public bool isMoveable = false;
     public float textSpeed = 0.3f;
+
+    [SerializeField] GameObject popUpPrefeb;
 
 
     private void OnDestroy()
@@ -64,10 +69,45 @@ public class CardOnFeild : MonoBehaviour
                 return;
             case (CardType.Skill):
                 backgroundSprite.sprite = background[0];
-
                 SkillCard skill = (SkillCard)card;
                 skillCostTMP.text = "<color=#1E90FF>" + skill.cost.ToString();
                 cardTypeTMP.text = "<color=#1E90FF>Skill";
+
+                string skillDescription = "";
+                foreach(SkillEffect skillEffect in skill.skillEffects)
+                {
+                    switch (skillEffect.skillType)
+                    {
+                        case (SkillType.PscDamage):
+                            skillDescription += "적에게 <color=red>물리 피해</color>";
+                            break;
+                        case (SkillType.MgcDamage):
+                            skillDescription += "적에게 <color=#7b68ee>마법 피해</color>";
+                            break;
+                        case (SkillType.Heal):
+                            skillDescription += "자신에게 <color=green>체력 회복</color>";
+                            break;
+                    }
+
+                    skillDescription += "(";
+
+                    switch (skillEffect.skillStatType)
+                    {
+                        case (EntityStat.Str):
+                            skillDescription += "<color=red>Str</color>/";
+                            break;
+                        case (EntityStat.Int):
+                            skillDescription += "<color=#7b68ee>Int</color>/";
+                            break;
+                        case (EntityStat.MaxHP):
+                            skillDescription += "<color=green>MaxHP</color>/";
+                            break;
+                    }
+                    skillDescription += skillEffect.pow;
+                    skillDescription += ")\n";
+                }
+                skillDescription += "(acc/" + skill.acc + ")";
+                descriptionTMP.text = skillDescription;
                 return;
             case (CardType.Event):
                 backgroundSprite.sprite = background[1];
@@ -80,15 +120,39 @@ public class CardOnFeild : MonoBehaviour
         }
     }
 
+    public void SetEquipDescription(int level)
+    {
+        EquipmentCard equip = (EquipmentCard)card;
+        string equipDescription = "";
+        foreach (EquipmentStats stat in equip.equipStats)
+        {
+            switch (stat.equipStat)
+            {
+                case (EntityStat.MaxHP):
+                    equipDescription += "<color=green>MaxHP+";
+                    break;
+                case (EntityStat.Str):
+                    equipDescription += "<color=red>Str+";
+                    break;
+                case (EntityStat.Int):
+                    equipDescription += "<color=#1E90FF>Int+";
+                    break;
+            }
+            int equipPow = stat.basePow + stat.PowPL * level;
+
+            equipDescription += equipPow + "\n";
+        }
+        descriptionTMP.text = equipDescription;
+    }
+
     public void MoveTransform(PRS prs, bool useDotween, float dotweenTime = 0)
     {
 
         if (useDotween)
         {
-            GameManager.instance.AddControlBlock();
             transform.DOMove(prs.pos, dotweenTime);
             transform.DORotateQuaternion(prs.rot, dotweenTime);
-            transform.DOScale(prs.scale, dotweenTime).OnComplete(() => GameManager.instance.RemoveControlBlock());
+            transform.DOScale(prs.scale, dotweenTime);
         }
         else
         {
@@ -100,7 +164,6 @@ public class CardOnFeild : MonoBehaviour
 
     public void DiscardTo(Transform discardPoint, Vector3 targetScale)
     {
-        CardManager.instance.CardMouseUp(this);
         GameManager.instance.AddControlBlock();
 
         Quaternion targetRotation = Quaternion.Euler(0f, -180f, 0f);
@@ -199,6 +262,17 @@ public class CardOnFeild : MonoBehaviour
     }
     #endregion
 
+    public void CardPopUp(string line)
+    {
+        Transform popUpPosition = transform;
+        var popUp = Instantiate(popUpPrefeb, popUpPosition);
+        TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
+        popUpTmp.text = line;
+        Vector3 dest = new Vector3(popUpPosition.position.x, popUpPosition.position.y + 1f, popUpPosition.position.z - 20f);
+        popUp.gameObject.transform.DOMove(dest, 1f)
+            .OnComplete(() => Destroy(popUp));
+    }
+
     public void ShowHealthbar(bool on)
     {
         healthBar.SetActive(on);
@@ -212,11 +286,39 @@ public class CardOnFeild : MonoBehaviour
         healthbarSprite.fillAmount = healthbarAmount;
     }
 
+    public void ShowEquipDurability(bool on)
+    {
+        equipDurability.SetActive(on);
+    }
+
+    public void UpdateEquipDurability(float maxDurability, float currentDurability)
+    {
+        float durabilityAmount = currentDurability / maxDurability;
+        durabilitySprite.fillAmount = durabilityAmount;
+    }
+
     public void UpdateApGage(float actionPoints)
     {
         manaGageSprites[0].fillAmount = actionPoints;
         manaGageSprites[1].fillAmount = actionPoints - 1;
         manaGageSprites[2].fillAmount = actionPoints - 2;
         manaGageSprites[3].fillAmount = actionPoints - 3;
+    }
+
+    public void StartCoolDown(float coolTime)
+    {
+        StartCoroutine(CoolDown(coolTime));
+    }
+
+    IEnumerator CoolDown(float coolTime)
+    {
+        float currentTime = coolTime;
+        coolDownSprite.fillAmount = currentTime/coolTime;
+        while (currentTime > 0)
+        {
+            yield return new WaitForSeconds(0.1f);
+            currentTime -= 0.1f;
+            coolDownSprite.fillAmount = currentTime / coolTime;
+        }
     }
 }

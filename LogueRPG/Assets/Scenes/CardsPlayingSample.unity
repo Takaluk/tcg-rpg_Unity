@@ -180,7 +180,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.9, y: -4.75, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.55, y: 0.55, z: 0.55}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 165191850}
@@ -212,7 +212,7 @@ Transform:
   m_GameObject: {fileID: 38264459}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7, y: 0, z: 0}
+  m_LocalPosition: {x: 6.3, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -228,7 +228,7 @@ GameObject:
   m_Component:
   - component: {fileID: 82340843}
   m_Layer: 0
-  m_Name: EnemySkillPosition
+  m_Name: EnemySkillBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -588,7 +588,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.9, y: -0.75, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.55, y: 0.55, z: 0.55}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 890704018}
@@ -766,7 +766,7 @@ Transform:
   m_GameObject: {fileID: 210298658}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7, y: 0, z: 0}
+  m_LocalPosition: {x: 6.3, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -2265,9 +2265,7 @@ MonoBehaviour:
     entityPopUpPosition: {fileID: 835140224}
     skillCards: []
     equipCards: []
-    weaponLevel: 0
-    armorLevel: 0
-    artifactLevel: 0
+    equipLevels: 010000000100000001000000
     isEnchanted: 000000
     actionPoint: 0
   enemy:
@@ -2276,14 +2274,12 @@ MonoBehaviour:
     entityPopUpPosition: {fileID: 750972841}
     skillCards: []
     equipCards: []
-    weaponLevel: 0
-    armorLevel: 0
-    artifactLevel: 0
+    equipLevels: 010000000100000001000000
     isEnchanted: 000000
     actionPoint: 0
-  apChargeSpeed: 1
-  apChargeBlock: 1
   hitFlashMaterial: {fileID: 2100000, guid: 4d067d30ae39a054fbc7c0a7309c2880, type: 2}
+  magicFlashMaterial: {fileID: 2100000, guid: 329bcc53be06044488fe193d76d2f19c, type: 2}
+  dotFlashMaterial: {fileID: 0}
 --- !u!4 &1098960886
 Transform:
   m_ObjectHideFlags: 0
@@ -2395,23 +2391,27 @@ MonoBehaviour:
   playerCardPosition: {fileID: 1309892609}
   playerBattlePosition: {fileID: 835140224}
   playerEquipSpawnPosition: {fileID: 1188915344}
-  playerWeaponPosition: {fileID: 172178225}
-  playerArmorPosition: {fileID: 23330681}
-  playerArtifactPosition: {fileID: 1320239745}
+  playerEquipPositions:
+  - {fileID: 172178225}
+  - {fileID: 23330681}
+  - {fileID: 1320239745}
+  playerEquipSkillPositions:
+  - {fileID: 210298659}
+  - {fileID: 1822996892}
+  - {fileID: 38264460}
   enemyPosition: {fileID: 750972841}
   enemyEquipSpawnPosition: {fileID: 186763718}
-  enemyWeaponPosition: {fileID: 840378268}
-  enemyArmorPosition: {fileID: 1133613448}
-  enemyArtifactPosition: {fileID: 765063434}
-  playerWeaponSkillPosition: {fileID: 210298659}
-  playerArmorSkillPosition: {fileID: 1822996892}
-  playerArtifactSkillPosition: {fileID: 38264460}
-  enemyWeaponSkillPosition: {fileID: 0}
-  enemyArmorSkillPosition: {fileID: 0}
-  enemyArtifactSkillPosition: {fileID: 0}
+  enemyEquipPositions:
+  - {fileID: 840378268}
+  - {fileID: 1133613448}
+  - {fileID: 765063434}
+  enemyEquipSkillPositions:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   dummyBackCard: {fileID: 1578077236}
-  EnemySkillPositions: {fileID: 82340842}
-  PlayerSkillPositions: {fileID: 2071153580}
+  playerSkillBackground: {fileID: 2071153580}
+  enemySkillBackground: {fileID: 82340842}
 --- !u!4 &1173326718
 Transform:
   m_ObjectHideFlags: 0
@@ -2548,7 +2548,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.9, y: -8.75, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.55, y: 0.55, z: 0.55}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 185981602}
@@ -2886,7 +2886,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1708252808}
   m_Layer: 0
-  m_Name: DemoSkillPosition
+  m_Name: DemoSkillBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3091,7 +3091,7 @@ Transform:
   m_GameObject: {fileID: 1822996891}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7, y: 0, z: 0}
+  m_LocalPosition: {x: 6.3, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -3237,7 +3237,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2071153581}
   m_Layer: 0
-  m_Name: PlayerSkillPosition
+  m_Name: PlayerSkillBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

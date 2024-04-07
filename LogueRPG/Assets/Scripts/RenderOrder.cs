@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class RenderOrder : MonoBehaviour
 {
-    [SerializeField] Renderer[] backRenderers;
-    [SerializeField] Renderer[] middleRenderers;
-    [SerializeField] Renderer[] frontRenderers;
+    [SerializeField] Renderer[] renderers;
     [SerializeField] string sortingLayerName;
+    [SerializeField] Canvas CardStatusCanvas;
     int originOrder;
 
     public void SetOriginOrder(int originOrder)
@@ -25,22 +24,12 @@ public class RenderOrder : MonoBehaviour
     {
         int mulOrder = order * 10;
 
-        foreach (var renderer in backRenderers)
-        {
-            renderer.sortingLayerName = sortingLayerName;
-            renderer.sortingOrder = mulOrder;
-        }
-
-        foreach (var renderer in middleRenderers)
+        foreach (var renderer in renderers)
         {
             renderer.sortingLayerName = sortingLayerName;
             renderer.sortingOrder = mulOrder + 1;
         }
 
-        foreach (var renderer in frontRenderers)
-        {
-            renderer.sortingLayerName = sortingLayerName;
-            renderer.sortingOrder = mulOrder + 2;
-        }
+        CardStatusCanvas.sortingOrder = mulOrder + 1;
     }
 }

@@ -3,7 +3,8 @@ using UnityEngine;
 
 public enum SkillType
 {
-    Deal, //��������, ��������, ��������, ��(ũ����) ���� ���
+    PscDamage,
+    MgcDamage,
     Dot,
     Heal,
     AttackBuff,
@@ -14,7 +15,7 @@ public enum SkillType
 
 public class SkillController : MonoBehaviour
 {
-    public void UseSkill(SkillCard skill, Entity target, Entity user)
+    public void UseSkill(SkillCard skill, Entity target, Entity user, int equipNum)
     {
         if (skill == null)
             return;
@@ -25,20 +26,24 @@ public class SkillController : MonoBehaviour
             return;
         }
 
-        StartCoroutine(ProcessSkillEffects(skill, target, user));
+        StartCoroutine(ProcessSkillEffects(skill, target, user, equipNum));
     }
 
-    void DamageSkill(SkillEffect skillEffect, Entity target, Entity user)
+    void DamageSkill(SkillEffect skillEffect, Entity target, Entity user, int equipNum)
     {
-        float statBonusDamage = skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
-        int damage = 1 + (int)statBonusDamage;
+        int damage = 1;
+        damage += skillEffect.pow / 100 * user.entityStat[skillEffect.skillStatType];
 
-        target.TakeDamage(damage);
+        target.TakeDamage(skillEffect.skillType, damage, equipNum);
     }
 
     void HealSkill(SkillEffect skillEffect, Entity user)
     {
-        int heal = 1 + skillEffect.pow;
+        int heal = 1;
+        if (skillEffect.skillStatType == EntityStat.MaxHP)
+        {
+            heal += user.entityStat[skillEffect.skillStatType] * skillEffect.pow / 100;
+        }
 
         user.TakeHeal(heal);
     }
@@ -50,16 +55,16 @@ public class SkillController : MonoBehaviour
         return vData.effectTiming;
     }
 
-    IEnumerator ProcessSkillEffects(SkillCard skill, Entity target, Entity user)
+    IEnumerator ProcessSkillEffects(SkillCard skill, Entity target, Entity user, int equipNum)
     {
         GameManager.instance.AddControlBlock();
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.2f);
 
         foreach (SkillEffect skillEffect in skill.skillEffects)
         {
             switch (skillEffect.skillType)
             {
-                case SkillType.Deal:
+                case SkillType.PscDamage:
                     if (target.entityStat[EntityStat.CurrentHP] == 0)
                     {
                         break;
@@ -67,7 +72,20 @@ public class SkillController : MonoBehaviour
 
                     yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
 
-                    DamageSkill(skillEffect, target, user);
+                    DamageSkill(skillEffect, target, user, equipNum);
+
+                    yield return new WaitForSeconds(0.3f);
+                    continue;
+
+                case SkillType.MgcDamage:
+                    if (target.entityStat[EntityStat.CurrentHP] == 0)
+                    {
+                        break;
+                    }
+
+                    yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
+
+                    DamageSkill(skillEffect, target, user, equipNum);
 
                     yield return new WaitForSeconds(0.3f);
                     continue;
