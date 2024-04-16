@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using System.Drawing;
 
 public class CardOnFeild : MonoBehaviour
 {
@@ -26,6 +25,7 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] Image[] manaGageSprites;
     [SerializeField] Image coolDownSprite;
     public SpriteRenderer characterSprite;
+    public SpriteRenderer cardBackSymbol;
 
     public Card card;
     public PRS originPRS;
@@ -52,26 +52,32 @@ public class CardOnFeild : MonoBehaviour
         characterSprite.sprite = card.sprite;
         string name = card.name.Replace("\\n", "\n");
         nameTMP.text = name;
-
-        switch (card.type)
+        Color symbolColor = Color.white;
+            switch (card.type)
         {
-            //background
+            //기본 배경들
             //0:skill
             //1:demo_town
             //2:equip
             case (CardType.Player):
                 backgroundSprite.sprite = background[1];
                 cardTypeTMP.text = "<color=white>Player";
-                return;
+                symbolColor = new Color(1, 1, 1, 60f / 255f);
+                cardBackSymbol.color = symbolColor;
+                break;
             case (CardType.Enemy):
                 backgroundSprite.sprite = background[1];
                 cardTypeTMP.text = "<color=red>Enemy";
-                return;
+                symbolColor = new Color(1, 0, 0, 60f/255f);
+                cardBackSymbol.color = symbolColor;
+                break;
             case (CardType.Skill):
                 backgroundSprite.sprite = background[0];
                 SkillCard skill = (SkillCard)card;
                 skillCostTMP.text = "<color=#1E90FF>" + skill.cost.ToString();
                 cardTypeTMP.text = "<color=#1E90FF>Skill";
+                symbolColor = new Color(0, 0, 1, 60f / 255f);
+                cardBackSymbol.color = symbolColor;
 
                 string skillDescription = "";
                 foreach(SkillEffect skillEffect in skill.skillEffects)
@@ -82,7 +88,7 @@ public class CardOnFeild : MonoBehaviour
                             skillDescription += "적에게 <color=red>물리 피해</color>";
                             break;
                         case (SkillType.MgcDamage):
-                            skillDescription += "적에게 <color=#7b68ee>마법 피해</color>";
+                            skillDescription += "적에게 <color=#5B40FF>마법 피해</color>";
                             break;
                         case (SkillType.Heal):
                             skillDescription += "자신에게 <color=green>체력 회복</color>";
@@ -97,7 +103,7 @@ public class CardOnFeild : MonoBehaviour
                             skillDescription += "<color=red>Str</color>/";
                             break;
                         case (EntityStat.Int):
-                            skillDescription += "<color=#7b68ee>Int</color>/";
+                            skillDescription += "<color=#5B40FF>Int</color>/";
                             break;
                         case (EntityStat.MaxHP):
                             skillDescription += "<color=green>MaxHP</color>/";
@@ -108,15 +114,20 @@ public class CardOnFeild : MonoBehaviour
                 }
                 skillDescription += "(acc/" + skill.acc + ")";
                 descriptionTMP.text = skillDescription;
-                return;
+                break;
             case (CardType.Event):
                 backgroundSprite.sprite = background[1];
                 cardTypeTMP.text = "<color=yellow>Event";
-                return;
+                symbolColor = new Color(1, 1, 0, 60f / 255f);
+                cardBackSymbol.color = symbolColor;
+                break;
             case CardType.Equip:
                 backgroundSprite.sprite = background[2];
                 cardTypeTMP.text = "<color=grey>Equip";
-                return;
+                cardBackSymbol.color = Color.grey;
+                symbolColor = new Color(100f / 255f, 100f / 255f, 100f / 255f, 60f / 255f);
+                cardBackSymbol.color = symbolColor;
+                break;
         }
     }
 
@@ -135,7 +146,7 @@ public class CardOnFeild : MonoBehaviour
                     equipDescription += "<color=red>Str+";
                     break;
                 case (EntityStat.Int):
-                    equipDescription += "<color=#1E90FF>Int+";
+                    equipDescription += "<color=#5B40FF>Int+";
                     break;
             }
             int equipPow = stat.basePow + stat.PowPL * level;
@@ -223,7 +234,17 @@ public class CardOnFeild : MonoBehaviour
             }
         }
         else
-            TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+        {
+            if (card.type == CardType.Enemy)
+            {
+                TurnManager.instance.ChangeTurnTo(GameState.Reward);
+            }
+            else
+            {
+                TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+            }
+        }
+            
     }
 
     public void TypeDescription(string line)
@@ -269,8 +290,18 @@ public class CardOnFeild : MonoBehaviour
         TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
         popUpTmp.text = line;
         Vector3 dest = new Vector3(popUpPosition.position.x, popUpPosition.position.y + 1f, popUpPosition.position.z - 20f);
-        popUp.gameObject.transform.DOMove(dest, 1f)
-            .OnComplete(() => Destroy(popUp));
+        if (isMinimized)
+        {
+            dest.y -= 2f;
+            popUp.transform.localScale = Vector3.one * 2f;
+            popUp.gameObject.transform.DOMove(dest, 0.5f)
+                .OnComplete(() => Destroy(popUp));
+        }
+        else
+        {
+            popUp.gameObject.transform.DOMove(dest, 1f)
+                .OnComplete(() => Destroy(popUp));
+        }
     }
 
     public void ShowHealthbar(bool on)
@@ -299,10 +330,15 @@ public class CardOnFeild : MonoBehaviour
 
     public void UpdateApGage(float actionPoints)
     {
-        manaGageSprites[0].fillAmount = actionPoints;
-        manaGageSprites[1].fillAmount = actionPoints - 1;
-        manaGageSprites[2].fillAmount = actionPoints - 2;
-        manaGageSprites[3].fillAmount = actionPoints - 3;
+        for (int i = 0; i < manaGageSprites.Length; i++)
+        {
+            manaGageSprites[i].fillAmount = actionPoints - i;
+
+            if (manaGageSprites[i].fillAmount == 1f)
+                manaGageSprites[i].color = Color.white;
+            else
+                manaGageSprites[i].color = Color.blue;
+        }
     }
 
     public void StartCoolDown(float coolTime)

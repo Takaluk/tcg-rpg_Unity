@@ -33,6 +33,7 @@ public class Card
 public class SkillCard : Card
 {
     public int cost;
+    public int coolTime;
     public int acc;
     public List<SkillEffect> skillEffects;
 }

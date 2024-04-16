@@ -20,32 +20,26 @@ public class SkillController : MonoBehaviour
         if (skill == null)
             return;
 
-        if (!Utils.CalculateProbability(skill.acc))
-        {
-            target.EntityPopUp("<color=#606060>MISS");
-            return;
-        }
-
         StartCoroutine(ProcessSkillEffects(skill, target, user, equipNum));
     }
 
     void DamageSkill(SkillEffect skillEffect, Entity target, Entity user, int equipNum)
     {
-        int damage = 1;
-        damage += skillEffect.pow / 100 * user.entityStat[skillEffect.skillStatType];
+        float damage = 1;
+        damage += skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
 
-        target.TakeDamage(skillEffect.skillType, damage, equipNum);
+        target.TakeDamage(skillEffect.skillType, (int)damage, equipNum);
     }
 
     void HealSkill(SkillEffect skillEffect, Entity user)
     {
-        int heal = 1;
+        float heal = 1;
         if (skillEffect.skillStatType == EntityStat.MaxHP)
         {
-            heal += user.entityStat[skillEffect.skillStatType] * skillEffect.pow / 100;
+            heal += skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
         }
 
-        user.TakeHeal(heal);
+        user.TakeHeal((int)heal);
     }
 
     float SkillVfxTiming(Entity target, GameObject skillPrefeb)
@@ -60,45 +54,58 @@ public class SkillController : MonoBehaviour
         GameManager.instance.AddControlBlock();
         yield return new WaitForSeconds(0.2f);
 
-        foreach (SkillEffect skillEffect in skill.skillEffects)
+        user.apChargeBlock = true;
+        if (!Utils.CalculateProbability(skill.acc))
         {
-            switch (skillEffect.skillType)
+            user.apChargeBlock = false;
+            target.EntityPopUp("<color=#606060>MISS");
+        }
+        else
+        {
+            foreach (SkillEffect skillEffect in skill.skillEffects)
             {
-                case SkillType.PscDamage:
-                    if (target.entityStat[EntityStat.CurrentHP] == 0)
-                    {
-                        break;
-                    }
+                switch (skillEffect.skillType)
+                {
+                    case SkillType.PscDamage:
+                        if (target.entityStat[EntityStat.CurrentHP] == 0)
+                        {
+                            user.apChargeBlock = false;
+                            break;
+                        }
 
-                    yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
+                        yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
 
-                    DamageSkill(skillEffect, target, user, equipNum);
+                        DamageSkill(skillEffect, target, user, equipNum);
 
-                    yield return new WaitForSeconds(0.3f);
-                    continue;
+                        yield return new WaitForSeconds(0.3f);
+                        continue;
 
-                case SkillType.MgcDamage:
-                    if (target.entityStat[EntityStat.CurrentHP] == 0)
-                    {
-                        break;
-                    }
+                    case SkillType.MgcDamage:
+                        if (target.entityStat[EntityStat.CurrentHP] == 0)
+                        {
+                            user.apChargeBlock = false;
+                            break;
+                        }
 
-                    yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
+                        yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
 
-                    DamageSkill(skillEffect, target, user, equipNum);
+                        DamageSkill(skillEffect, target, user, equipNum);
 
-                    yield return new WaitForSeconds(0.3f);
-                    continue;
+                        yield return new WaitForSeconds(0.3f);
+                        continue;
 
-                case SkillType.Heal:
+                    case SkillType.Heal:
 
-                    yield return new WaitForSeconds(SkillVfxTiming(user, skillEffect.vfx));
+                        yield return new WaitForSeconds(SkillVfxTiming(user, skillEffect.vfx));
 
-                    HealSkill(skillEffect, user);
+                        HealSkill(skillEffect, user);
 
-                    yield return new WaitForSeconds(0.3f);
-                    continue;
+                        yield return new WaitForSeconds(0.3f);
+                        continue;
+                }
             }
+
+            user.apChargeBlock = false;
         }
 
         GameManager.instance.RemoveControlBlock();

@@ -38,7 +38,6 @@ public class CardManager : MonoBehaviour
     public CardOnFeild playerCard;
     public CardOnFeild enemyCard;
     public CardOnFeild chosenHand;
-    public CardOnFeild chosenSelection;
     bool isMyCardDrag;
     bool onMyCardArea;
     bool onMyWeaponArea;
@@ -69,6 +68,7 @@ public class CardManager : MonoBehaviour
     public GameObject dummyBackCard;
     public GameObject playerSkillBackground;
     public GameObject enemySkillBackground;
+    public GameObject rewardButtons;
 
     System.Random random = new System.Random();
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
@@ -84,6 +84,11 @@ public class CardManager : MonoBehaviour
         if (isMyCardDrag && chosenHand != null)
         {
             CardDrag();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            ShowEquipCards();
         }
     }
 
@@ -109,7 +114,6 @@ public class CardManager : MonoBehaviour
                 CardMoveTo(enemyCard, enemyPosition);
                 enemyCard.ShowHealthbar(true);
             }
-            dummyBackCard.SetActive(false);
             playerSkillBackground.transform.DOMove(Vector3.zero, 0.3f);
             enemySkillBackground.transform.DOMove(Vector3.zero, 0.3f);
 
@@ -140,7 +144,6 @@ public class CardManager : MonoBehaviour
                 CardMoveTo(enemyCard, mainCardPosition);
                 enemyCard.ShowHealthbar(false);
             }
-            dummyBackCard.SetActive(true);
             enemySkillBackground.transform.DOMove(Vector3.one * 16.5f, 0.3f);
             playerSkillBackground.transform.DOMove(Vector3.one * -16.5f, 0.3f);
         }
@@ -154,6 +157,7 @@ public class CardManager : MonoBehaviour
             {
                 main.Add(selection[i]);
                 main[0].isMinimized = false;
+                main[0].GetComponent<RenderOrder>().SetOrder(-1);
 
                 CardMoveTo(main[0], mainCardPosition);
             }
@@ -172,10 +176,9 @@ public class CardManager : MonoBehaviour
     {
         if (main.Count > 0)
         {
-            main[0].DiscardTo(mainCardPosition, Vector3.one * 2);
+            main[0].DiscardTo(dummyBackCard.transform, Vector3.one * 2);
             main.Clear();
         }
-
 
         List<Card> selectionCards = new List<Card>();
 
@@ -210,6 +213,20 @@ public class CardManager : MonoBehaviour
         }
 
         StartCoroutine(PutCardInHand(cards));
+    }
+
+    public void SetRewardCards(Card rewardEquip, Card rewardSkill)
+    {
+        main[0].DiscardTo(dummyBackCard.transform, Vector3.one * 2);
+        main.Clear();
+
+        List<Card> rewards = new List<Card>();
+        rewards.Add(rewardEquip);
+        rewards.Add(rewardSkill);
+
+        StartCoroutine(PutCardInSelection(rewards, false));
+
+        selection[0].SetEquipDescription(EntityController.instance.enemy.entityStat[EntityStat.Level]);
     }
 
     public void EmptyHand()
@@ -282,6 +299,7 @@ public class CardManager : MonoBehaviour
             {
                 cof.isMinimized = false;
                 CardAlignment(selection, selectionLeftPointFlipped, selectionRightPointFlipped);
+                cof.cardBackSymbol.transform.DOShakePosition(0.5f,1f);
             }
             yield return delay03;
         }
@@ -299,13 +317,13 @@ public class CardManager : MonoBehaviour
             for (int i = 0; i < 3; i++)
             {
                 playerEquip.Add(DrawCard(player.equipCards[i], playerEquipSpawnPosition));
-                playerEquip[i].SetEquipDescription(player.entityEquipLevels[i]);
+                //playerEquip[i].SetEquipDescription(player.entityEquipLevels[i]);
                 playerEquip[i].gameObject.SetActive(false);
                 playerEquip[i].isMinimized = true;
                 playerEquip[i].ShowEquipDurability(true);
 
                 enemyEquip.Add(DrawCard(enemy.equipCards[i], enemyEquipSpawnPosition));
-                enemyEquip[i].SetEquipDescription(enemy.entityEquipLevels[i]);
+                //enemyEquip[i].SetEquipDescription(enemy.entityEquipLevels[i]);
                 enemyEquip[i].gameObject.SetActive(false);
                 enemyEquip[i].isMinimized = true;
                 enemyEquip[i].ShowEquipDurability(true);
@@ -504,6 +522,37 @@ public class CardManager : MonoBehaviour
                 SetPlayerSkillCard(cof, equipNum);
             }
         }
+
+        switch (cof.card.type)
+        {
+            case CardType.Skill:
+                if (!onMyCardArea && cof.isMoveable && TurnManager.instance.currentState == GameState.Battle)
+                {
+                    SkillCard skill = (SkillCard)cof.card;
+
+                    int equipNum;
+                    if (onMyWeaponArea)
+                    {
+                        equipNum = 0;
+                    }
+                    else if (onMyArmorArea)
+                    {
+                        equipNum = 1;
+                    }
+                    else if (onMyArtifactArea)
+                    {
+                        equipNum = 2;
+                    }
+                    else
+                        return;
+
+                    if (EntityController.instance.PlayerUseSkill(skill, equipNum))
+                    {
+                        SetPlayerSkillCard(cof, equipNum);
+                    }
+                }
+                return;
+        }
     }
 
     public void SetPlayerSkillCard(CardOnFeild cof, int equipNum)
@@ -527,8 +576,15 @@ public class CardManager : MonoBehaviour
         CameraEffectManager.instance.ShakeCam(0.1f, 0.5f, 30);
 
         SkillCard skill = (SkillCard)cof.card;
-        cof.StartCoolDown(skill.cost * 3);
-        yield return new WaitForSeconds(skill.cost * 3);
+        float coolTime = skill.coolTime;
+
+        if (coolTime > 0)
+        {
+            cof.StartCoolDown(coolTime);
+            yield return new WaitForSeconds(coolTime);
+        }
+
+        yield return new WaitForSeconds(0.5f);
 
         if (cof == null)
             yield break;
@@ -546,6 +602,12 @@ public class CardManager : MonoBehaviour
         }
     }
 
+    public void SkipReward()
+    {
+        rewardButtons.SetActive(false);
+        TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+    }
+
     public void CardMouseDown(CardOnFeild cof)
     {
         switch (cof.card.type)
@@ -560,9 +622,31 @@ public class CardManager : MonoBehaviour
                 return;
 
             case (CardType.Skill):
+                if (TurnManager.instance.currentState == GameState.Reward)
+                {
+                    if (main.Count == 0 && selection.Contains(cof))
+                    {
+                        SelectToMain(cof);
+                        cof.transform.DOScale(Vector3.one * 1.5f, 0.3f);
+
+                        ShowSkillCards();
+                        rewardButtons.SetActive(true);
+                    }
+                }
                 return;
 
             case (CardType.Equip):
+                if (TurnManager.instance.currentState == GameState.Reward)
+                {
+                    if (main.Count == 0 && selection.Contains(cof))
+                    {
+                        SelectToMain(cof);
+                        cof.transform.DOScale(Vector3.one * 1.5f, 0.3f);
+
+                        ShowEquipCards();
+                        rewardButtons.SetActive(true);
+                    }
+                }
                 return;
 
             case (CardType.Enemy):

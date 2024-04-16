@@ -2,9 +2,8 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
+
 
 public enum EntityStat
 {
@@ -37,6 +36,7 @@ public class Entity
     public int[] maxEquipDurabilities = { 0, 0, 0 };
     public bool[] isEnchanted = {false, false, false};
 
+    public bool apChargeBlock = false;
     public float actionPoint = 0;
 
     public void UpdateEntity(CardOnFeild cof)
@@ -57,7 +57,7 @@ public class Entity
             equipCards.Add(equip);
         }
 
-        SetEntityStat(GameManager.instance.GetTurnCount()/2);
+        SetEntityStat(GameManager.instance.GetTurnCount()/2); //여기서만 레벨 변동률 조정
 
         entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
     }
@@ -75,6 +75,7 @@ public class Entity
             entityStat[stat] = 0;
         }
 
+        entityStat[EntityStat.Level] = level;
         entityStat[EntityStat.MaxHP] = 100;
 
         for (int i =0; i< 3; i++)
@@ -95,7 +96,7 @@ public class Entity
         }
 
         actionPoint = 0;
-        entityStat[EntityStat.APChargeSpeed] += 50;
+        entityStat[EntityStat.APChargeSpeed] += 45;
     }
 
     public void TakeDamage(SkillType skillType, int damage, int equipNum = 3)
@@ -114,7 +115,7 @@ public class Entity
                 }
                 break;
             case (SkillType.MgcDamage):
-                damageAmount += "<color=#7b68ee>" + damage.ToString();
+                damageAmount += "<color=#5B40FF>" + damage.ToString();
                 break;
         }
 
@@ -130,7 +131,7 @@ public class Entity
         }
         entityStat[EntityStat.CurrentHP] = afterHp;
 
-        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], afterHp);
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
     }
 
     public void TakeDurabilityDamage(int equipNum, int damage)
@@ -161,8 +162,15 @@ public class Entity
 
     public void TakeHeal(int heal)
     {
+        int afterHp = entityStat[EntityStat.CurrentHP] + heal;
+        if (afterHp > entityStat[EntityStat.MaxHP])
+            entityStat[EntityStat.CurrentHP] = entityStat[EntityStat.MaxHP];
+        else
+            entityStat[EntityStat.CurrentHP] = afterHp;
+
         string healAmount = "<color=green>" + heal.ToString();
         EntityPopUp(healAmount);
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
     }
 
     public void Die()
@@ -173,6 +181,19 @@ public class Entity
     public void EntityPopUp(string line)
     {
         entityCard.CardPopUp(line);
+    }
+
+    public void EntityApCharge(float apCharge)
+    {
+        if (apChargeBlock)
+            return;
+
+        if (actionPoint < 4f)
+            actionPoint += (entityStat[EntityStat.APChargeSpeed] / 60f) * apCharge;
+        else
+            actionPoint = 4f;
+
+        entityCard.UpdateApGage(actionPoint);
     }
 }
 
@@ -196,11 +217,16 @@ public class EntityController : MonoBehaviour
     SkillController skillController = null;
 
     public GameObject popUpPrefeb;
+    public GameObject handBlockSprite;
 
     public Entity player;
     public Entity enemy;
-
     public Material hitFlashMaterial;
+
+    public List<EquipmentCard> rewardEquips = new List<EquipmentCard>();
+
+    float apChargeTimer = 0f;
+    float apChargeInterval = 0.1f;
 
     private void Start()
     {
@@ -213,21 +239,29 @@ public class EntityController : MonoBehaviour
         {
             player.TakeDamage(SkillType.PscDamage,100);
         }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+        }
 
         if (TurnManager.instance.currentState == GameState.Battle)
         {
-            if (player.actionPoint < 4f)
-                player.actionPoint += (player.entityStat[EntityStat.APChargeSpeed] / 60f) * Time.deltaTime;
+            if (GameManager.instance.GetControlBlockCount() > 0)
+            {
+                handBlockSprite.SetActive(true);
+            }
             else
-                player.actionPoint = 4f;
+                handBlockSprite.SetActive(false);
 
-            player.entityCard.UpdateApGage(player.actionPoint);
+            apChargeTimer += Time.deltaTime;
 
-            if (enemy.actionPoint < 4f)
-                enemy.actionPoint += (enemy.entityStat[EntityStat.APChargeSpeed] / 60f) * Time.deltaTime;
-            else
-                enemy.actionPoint = 4f;
-            enemy.entityCard.UpdateApGage(enemy.actionPoint);
+            if (apChargeTimer >= apChargeInterval) 
+            {
+                player.EntityApCharge(apChargeTimer);
+                enemy.EntityApCharge(apChargeTimer);
+
+                apChargeTimer = 0f;
+            }
         }
     }
 
@@ -237,6 +271,9 @@ public class EntityController : MonoBehaviour
         player.isEnchanted[0] = false;
         player.isEnchanted[1] = false;
         player.isEnchanted[2] = false;
+
+        player.apChargeBlock = false;
+        enemy.apChargeBlock = false;
     }
 
     public bool PlayerUseSkill(SkillCard skill, int equipNum)
@@ -245,6 +282,12 @@ public class EntityController : MonoBehaviour
         {
             if (player.isEnchanted[equipNum])
                 return false;
+        }
+        else
+        {
+            //event skill
+            skillController.UseSkill(skill, enemy, player, equipNum);
+            return true;
         }
         //equipmentList에서 스킬 발동
 
@@ -258,7 +301,7 @@ public class EntityController : MonoBehaviour
         }
         else
         {
-            player.EntityPopUp("<color=blue>Not enough AP");
+            player.EntityPopUp("<color=#1E90FF>Not enough AP");
             return false;
         }
 
@@ -296,6 +339,24 @@ public class EntityController : MonoBehaviour
             StartCoroutine(EquipDamageReactionEffect(CardManager.instance.enemyEquip[equipNum]));
     }
 
+    public void BattleReward()
+    {
+        EquipmentCard rewardEquip;
+
+        if (rewardEquips.Count > 0)
+        {
+            rewardEquip = rewardEquips[UnityEngine.Random.Range(0, rewardEquips.Count)];
+        }
+        else
+            rewardEquip = enemy.equipCards[UnityEngine.Random.Range(0, 3)];
+
+        SkillCard rewardSkill = enemy.skillCards[UnityEngine.Random.Range(0, 3)];
+
+        CardManager.instance.SetRewardCards(rewardEquip, rewardSkill);
+
+        //button on -> button function (넘기기, 교체)
+    }
+
     IEnumerator DamageReactionEffect(Entity entity)
     {
         entity.entityCard.characterSprite.transform.DOShakePosition(0.1f);
@@ -319,8 +380,8 @@ public class EntityController : MonoBehaviour
         enemy.EntityPopUp("<color=#606060>Died");
         yield return new WaitForSeconds(0.3f);
         TurnManager.instance.ChangeTurnTo(GameState.Event);
-        CardManager.instance.main[0].NextDialogue();
-
+        enemy.entityCard.NextDialogue();
+        handBlockSprite.SetActive(false);
         GameManager.instance.RemoveControlBlock();
     }
 

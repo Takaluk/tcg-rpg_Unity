@@ -4,7 +4,8 @@ public enum GameState
 {
     PathSelection = 0,
     Battle,
-    Event
+    Event,
+    Reward
 };
 
 public class TurnManager : MonoBehaviour
@@ -57,11 +58,14 @@ public class TurnManager : MonoBehaviour
                 CardManager.instance.SetBattlePosition(false);
                 return;
 
-            //case GameState.Reward:
-                //currentState = GameState.Reward;
-                //���� battle, event ī�忡�� ������ ������ ��, reward ���������� �����ֱ�
-                //or reward �Ŵ���?
-                //return;
+            case GameState.Reward:
+                currentState = GameState.Reward;
+                CardManager.instance.EmptyHand();
+                CardManager.instance.SetBattlePosition(false);
+
+                EntityController.instance.BattleReward();
+                return;
+
             default:
                 Debug.LogError("Unknown state");
                 break;
