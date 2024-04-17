@@ -745,7 +745,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2204790808947158261}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.010974787, z: -0, w: 0.9999398}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
@@ -762,7 +762,7 @@ Transform:
   - {fileID: 7551852210853974465}
   - {fileID: 7267955731719327821}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 1.258, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6116351813171144037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -791,6 +791,7 @@ MonoBehaviour:
   maxHpTMP: {fileID: 6507988248806340376}
   healthBar: {fileID: 1990743747797002572}
   equipDurability: {fileID: 6392249099397507108}
+  cardSelectSprite: {fileID: 0}
   healthbarSprite: {fileID: 208715764484712567}
   durabilitySprite: {fileID: 1668596243405366347}
   manaGageSprites:
@@ -2014,7 +2015,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7551852210853974465
 Transform:
   m_ObjectHideFlags: 0

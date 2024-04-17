@@ -487,7 +487,10 @@ public class CardManager : MonoBehaviour
     public void CardMouseDrag(CardOnFeild cof)
     {
         DetectCardArea();
+        if (chosenHand != null)
+            chosenHand.CardSelectedEffect(false);
         chosenHand = cof;
+        chosenHand.CardSelectedEffect(true);
         isMyCardDrag = true;
         EnLargeCard(true, cof);
     }
@@ -631,6 +634,8 @@ public class CardManager : MonoBehaviour
 
                         ShowSkillCards();
                         rewardButtons.SetActive(true);
+
+                        cof.CardSelectedEffect(true);
                     }
                 }
                 return;
@@ -645,6 +650,8 @@ public class CardManager : MonoBehaviour
 
                         ShowEquipCards();
                         rewardButtons.SetActive(true);
+
+                        cof.CardSelectedEffect(true);
                     }
                 }
                 return;

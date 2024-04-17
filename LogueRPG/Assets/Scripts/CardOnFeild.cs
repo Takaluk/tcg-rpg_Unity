@@ -20,6 +20,7 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] TMP_Text maxHpTMP;
     [SerializeField] GameObject healthBar;
     [SerializeField] GameObject equipDurability;
+    [SerializeField] GameObject cardSelectSprite;
     [SerializeField] Image healthbarSprite;
     [SerializeField] Image durabilitySprite;
     [SerializeField] Image[] manaGageSprites;
@@ -356,5 +357,10 @@ public class CardOnFeild : MonoBehaviour
             currentTime -= 0.1f;
             coolDownSprite.fillAmount = currentTime / coolTime;
         }
+    }
+
+    public void CardSelectedEffect(bool on)
+    {
+        cardSelectSprite.SetActive(on);
     }
 }
