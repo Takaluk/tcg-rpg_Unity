@@ -13,8 +13,7 @@ public enum CardType
 
 public enum EquipType
 {
-    None = 0,
-    Weapon,
+    Weapon = 0,
     Armor,
     Artifact
 }

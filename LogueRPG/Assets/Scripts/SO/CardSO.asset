@@ -48,22 +48,22 @@ MonoBehaviour:
         pow: 30
         vfx: {fileID: 101720521372148498, guid: e81dec0e559cf0041bfe40d4807a51ae, type: 3}
   enemies:
-  - name: Sorcerer
+  - name: Witch
     context:
     - .........!
     weight: 1
     type: 2
-    sprite: {fileID: 21300000, guid: f614965f82cbca241afbd66cf2f3d068, type: 3}
+    sprite: {fileID: 21300000, guid: 8bbb49b58fd2c88418549a6116c08c85, type: 3}
     equipmentCards:
     - name: "\uB0A1\uC740 \uCC45"
       context: []
       weight: 0
       type: 6
       sprite: {fileID: 21300000, guid: e233ada80a15e754a80b909a432be4da, type: 3}
-      equipType: 1
+      equipType: 0
       equipStats:
       - equipStat: 5
-        basePow: 50
+        basePow: 100
         PowPL: 3
       Durability: 20
     - name: "\uB0A1\uC740 \uB85C\uBE0C"
@@ -71,34 +71,24 @@ MonoBehaviour:
       weight: 0
       type: 6
       sprite: {fileID: 21300000, guid: bc28869298956064dba54649eab4edc1, type: 3}
-      equipType: 2
+      equipType: 1
       equipStats:
       - equipStat: 2
         basePow: 512
         PowPL: 128
       Durability: 40
-    - name: "\uC2A4\uC2B9\uC758 \uB450\uAC1C\uACE8"
+    - name: "\uAC00\uB974\uCE68\uC758 \uC758\uC9C0"
       context: []
       weight: 0
       type: 6
-      sprite: {fileID: 21300000, guid: 48ac426ad485c6f43947cfe29dcbe972, type: 3}
-      equipType: 3
-      equipStats: []
+      sprite: {fileID: 21300000, guid: 2f8178592534c3b4ebdf525f27765a5a, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 6
+        basePow: 100
+        PowPL: 10
       Durability: 10
     enemySkills:
-    - name: "\uBCA0\uAE30"
-      context: []
-      weight: 0
-      type: 5
-      sprite: {fileID: 21300000, guid: 39605b01c89417c4eafdea6fa3adff5f, type: 3}
-      cost: 1
-      coolTime: 0
-      acc: 100
-      skillEffects:
-      - skillType: 0
-        skillStatType: 5
-        pow: 150
-        vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
     - name: "\uBD88\uD0DC\uC6B0\uAE30"
       context: []
       weight: 0
@@ -108,102 +98,245 @@ MonoBehaviour:
       coolTime: 0
       acc: 100
       skillEffects:
-      - skillType: 0
-        skillStatType: 5
+      - skillType: 1
+        skillStatType: 6
         pow: 500
         vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
-    - name: "\uD68C\uBCF5"
-      context: []
-      weight: 0
-      type: 5
-      sprite: {fileID: 21300000, guid: db2dd78343cfaa247948e34de8bdeb06, type: 3}
-      cost: 3
-      coolTime: 0
-      acc: 100
-      skillEffects:
-      - skillType: 2
-        skillStatType: 5
-        pow: 200
-        vfx: {fileID: 101720521372148498, guid: e81dec0e559cf0041bfe40d4807a51ae, type: 3}
-  quests: []
-  player:
-    name: Player Name
+  - name: Mistweb
     context:
     - .........!
     weight: 1
-    type: 1
-    sprite: {fileID: 21300000, guid: a9899da493bf9bb4395c303b7d8867a9, type: 3}
+    type: 2
+    sprite: {fileID: 21300000, guid: a8d9c12d5181baf499cd34daecfdb104, type: 3}
+    equipmentCards:
+    - name: "\uC548\uAC1C \uBC1C\uD1B1"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 26a0d23b3b166ef4f9b8222edb59365f, type: 3}
+      equipType: 0
+      equipStats:
+      - equipStat: 5
+        basePow: 100
+        PowPL: 3
+      - equipStat: 6
+        basePow: 100
+        PowPL: 3
+      Durability: 20
+    - name: "\uC548\uAC1C \uB450\uB974\uAE30"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: b8a02d896413af54ea3f802bce33b2b5, type: 3}
+      equipType: 1
+      equipStats:
+      - equipStat: 2
+        basePow: 512
+        PowPL: 128
+      Durability: 40
+    - name: "\uC548\uAC1C\uC758 \uD575"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 865437b894d23d54c992483b37a021a8, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 6
+        basePow: 50
+        PowPL: 10
+      - equipStat: 5
+        basePow: 50
+        PowPL: 10
+      Durability: 10
+    enemySkills:
+    - name: "\uC548\uAC1C\uC758 \uC190\uAE38"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: f98594875a6047e4783d8e5158bccd2f, type: 3}
+      cost: 2
+      coolTime: 0
+      acc: 100
+      skillEffects:
+      - skillType: 0
+        skillStatType: 5
+        pow: 200
+        vfx: {fileID: 5147851105986684181, guid: 7c8843ad7b8e65f4c955ebd4e595f25d, type: 3}
+      - skillType: 1
+        skillStatType: 6
+        pow: 200
+        vfx: {fileID: 0}
+  - name: Mistweb
+    context:
+    - .........!
+    weight: 1
+    type: 2
+    sprite: {fileID: 21300000, guid: f344fcbcdc173db44a623476ffe5b870, type: 3}
+    equipmentCards:
+    - name: "\uC548\uAC1C \uBC1C\uD1B1"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 26a0d23b3b166ef4f9b8222edb59365f, type: 3}
+      equipType: 0
+      equipStats:
+      - equipStat: 5
+        basePow: 100
+        PowPL: 3
+      - equipStat: 6
+        basePow: 100
+        PowPL: 3
+      Durability: 20
+    - name: "\uC548\uAC1C \uB450\uB974\uAE30"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: b8a02d896413af54ea3f802bce33b2b5, type: 3}
+      equipType: 1
+      equipStats:
+      - equipStat: 2
+        basePow: 512
+        PowPL: 128
+      Durability: 40
+    - name: "\uC548\uAC1C\uC758 \uD575"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 865437b894d23d54c992483b37a021a8, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 6
+        basePow: 50
+        PowPL: 10
+      - equipStat: 5
+        basePow: 50
+        PowPL: 10
+      Durability: 10
+    enemySkills:
+    - name: "\uC548\uAC1C\uC758 \uC190\uAE38"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: f98594875a6047e4783d8e5158bccd2f, type: 3}
+      cost: 2
+      coolTime: 0
+      acc: 100
+      skillEffects:
+      - skillType: 0
+        skillStatType: 5
+        pow: 200
+        vfx: {fileID: 5147851105986684181, guid: 7c8843ad7b8e65f4c955ebd4e595f25d, type: 3}
+      - skillType: 1
+        skillStatType: 6
+        pow: 200
+        vfx: {fileID: 0}
+  - name: Mistweb
+    context:
+    - .........!
+    weight: 1
+    type: 2
+    sprite: {fileID: 21300000, guid: a8d9c12d5181baf499cd34daecfdb104, type: 3}
+    equipmentCards:
+    - name: "\uC548\uAC1C \uBC1C\uD1B1"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 26a0d23b3b166ef4f9b8222edb59365f, type: 3}
+      equipType: 0
+      equipStats:
+      - equipStat: 5
+        basePow: 100
+        PowPL: 3
+      - equipStat: 6
+        basePow: 100
+        PowPL: 3
+      Durability: 20
+    - name: "\uC548\uAC1C \uB450\uB974\uAE30"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: b8a02d896413af54ea3f802bce33b2b5, type: 3}
+      equipType: 1
+      equipStats:
+      - equipStat: 2
+        basePow: 512
+        PowPL: 128
+      Durability: 40
+    - name: "\uC548\uAC1C\uC758 \uD575"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 865437b894d23d54c992483b37a021a8, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 6
+        basePow: 50
+        PowPL: 10
+      - equipStat: 5
+        basePow: 50
+        PowPL: 10
+      Durability: 10
+    enemySkills:
+    - name: "\uC548\uAC1C\uC758 \uC190\uAE38"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: f98594875a6047e4783d8e5158bccd2f, type: 3}
+      cost: 2
+      coolTime: 0
+      acc: 100
+      skillEffects:
+      - skillType: 0
+        skillStatType: 5
+        pow: 200
+        vfx: {fileID: 5147851105986684181, guid: 7c8843ad7b8e65f4c955ebd4e595f25d, type: 3}
+      - skillType: 1
+        skillStatType: 6
+        pow: 200
+        vfx: {fileID: 0}
+  quests: []
+  player:
+    name: Witch
+    context:
+    - .........!
+    weight: 1
+    type: 2
+    sprite: {fileID: 21300000, guid: 8bbb49b58fd2c88418549a6116c08c85, type: 3}
     equipmentCards:
     - name: "\uB0A1\uC740 \uCC45"
       context: []
       weight: 0
       type: 6
       sprite: {fileID: 21300000, guid: e233ada80a15e754a80b909a432be4da, type: 3}
-      equipType: 1
+      equipType: 0
       equipStats:
       - equipStat: 5
-        basePow: 50
+        basePow: 100
         PowPL: 3
-      - equipStat: 6
-        basePow: 50
-        PowPL: 3
-      - equipStat: 6
-        basePow: 50
-        PowPL: 3
-      - equipStat: 6
-        basePow: 50
-        PowPL: 3
-      Durability: 0
+      Durability: 20
     - name: "\uB0A1\uC740 \uB85C\uBE0C"
       context: []
       weight: 0
       type: 6
       sprite: {fileID: 21300000, guid: bc28869298956064dba54649eab4edc1, type: 3}
-      equipType: 2
+      equipType: 1
       equipStats:
       - equipStat: 2
         basePow: 512
         PowPL: 128
-      Durability: 0
-    - name: "\uC2A4\uC2B9\uC758 \uB450\uAC1C\uACE8"
+      Durability: 40
+    - name: "\uAC00\uB974\uCE68\uC758 \uC758\uC9C0"
       context: []
       weight: 0
       type: 6
-      sprite: {fileID: 21300000, guid: 48ac426ad485c6f43947cfe29dcbe972, type: 3}
-      equipType: 3
-      equipStats: []
-      Durability: 0
+      sprite: {fileID: 21300000, guid: 2f8178592534c3b4ebdf525f27765a5a, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 6
+        basePow: 100
+        PowPL: 10
+      Durability: 10
     enemySkills:
-    - name: "\uBCA0\uAE30"
-      context: []
-      weight: 0
-      type: 5
-      sprite: {fileID: 21300000, guid: 39605b01c89417c4eafdea6fa3adff5f, type: 3}
-      cost: 1
-      coolTime: 0
-      acc: 80
-      skillEffects:
-      - skillType: 0
-        skillStatType: 5
-        pow: 300
-        vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
-    - name: "\uBCA0\uAE30"
-      context: []
-      weight: 0
-      type: 5
-      sprite: {fileID: 21300000, guid: 39605b01c89417c4eafdea6fa3adff5f, type: 3}
-      cost: 2
-      coolTime: 0
-      acc: 100
-      skillEffects:
-      - skillType: 0
-        skillStatType: 5
-        pow: 200
-        vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
-      - skillType: 0
-        skillStatType: 5
-        pow: 200
-        vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
     - name: "\uBD88\uD0DC\uC6B0\uAE30"
       context: []
       weight: 0
@@ -215,30 +348,5 @@ MonoBehaviour:
       skillEffects:
       - skillType: 1
         skillStatType: 6
-        pow: 100
+        pow: 500
         vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
-      - skillType: 1
-        skillStatType: 6
-        pow: 100
-        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
-      - skillType: 1
-        skillStatType: 6
-        pow: 100
-        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
-      - skillType: 1
-        skillStatType: 6
-        pow: 200
-        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
-    - name: "\uD68C\uBCF5"
-      context: []
-      weight: 0
-      type: 5
-      sprite: {fileID: 21300000, guid: db2dd78343cfaa247948e34de8bdeb06, type: 3}
-      cost: 3
-      coolTime: 0
-      acc: 100
-      skillEffects:
-      - skillType: 3
-        skillStatType: 2
-        pow: 30
-        vfx: {fileID: 101720521372148498, guid: e81dec0e559cf0041bfe40d4807a51ae, type: 3}

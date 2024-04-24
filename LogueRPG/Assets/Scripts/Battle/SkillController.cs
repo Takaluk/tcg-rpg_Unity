@@ -44,6 +44,8 @@ public class SkillController : MonoBehaviour
 
     float SkillVfxTiming(Entity target, GameObject skillPrefeb)
     {
+        if (skillPrefeb == null)
+            return 0;
         var vfx = Instantiate(skillPrefeb, target.entityCard.transform);
         VfxData vData = vfx.GetComponent<VfxData>();
         return vData.effectTiming;

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
 
 
@@ -69,6 +70,7 @@ public class CardManager : MonoBehaviour
     public GameObject playerSkillBackground;
     public GameObject enemySkillBackground;
     public GameObject rewardButtons;
+    public Button rewardAcceptButton;
 
     System.Random random = new System.Random();
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
@@ -226,7 +228,7 @@ public class CardManager : MonoBehaviour
 
         StartCoroutine(PutCardInSelection(rewards, false));
 
-        selection[0].SetEquipDescription(EntityController.instance.enemy.entityStat[EntityStat.Level]);
+        selection[0].SetEquipDescription(EntityController.instance.enemy);
     }
 
     public void EmptyHand()
@@ -255,6 +257,8 @@ public class CardManager : MonoBehaviour
         foreach (Card card in CardList)
         {
             CardOnFeild cof = DrawCard(card, handSpawnPoint);
+            if (cof.card.type == CardType.Equip)
+                cof.SetEquipDescription(EntityController.instance.player);
             cof.isMinimized = true;
             cof.isMoveable = true;
             hand.Add(cof);
@@ -490,7 +494,11 @@ public class CardManager : MonoBehaviour
         if (chosenHand != null)
             chosenHand.CardSelectedEffect(false);
         chosenHand = cof;
-        chosenHand.CardSelectedEffect(true);
+        if (TurnManager.instance.currentState == GameState.Reward)
+        {
+            chosenHand.CardSelectedEffect(true);
+            rewardAcceptButton.interactable = true;
+        }
         isMyCardDrag = true;
         EnLargeCard(true, cof);
     }
@@ -505,7 +513,7 @@ public class CardManager : MonoBehaviour
             SkillCard skill = (SkillCard)cof.card;
 
             int equipNum;
-            if (onMyWeaponArea)
+            if (onMyWeaponArea)//카드 장착 가능 체크
             {
                 equipNum = 0;
             }
@@ -605,10 +613,34 @@ public class CardManager : MonoBehaviour
         }
     }
 
+    public void AcceptReward()
+    {
+        if (chosenHand == null)
+            return;
+        if (chosenHand.card.type == CardType.Equip)
+            EntityController.instance.player.ChangeEquip((EquipmentCard)main[0].card, GameManager.instance.GetEnemyLevel());
+        else if (chosenHand.card.type == CardType.Skill)
+        {
+            for (int i = 0; i < hand.Count; i++)
+            {
+                if (hand[i] == chosenHand)
+                {
+                    EntityController.instance.player.ChangeSkill((SkillCard)main[0].card, i);
+                }
+            }
+        }
+        hand.Remove(chosenHand);
+        hand.Add(main[0]);
+        main[0] = chosenHand;
+
+        TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+        rewardButtons.SetActive(false);
+    }
+
     public void SkipReward()
     {
-        rewardButtons.SetActive(false);
         TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+        rewardButtons.SetActive(false);
     }
 
     public void CardMouseDown(CardOnFeild cof)
@@ -634,6 +666,7 @@ public class CardManager : MonoBehaviour
 
                         ShowSkillCards();
                         rewardButtons.SetActive(true);
+                        rewardAcceptButton.interactable = false;
 
                         cof.CardSelectedEffect(true);
                     }
@@ -648,8 +681,14 @@ public class CardManager : MonoBehaviour
                         SelectToMain(cof);
                         cof.transform.DOScale(Vector3.one * 1.5f, 0.3f);
 
-                        ShowEquipCards();
+                        EquipmentCard rewardEquip = (EquipmentCard)main[0].card;
+                        List<Card> cards = new List<Card>();
+                        EquipmentCard equip = EntityController.instance.player.equipCards[(int)rewardEquip.equipType];
+                        cards.Add(equip);
+                        StartCoroutine(PutCardInHand(cards));
+
                         rewardButtons.SetActive(true);
+                        rewardAcceptButton.interactable = false;
 
                         cof.CardSelectedEffect(true);
                     }

@@ -57,12 +57,10 @@ public class Entity
             equipCards.Add(equip);
         }
 
-        SetEntityStat(GameManager.instance.GetTurnCount()/2); //여기서만 레벨 변동률 조정
-
-        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
+        SetEntityStat(GameManager.instance.GetEnemyLevel());
     }
 
-    public void SetEntityStat(int level)
+    private void SetEntityStat(int level)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -97,6 +95,8 @@ public class Entity
 
         actionPoint = 0;
         entityStat[EntityStat.APChargeSpeed] += 45;
+
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
     }
 
     public void TakeDamage(SkillType skillType, int damage, int equipNum = 3)
@@ -148,7 +148,10 @@ public class Entity
             if (isPlayer)
                 CardManager.instance.playerEquip[equipNum].CardPopUp("<color=grey>파괴됨!");
             else
+            {
                 CardManager.instance.enemyEquip[equipNum].CardPopUp("<color=grey>파괴됨!");
+                EntityController.instance.rewardEquips.Add(equipCards[equipNum]);
+            }
         }
 
         if (currentEquipDurabilities[0] == 0 && currentEquipDurabilities[1] == 0 && currentEquipDurabilities[2] == 0)
@@ -194,6 +197,34 @@ public class Entity
             actionPoint = 4f;
 
         entityCard.UpdateApGage(actionPoint);
+    }
+
+    public void ChangeEquip(EquipmentCard newEquip, int level)
+    {
+        int equipNum = (int)newEquip.equipType;
+        foreach (EquipmentStats eStat in equipCards[equipNum].equipStats)
+        {
+            entityStat[eStat.equipStat] -= eStat.basePow;
+            entityStat[eStat.equipStat] -= eStat.PowPL * entityEquipLevels[equipNum];
+        }
+
+        equipCards[equipNum] = newEquip;
+        entityEquipLevels[equipNum] = level;
+
+        foreach (EquipmentStats eStat in newEquip.equipStats)
+        {
+            entityStat[eStat.equipStat] += eStat.basePow;
+            entityStat[eStat.equipStat] += eStat.PowPL * level;
+
+            Debug.Log(entityStat[eStat.equipStat]);
+        }
+
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
+    }
+
+    public void ChangeSkill(SkillCard skill, int skillNum)
+    {
+        skillCards[skillNum] = skill;
     }
 }
 
@@ -274,6 +305,8 @@ public class EntityController : MonoBehaviour
 
         player.apChargeBlock = false;
         enemy.apChargeBlock = false;
+
+        rewardEquips.Clear();
     }
 
     public bool PlayerUseSkill(SkillCard skill, int equipNum)
@@ -350,7 +383,7 @@ public class EntityController : MonoBehaviour
         else
             rewardEquip = enemy.equipCards[UnityEngine.Random.Range(0, 3)];
 
-        SkillCard rewardSkill = enemy.skillCards[UnityEngine.Random.Range(0, 3)];
+        SkillCard rewardSkill = enemy.skillCards[UnityEngine.Random.Range(0, enemy.skillCards.Count)];
 
         CardManager.instance.SetRewardCards(rewardEquip, rewardSkill);
 

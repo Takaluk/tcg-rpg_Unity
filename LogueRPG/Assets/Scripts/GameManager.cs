@@ -27,6 +27,11 @@ public class GameManager : MonoBehaviour
     int controlBlock = 0;
     int turnCount = 0;
 
+    public int GetEnemyLevel()
+    {
+        return turnCount / 2;
+    }
+
     public int GetControlBlockCount()
     {
         return controlBlock;

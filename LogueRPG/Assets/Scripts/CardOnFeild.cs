@@ -20,7 +20,7 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] TMP_Text maxHpTMP;
     [SerializeField] GameObject healthBar;
     [SerializeField] GameObject equipDurability;
-    [SerializeField] GameObject cardSelectSprite;
+    [SerializeField] GameObject cardSelectAnimation;
     [SerializeField] Image healthbarSprite;
     [SerializeField] Image durabilitySprite;
     [SerializeField] Image[] manaGageSprites;
@@ -126,13 +126,13 @@ public class CardOnFeild : MonoBehaviour
                 backgroundSprite.sprite = background[2];
                 cardTypeTMP.text = "<color=grey>Equip";
                 cardBackSymbol.color = Color.grey;
-                symbolColor = new Color(100f / 255f, 100f / 255f, 100f / 255f, 60f / 255f);
+                symbolColor = new Color(150f / 255f, 150f / 255f, 150f / 255f, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
                 break;
         }
     }
 
-    public void SetEquipDescription(int level)
+    public void SetEquipDescription(Entity entity)
     {
         EquipmentCard equip = (EquipmentCard)card;
         string equipDescription = "";
@@ -150,7 +150,7 @@ public class CardOnFeild : MonoBehaviour
                     equipDescription += "<color=#5B40FF>Int+";
                     break;
             }
-            int equipPow = stat.basePow + stat.PowPL * level;
+            int equipPow = stat.basePow + stat.PowPL * entity.entityEquipLevels[(int)equip.equipType];
 
             equipDescription += equipPow + "\n";
         }
@@ -361,6 +361,6 @@ public class CardOnFeild : MonoBehaviour
 
     public void CardSelectedEffect(bool on)
     {
-        cardSelectSprite.SetActive(on);
+        cardSelectAnimation.SetActive(on);
     }
 }
