@@ -295,12 +295,120 @@ MonoBehaviour:
         pow: 200
         vfx: {fileID: 0}
   quests: []
-  player:
-    name: Witch
+  playerCharacters:
+  - name: Witch
     context:
     - .........!
     weight: 1
-    type: 2
+    type: 1
+    sprite: {fileID: 21300000, guid: 8bbb49b58fd2c88418549a6116c08c85, type: 3}
+    equipmentCards:
+    - name: "\uB0A1\uC740 \uCC45"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: e233ada80a15e754a80b909a432be4da, type: 3}
+      equipType: 0
+      equipStats:
+      - equipStat: 5
+        basePow: 100
+        PowPL: 3
+      Durability: 20
+    - name: "\uB0A1\uC740 \uB85C\uBE0C"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: bc28869298956064dba54649eab4edc1, type: 3}
+      equipType: 1
+      equipStats:
+      - equipStat: 2
+        basePow: 512
+        PowPL: 128
+      Durability: 40
+    - name: "\uAC00\uB974\uCE68\uC758 \uC758\uC9C0"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 2f8178592534c3b4ebdf525f27765a5a, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 6
+        basePow: 100
+        PowPL: 10
+      Durability: 10
+    enemySkills:
+    - name: "\uBD88\uD0DC\uC6B0\uAE30"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 657f8a2c3ee2d0340847425ef27508b6, type: 3}
+      cost: 2
+      coolTime: 0
+      acc: 100
+      skillEffects:
+      - skillType: 1
+        skillStatType: 6
+        pow: 500
+        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
+  - name: Witch
+    context:
+    - .........!
+    weight: 1
+    type: 1
+    sprite: {fileID: 21300000, guid: 8bbb49b58fd2c88418549a6116c08c85, type: 3}
+    equipmentCards:
+    - name: "\uB0A1\uC740 \uCC45"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: e233ada80a15e754a80b909a432be4da, type: 3}
+      equipType: 0
+      equipStats:
+      - equipStat: 5
+        basePow: 100
+        PowPL: 3
+      Durability: 20
+    - name: "\uB0A1\uC740 \uB85C\uBE0C"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: bc28869298956064dba54649eab4edc1, type: 3}
+      equipType: 1
+      equipStats:
+      - equipStat: 2
+        basePow: 512
+        PowPL: 128
+      Durability: 40
+    - name: "\uAC00\uB974\uCE68\uC758 \uC758\uC9C0"
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 2f8178592534c3b4ebdf525f27765a5a, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 6
+        basePow: 100
+        PowPL: 10
+      Durability: 10
+    enemySkills:
+    - name: "\uBD88\uD0DC\uC6B0\uAE30"
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 657f8a2c3ee2d0340847425ef27508b6, type: 3}
+      cost: 2
+      coolTime: 0
+      acc: 100
+      skillEffects:
+      - skillType: 1
+        skillStatType: 6
+        pow: 500
+        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
+  - name: Witch
+    context:
+    - .........!
+    weight: 1
+    type: 1
     sprite: {fileID: 21300000, guid: 8bbb49b58fd2c88418549a6116c08c85, type: 3}
     equipmentCards:
     - name: "\uB0A1\uC740 \uCC45"

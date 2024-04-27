@@ -5,7 +5,8 @@ public enum GameState
     PathSelection = 0,
     Battle,
     Event,
-    Reward
+    Reward,
+    MainCharacterSelection
 };
 
 public class TurnManager : MonoBehaviour
@@ -29,7 +30,7 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
-        currentState = GameState.PathSelection;
+        currentState = GameState.MainCharacterSelection;
         ChangeTurnTo(currentState);
     }
 
@@ -66,9 +67,14 @@ public class TurnManager : MonoBehaviour
                 EntityController.instance.BattleReward();
                 return;
 
+            case GameState.MainCharacterSelection:
+                currentState = GameState.MainCharacterSelection;
+                CardManager.instance.ShowPlayerSelection();
+                return;
+
             default:
                 Debug.LogError("Unknown state");
-                break;
+                return;
         }
     }
 

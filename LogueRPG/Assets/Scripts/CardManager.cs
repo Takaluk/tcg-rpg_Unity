@@ -71,15 +71,11 @@ public class CardManager : MonoBehaviour
     public GameObject enemySkillBackground;
     public GameObject rewardButtons;
     public Button rewardAcceptButton;
+    public Button selectPlayerButton;
 
     System.Random random = new System.Random();
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
     WaitForSeconds delay03 = new WaitForSeconds(0.3f);
-
-    private void Start()
-    {
-        SetPlayerCard();
-    }
 
     private void Update()
     {
@@ -94,9 +90,9 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    public void SetPlayerCard()
+    public void SetPlayerCard(CardOnFeild card)
     {
-        playerCard = DrawCard(cardSO.player, handSpawnPoint);
+        playerCard = card;
         EntityController.instance.player.UpdateEntity(playerCard);
         playerCard.ShowHealthbar(true);
         CardMoveTo(playerCard, playerCardPosition);
@@ -172,6 +168,18 @@ public class CardManager : MonoBehaviour
         selection.Clear();
 
         //change turn to selectedcard
+    }
+
+    public void ShowPlayerSelection()
+    {
+        List<Card> cards = new List<Card>();
+
+        foreach (EnemyCard player in cardSO.playerCharacters)
+        {
+            cards.Add(player);
+        }
+
+        StartCoroutine(PutCardInHand(cards));
     }
 
     public void ShowMainCardSelection()
@@ -643,6 +651,11 @@ public class CardManager : MonoBehaviour
         rewardButtons.SetActive(false);
     }
 
+    public void SelectPlayerCharacter()
+    {
+        SetPlayerCard(chosenHand);
+    }
+
     public void CardMouseDown(CardOnFeild cof)
     {
         switch (cof.card.type)
@@ -696,12 +709,6 @@ public class CardManager : MonoBehaviour
                 return;
 
             case (CardType.Enemy):
-                if (cof == playerCard)
-                {
-                    Debug.Log("player status");
-                    return;
-                }
-
                 if (TurnManager.instance.currentState == GameState.PathSelection)
                 {
                     enemyCard = cof;
@@ -715,6 +722,13 @@ public class CardManager : MonoBehaviour
                 else if (TurnManager.instance.currentState == GameState.Event)
                 {
                     cof.NextDialogue();
+                }
+                return;
+
+            case (CardType.Player):
+                if (TurnManager.instance.currentState == GameState.MainCharacterSelection)
+                {
+                    //player card set
                 }
                 return;
 

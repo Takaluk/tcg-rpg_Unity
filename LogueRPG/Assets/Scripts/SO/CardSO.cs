@@ -85,7 +85,7 @@ public class CardSO : ScriptableObject
     public EnemyCard[] enemies; //�������� ��ų�� ��� �̸� �Է�
     public Card[] quests;
 
-    public EnemyCard player;
+    public EnemyCard[] playerCharacters;
     //n skillcard
     //r skill card
 }
