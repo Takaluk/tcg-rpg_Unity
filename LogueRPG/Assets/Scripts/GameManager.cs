@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     [SerializeField] TMP_Text turnCountTMP;
-
+    [SerializeField] int enemyPenalty = 100;
     int controlBlock = 0;
     int turnCount = 0;
 
@@ -56,5 +56,10 @@ public class GameManager : MonoBehaviour
     public int GetTurnCount()
     {
         return turnCount;
+    }
+
+    public int GetEnemyPenalty()
+    {
+        return enemyPenalty;
     }
 }

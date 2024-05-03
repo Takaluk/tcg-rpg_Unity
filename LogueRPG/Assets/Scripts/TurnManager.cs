@@ -6,8 +6,15 @@ public enum GameState
     Battle,
     Event,
     Reward,
-    MainCharacterSelection
+    PlayerCharacterSelection
 };
+
+public enum StageType
+{
+    Wood,
+    Town,
+    Castle
+}
 
 public class TurnManager : MonoBehaviour
 {
@@ -27,11 +34,18 @@ public class TurnManager : MonoBehaviour
     }
     #endregion
     public GameState currentState;
+    public StageType currentStage;
 
     private void Start()
     {
-        currentState = GameState.MainCharacterSelection;
-        ChangeTurnTo(currentState);
+        currentState = GameState.PlayerCharacterSelection;
+    }
+                                    
+    public void ChangeStageTo(StageType stage)
+    {
+        currentStage = stage;
+
+        CardManager.instance.SetStageData(stage);
     }
 
     public void ChangeTurnTo(GameState gameState)
@@ -62,13 +76,13 @@ public class TurnManager : MonoBehaviour
             case GameState.Reward:
                 currentState = GameState.Reward;
                 CardManager.instance.EmptyHand();
-                CardManager.instance.SetBattlePosition(false);
+                //CardManager.instance.SetBattlePosition(false);
 
                 EntityController.instance.BattleReward();
                 return;
 
-            case GameState.MainCharacterSelection:
-                currentState = GameState.MainCharacterSelection;
+            case GameState.PlayerCharacterSelection:
+                currentState = GameState.PlayerCharacterSelection;
                 CardManager.instance.ShowPlayerSelection();
                 return;
 

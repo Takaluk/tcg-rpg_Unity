@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections.Generic;
 using UnityEngine;
 public enum CardType
@@ -8,7 +9,8 @@ public enum CardType
     Event,
     Quest,
     Skill,
-    Equip
+    Equip,
+    Stage
 };
 
 public enum EquipType
@@ -77,15 +79,40 @@ public class EventCard : Card
     public SkillCard skill;
 }
 
+[System.Serializable]
+public class StageCard : Card
+{
+    public StageType stageType;
+}
+
+[System.Serializable]
+public class StageData
+{
+    public Sprite stageBackground;
+
+    public EnemyCard[] enemies;
+    public EventCard[] events;
+    public EnemyCard[] mainEnemies;
+    public EventCard[] mainEvents;
+    public StageCard[] connectedStages;
+    //고정이벤트(
+    //quests;
+}
+
 [CreateAssetMenu(fileName = "CardSO", menuName = "Scriptable Object/CardSO")]
 public class CardSO : ScriptableObject
 {
     public Card[] mainCardTypes;
-    public EventCard[] events;
-    public EnemyCard[] enemies; //�������� ��ų�� ��� �̸� �Է�
-    public Card[] quests;
 
     public EnemyCard[] playerCharacters;
-    //n skillcard
-    //r skill card
+
+    [Header("MapData")]
+    public StageData woodStageData;
+    public StageData castleStageData;
+    public StageData townStageData;
+
+    [Header("Backgrounds")]
+    public Sprite skillBakcground;
+    public Sprite equipBakcground;
+    public Sprite playerBakcground;
 }

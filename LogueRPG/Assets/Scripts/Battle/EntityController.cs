@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 
 public enum EntityStat
@@ -62,6 +63,10 @@ public class Entity
 
     private void SetEntityStat(int level)
     {
+        int enemyPenalty = 100;
+        if (!isPlayer)
+            enemyPenalty = GameManager.instance.GetEnemyPenalty();
+
         for (int i = 0; i < 3; i++)
         {
             entityEquipLevels[i] = level;
@@ -80,8 +85,8 @@ public class Entity
         {
             foreach(EquipmentStats eStat in equipCards[i].equipStats)
             {
-                entityStat[eStat.equipStat] += eStat.basePow;
-                entityStat[eStat.equipStat] += eStat.PowPL * level;
+                entityStat[eStat.equipStat] += eStat.basePow * enemyPenalty / 100;
+                entityStat[eStat.equipStat] += eStat.PowPL * level * enemyPenalty / 100;
             }
         }
 
@@ -258,6 +263,10 @@ public class EntityController : MonoBehaviour
 
     float apChargeTimer = 0f;
     float apChargeInterval = 0.1f;
+    float enemyActionTimer = 0f;
+    float enemyActionInterval = 0.5f;
+
+    SkillCard currentEnemySkill = null;
 
     private void Start()
     {
@@ -266,21 +275,10 @@ public class EntityController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            player.TakeDamage(SkillType.PscDamage,100);
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
-        }
-
         if (TurnManager.instance.currentState == GameState.Battle)
         {
             if (GameManager.instance.GetControlBlockCount() > 0)
-            {
                 handBlockSprite.SetActive(true);
-            }
             else
                 handBlockSprite.SetActive(false);
 
@@ -292,6 +290,21 @@ public class EntityController : MonoBehaviour
                 enemy.EntityApCharge(apChargeTimer);
 
                 apChargeTimer = 0f;
+            }
+
+            enemyActionTimer += Time.deltaTime;
+
+            if (currentEnemySkill == null)
+            {
+                currentEnemySkill = CardManager.instance.ChooseRandomEnemySkill();
+            }
+
+            if (enemyActionTimer > enemyActionInterval)
+            {
+                CardManager.instance.EnemyUseSkill(currentEnemySkill);
+                enemyActionTimer = 0f;
+
+                currentEnemySkill = null;
             }
         }
     }
@@ -309,47 +322,66 @@ public class EntityController : MonoBehaviour
         rewardEquips.Clear();
     }
 
-    public bool PlayerUseSkill(SkillCard skill, int equipNum)
+    public bool UseSkill(SkillCard skill, int equipNum, bool isPlayer)
     {
+        Entity entity;
+        if (isPlayer)
+            entity = player;
+        else
+            entity = enemy;
+
         if (equipNum < 3)
         {
-            if (player.isEnchanted[equipNum])
+            if (entity.isEnchanted[equipNum])
                 return false;
         }
-        else
+        else if (TurnManager.instance.currentState == GameState.Event)
         {
-            //event skill
             skillController.UseSkill(skill, enemy, player, equipNum);
             return true;
         }
+        else
+            return false;
         //equipmentList에서 스킬 발동
 
-        if (player.actionPoint >= skill.cost)
+        if (entity.actionPoint >= skill.cost)
         {
-            player.isEnchanted[equipNum] = true;
+            entity.isEnchanted[equipNum] = true;
 
-            player.actionPoint -= skill.cost;
-            player.entityCard.UpdateApGage(player.actionPoint);
-            skillController.UseSkill(skill, enemy, player, equipNum);
+            entity.actionPoint -= skill.cost;
+            entity.entityCard.UpdateApGage(entity.actionPoint);
+            if (isPlayer)
+                skillController.UseSkill(skill, enemy, player, equipNum);
+            else
+                skillController.UseSkill(skill, player, enemy, equipNum);
         }
         else
         {
-            player.EntityPopUp("<color=#1E90FF>Not enough AP");
+            if (entity.isPlayer)
+                entity.EntityPopUp("<color=#1E90FF>Not enough AP");
             return false;
         }
 
         return true;
     }
 
-/*    public void EntityPopUp(string line, Transform popUpPosition )
+    public int GetEmptySlot(Entity entity)
     {
-        var popUp = Instantiate(popUpPrefeb, popUpPosition);
-        TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
-        popUpTmp.text = line;
-        Vector3 dest = new Vector3(popUpPosition.position.x, popUpPosition.position.y + 1f, popUpPosition.position.z - 20f);
-        popUp.gameObject.transform.DOMove(dest, 1f)
-            .OnComplete(() => Destroy(popUp));
-    }*/
+        List<int> emptySlots = new List<int>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (!entity.isEnchanted[i])
+                emptySlots.Add(i);
+        }
+
+        if (emptySlots.Count > 0)
+        {
+            return UnityEngine.Random.Range(0, emptySlots.Count);
+        }
+        else
+            return 3;
+    }
 
     public void EntityDied(Entity entity)
     {

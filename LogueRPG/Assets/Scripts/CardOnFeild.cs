@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using Unity.VisualScripting;
 
 public class CardOnFeild : MonoBehaviour
 {
@@ -13,9 +14,9 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] TMP_Text cardTypeTMP;
     [SerializeField] TMP_Text descriptionTMP;
     [SerializeField] TMP_Text skillCostTMP;
+    [SerializeField] TMP_Text skillCoolTMP;
     [SerializeField] Sprite cardFront;
     [SerializeField] Sprite cardBack;
-    [SerializeField] Sprite[] background;
     [SerializeField] TMP_Text currentHpTMP;
     [SerializeField] TMP_Text maxHpTMP;
     [SerializeField] GameObject healthBar;
@@ -54,28 +55,27 @@ public class CardOnFeild : MonoBehaviour
         string name = card.name.Replace("\\n", "\n");
         nameTMP.text = name;
         Color symbolColor = Color.white;
-            switch (card.type)
+        switch (card.type)
         {
-            //기본 배경들
-            //0:skill
-            //1:demo_town
-            //2:equip
             case (CardType.Player):
-                backgroundSprite.sprite = background[1];
+                backgroundSprite.sprite = CardManager.instance.cardSO.playerBakcground;
                 cardTypeTMP.text = "<color=white>Player";
                 symbolColor = new Color(1, 1, 1, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
+
+                NextDialogue();
                 break;
             case (CardType.Enemy):
-                backgroundSprite.sprite = background[1];
+                backgroundSprite.sprite = CardManager.instance.currentStageData.stageBackground;
                 cardTypeTMP.text = "<color=red>Enemy";
                 symbolColor = new Color(1, 0, 0, 60f/255f);
                 cardBackSymbol.color = symbolColor;
                 break;
             case (CardType.Skill):
-                backgroundSprite.sprite = background[0];
+                backgroundSprite.sprite = CardManager.instance.cardSO.skillBakcground;
                 SkillCard skill = (SkillCard)card;
                 skillCostTMP.text = "<color=#1E90FF>" + skill.cost.ToString();
+                skillCoolTMP.text = "<color=grey>" + skill.coolTime.ToString();
                 cardTypeTMP.text = "<color=#1E90FF>Skill";
                 symbolColor = new Color(0, 0, 1, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
@@ -117,17 +117,21 @@ public class CardOnFeild : MonoBehaviour
                 descriptionTMP.text = skillDescription;
                 break;
             case (CardType.Event):
-                backgroundSprite.sprite = background[1];
+                backgroundSprite.sprite = CardManager.instance.currentStageData.stageBackground;
                 cardTypeTMP.text = "<color=yellow>Event";
                 symbolColor = new Color(1, 1, 0, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
                 break;
             case CardType.Equip:
-                backgroundSprite.sprite = background[2];
+                backgroundSprite.sprite = CardManager.instance.cardSO.equipBakcground;
                 cardTypeTMP.text = "<color=grey>Equip";
-                cardBackSymbol.color = Color.grey;
                 symbolColor = new Color(150f / 255f, 150f / 255f, 150f / 255f, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
+                break;
+            case CardType.Stage:
+                cardTypeTMP.text = "<color=blue>Location";
+                cardBackSymbol.color = Color.blue;
+                NextDialogue();
                 break;
         }
     }
@@ -230,7 +234,7 @@ public class CardOnFeild : MonoBehaviour
 
                 if (lineIndex == ecard.eventLineIndex)
                 {
-                    EntityController.instance.PlayerUseSkill(ecard.skill,3);
+                    EntityController.instance.UseSkill(ecard.skill, 3, true);
                 }
             }
         }
@@ -239,6 +243,12 @@ public class CardOnFeild : MonoBehaviour
             if (card.type == CardType.Enemy)
             {
                 TurnManager.instance.ChangeTurnTo(GameState.Reward);
+            }
+            else if (card.type == CardType.Stage)
+            {
+                if (TurnManager.instance.currentState == GameState.PlayerCharacterSelection)
+                    TurnManager.instance.ChangeTurnTo(GameState.PlayerCharacterSelection);
+                return;
             }
             else
             {
@@ -258,26 +268,22 @@ public class CardOnFeild : MonoBehaviour
     {
         GameManager.instance.AddControlBlock();
 
-        if (lineIndex == 0)
-        {
-            yield return new WaitForSeconds(0.4f);
-        }
-
         line = line.Replace("\\n", "\n");
 
+        int signCounter = 0;
+        foreach (char c in line.ToCharArray())
+        {
+            descriptionTMP.text += c;
 
-        if (line[0] == '<')
-        {
-            descriptionTMP.text += line;
-            yield return new WaitForSeconds(textSpeed);
-        }
-        else
-        {
-            foreach (char c in line.ToCharArray())
-            {
-                descriptionTMP.text += c;
+            if (c == '<')
+                signCounter++;
+            else if (c == '>')
+                signCounter--;
+
+            if (signCounter > 0)
+                continue;
+            else
                 yield return new WaitForSeconds(textSpeed);
-            }
         }
 
         GameManager.instance.RemoveControlBlock();
@@ -294,13 +300,13 @@ public class CardOnFeild : MonoBehaviour
         if (isMinimized)
         {
             dest.y -= 2f;
-            popUp.transform.localScale = Vector3.one * 2f;
-            popUp.gameObject.transform.DOMove(dest, 0.5f)
+            popUp.transform.localScale = Vector3.one * 1.6f;
+            popUp.gameObject.transform.DOMove(dest, 0.6f)
                 .OnComplete(() => Destroy(popUp));
         }
         else
         {
-            popUp.gameObject.transform.DOMove(dest, 1f)
+            popUp.gameObject.transform.DOMove(dest, 2f)
                 .OnComplete(() => Destroy(popUp));
         }
     }
