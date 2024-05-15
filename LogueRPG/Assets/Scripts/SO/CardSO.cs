@@ -45,6 +45,8 @@ public class SkillEffect
     public SkillType skillType;
     public EntityStat skillStatType;
     public int pow;
+    public int buffDur;
+    public Sprite buffIcon;
     public GameObject vfx;
 }
 
@@ -75,8 +77,8 @@ public class EquipmentStats
 [System.Serializable]
 public class EventCard : Card
 {
-    public int eventLineIndex;
-    public SkillCard skill;
+    public int[] eventLineIndexs;
+    public SkillCard[] eventSkills;
 }
 
 [System.Serializable]

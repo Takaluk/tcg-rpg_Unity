@@ -5,23 +5,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using Unity.VisualScripting;
+using static UnityEngine.GraphicsBuffer;
 
 public class CardOnFeild : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer cardSprite;
     [SerializeField] SpriteRenderer backgroundSprite;
     [SerializeField] TMP_Text nameTMP;
     [SerializeField] TMP_Text cardTypeTMP;
     [SerializeField] TMP_Text descriptionTMP;
     [SerializeField] TMP_Text skillCostTMP;
     [SerializeField] TMP_Text skillCoolTMP;
-    [SerializeField] Sprite cardFront;
-    [SerializeField] Sprite cardBack;
     [SerializeField] TMP_Text currentHpTMP;
     [SerializeField] TMP_Text maxHpTMP;
     [SerializeField] GameObject healthBar;
     [SerializeField] GameObject equipDurability;
     [SerializeField] GameObject cardSelectAnimation;
+    [SerializeField] GameObject cardBreakAnimation;
     [SerializeField] Image healthbarSprite;
     [SerializeField] Image durabilitySprite;
     [SerializeField] Image[] manaGageSprites;
@@ -34,11 +33,15 @@ public class CardOnFeild : MonoBehaviour
     public PRS handPRS;
 
     public int lineIndex = 0;
+    Coroutine typeCoroutine;
+
     public bool isMinimized = false;
     public bool isMoveable = false;
     public float textSpeed = 0.3f;
 
     [SerializeField] GameObject popUpPrefeb;
+    public Transform buffTrnasform;
+    public Transform debuffTransform;
 
 
     private void OnDestroy()
@@ -49,35 +52,33 @@ public class CardOnFeild : MonoBehaviour
     public void SetUp(Card card)
     {
         this.card = card;
-
-        cardSprite.sprite = cardFront;
         characterSprite.sprite = card.sprite;
         string name = card.name.Replace("\\n", "\n");
         nameTMP.text = name;
         Color symbolColor = Color.white;
         switch (card.type)
         {
-            case (CardType.Player):
+            case CardType.Player:
                 backgroundSprite.sprite = CardManager.instance.cardSO.playerBakcground;
-                cardTypeTMP.text = "<color=white>Player";
+                cardTypeTMP.text = Utils.color_player + "Player";
                 symbolColor = new Color(1, 1, 1, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
-
-                NextDialogue();
+                lineIndex++;
+                descriptionTMP.text = card.context[0].Replace("\\n", "\n"); ;
                 break;
-            case (CardType.Enemy):
+            case CardType.Enemy:
                 backgroundSprite.sprite = CardManager.instance.currentStageData.stageBackground;
-                cardTypeTMP.text = "<color=red>Enemy";
+                cardTypeTMP.text = Utils.color_enemy + "Enemy";
                 symbolColor = new Color(1, 0, 0, 60f/255f);
                 cardBackSymbol.color = symbolColor;
                 break;
-            case (CardType.Skill):
+            case CardType.Skill:
                 backgroundSprite.sprite = CardManager.instance.cardSO.skillBakcground;
                 SkillCard skill = (SkillCard)card;
-                skillCostTMP.text = "<color=#1E90FF>" + skill.cost.ToString();
-                skillCoolTMP.text = "<color=grey>" + skill.coolTime.ToString();
-                cardTypeTMP.text = "<color=#1E90FF>Skill";
-                symbolColor = new Color(0, 0, 1, 60f / 255f);
+                skillCostTMP.text = Utils.color_mana + skill.cost.ToString();
+                skillCoolTMP.text = Utils.color_cool + skill.coolTime.ToString();
+                cardTypeTMP.text = Utils.color_mana + "Skill";
+                symbolColor = new Color(82f / 255f, 177f / 255f, 249f / 255f, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
 
                 string skillDescription = "";
@@ -85,52 +86,74 @@ public class CardOnFeild : MonoBehaviour
                 {
                     switch (skillEffect.skillType)
                     {
-                        case (SkillType.PscDamage):
-                            skillDescription += "적에게 <color=red>물리 피해</color>";
+                        case SkillType.PscDamage:
+                            skillDescription += "Deal " + Utils.color_pcsDamage + "Physical damage</color>";
                             break;
-                        case (SkillType.MgcDamage):
-                            skillDescription += "적에게 <color=#5B40FF>마법 피해</color>";
+                        case SkillType.MgcDamage:
+                            skillDescription += "Deal " + Utils.color_mgcDamage + "Magical damage</color>";
                             break;
-                        case (SkillType.Heal):
-                            skillDescription += "자신에게 <color=green>체력 회복</color>";
+                        case SkillType.Heal:
+                            skillDescription += "Heal</color>";
+                            break;
+                        case SkillType.Buff:
+                            skillDescription += "Gain </color>";
                             break;
                     }
 
-                    skillDescription += "(";
+                    skillDescription += " (";
 
                     switch (skillEffect.skillStatType)
                     {
-                        case (EntityStat.Str):
-                            skillDescription += "<color=red>Str</color>/";
+                        case EntityStat.Str:
+                            skillDescription += Utils.color_Str + "Str</color>/";
                             break;
-                        case (EntityStat.Int):
-                            skillDescription += "<color=#5B40FF>Int</color>/";
+                        case EntityStat.Int:
+                            skillDescription += Utils.color_Int + "Int</color>/";
                             break;
-                        case (EntityStat.MaxHP):
-                            skillDescription += "<color=green>MaxHP</color>/";
+                        case EntityStat.MaxHP:
+                            skillDescription += Utils.color_HP + "MaxHP</color>/";
+                            break;
+                        case EntityStat.PDef:
+                            skillDescription += Utils.color_Str + "Physical Defence</color>/";
+                            break;
+                        case EntityStat.MDef:
+                            skillDescription += Utils.color_Int + "Magical Defence</color>/";
+                            break;
+                        case EntityStat.Dodge:
+                            skillDescription += Utils.color_miss + "Dodge</color>/";
+                            break;
+                        case EntityStat.Acc:
+                            skillDescription += Utils.color_miss + "Accuracy</color>/";
                             break;
                     }
                     skillDescription += skillEffect.pow;
+
+                    if (skillEffect.buffDur > 0)
+                    {
+                        skillDescription += "/" + skillEffect.buffDur + "s";
+                    }
+
                     skillDescription += ")\n";
                 }
                 skillDescription += "(acc/" + skill.acc + ")";
                 descriptionTMP.text = skillDescription;
                 break;
-            case (CardType.Event):
+            case CardType.Event:
                 backgroundSprite.sprite = CardManager.instance.currentStageData.stageBackground;
-                cardTypeTMP.text = "<color=yellow>Event";
-                symbolColor = new Color(1, 1, 0, 60f / 255f);
+                cardTypeTMP.text = Utils.color_event + "Event";
+                symbolColor = new Color(1, 1, 115f / 255f, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
                 break;
             case CardType.Equip:
                 backgroundSprite.sprite = CardManager.instance.cardSO.equipBakcground;
-                cardTypeTMP.text = "<color=grey>Equip";
+                cardTypeTMP.text = Utils.color_equip + "Equip";
                 symbolColor = new Color(150f / 255f, 150f / 255f, 150f / 255f, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
                 break;
             case CardType.Stage:
-                cardTypeTMP.text = "<color=blue>Location";
-                cardBackSymbol.color = Color.blue;
+                cardTypeTMP.text = Utils.color_location + "Location";
+                symbolColor = new Color(0, 0, 1, 60f / 255f);
+                cardBackSymbol.color = symbolColor;
                 NextDialogue();
                 break;
         }
@@ -144,14 +167,14 @@ public class CardOnFeild : MonoBehaviour
         {
             switch (stat.equipStat)
             {
-                case (EntityStat.MaxHP):
-                    equipDescription += "<color=green>MaxHP+";
+                case EntityStat.MaxHP:
+                    equipDescription += Utils.color_HP + "MaxHP</color> +";
                     break;
-                case (EntityStat.Str):
-                    equipDescription += "<color=red>Str+";
+                case EntityStat.Str:
+                    equipDescription += Utils.color_Str + "Str</color> +";
                     break;
-                case (EntityStat.Int):
-                    equipDescription += "<color=#5B40FF>Int+";
+                case EntityStat.Int:
+                    equipDescription += Utils.color_Int + "Int</color> +";
                     break;
             }
             int equipPow = stat.basePow + stat.PowPL * entity.entityEquipLevels[(int)equip.equipType];
@@ -202,9 +225,6 @@ public class CardOnFeild : MonoBehaviour
 
     private void OnMouseUp()
     {
-        if (GameManager.instance.GetControlBlockCount() > 0)
-            return;
-
         if (isMinimized)
         {
             CardManager.instance.CardMouseUp(this);
@@ -225,17 +245,29 @@ public class CardOnFeild : MonoBehaviour
     {
         if (lineIndex < card.context.Length)
         {
-            TypeDescription(card.context[lineIndex]);
-            lineIndex++;
+            if (typeCoroutine == null)
+            {
+                typeCoroutine = StartCoroutine(Type(card.context[lineIndex].Replace("\\n", "\n")));
+            }
+            else
+            {
+                StopCoroutine(typeCoroutine);
+                typeCoroutine = null;
+                descriptionTMP.text = card.context[lineIndex].Replace("\\n", "\n");
+                lineIndex++;
+            }
 
             if (card.type == CardType.Event)
             {
-                EventCard ecard = (EventCard)card;
+/*                EventCard ecard = (EventCard)card;
 
-                if (lineIndex == ecard.eventLineIndex)
+                foreach (int i in ecard.eventLineIndexs)
                 {
-                    EntityController.instance.UseSkill(ecard.skill, 3, true);
-                }
+                    if (lineIndex == i)
+                    {
+                        EntityController.instance.UseSkill(ecard.eventSkills[0], 3, true);
+                    }
+                }*/
             }
         }
         else
@@ -258,17 +290,13 @@ public class CardOnFeild : MonoBehaviour
             
     }
 
-    public void TypeDescription(string line)
-    {
-        descriptionTMP.text = "";
-        StartCoroutine(Type(line));
-    }
-
     IEnumerator Type(string line)
     {
-        GameManager.instance.AddControlBlock();
+        descriptionTMP.text = "";
 
-        line = line.Replace("\\n", "\n");
+        GameManager.instance.AddControlBlock();
+        yield return new WaitForSeconds(textSpeed);
+        GameManager.instance.RemoveControlBlock();
 
         int signCounter = 0;
         foreach (char c in line.ToCharArray())
@@ -286,7 +314,7 @@ public class CardOnFeild : MonoBehaviour
                 yield return new WaitForSeconds(textSpeed);
         }
 
-        GameManager.instance.RemoveControlBlock();
+        lineIndex++;
     }
     #endregion
 
@@ -300,13 +328,13 @@ public class CardOnFeild : MonoBehaviour
         if (isMinimized)
         {
             dest.y -= 2f;
-            popUp.transform.localScale = Vector3.one * 1.6f;
-            popUp.gameObject.transform.DOMove(dest, 0.6f)
+            popUp.transform.localScale = Vector3.one * 1f;
+            popUp.gameObject.transform.DOMove(dest, 1f)
                 .OnComplete(() => Destroy(popUp));
         }
         else
         {
-            popUp.gameObject.transform.DOMove(dest, 2f)
+            popUp.gameObject.transform.DOMove(dest, 1f)
                 .OnComplete(() => Destroy(popUp));
         }
     }
@@ -335,7 +363,7 @@ public class CardOnFeild : MonoBehaviour
         durabilitySprite.fillAmount = durabilityAmount;
     }
 
-    public void UpdateApGage(float actionPoints)
+    public void UpdateManaGage(float actionPoints)
     {
         for (int i = 0; i < manaGageSprites.Length; i++)
         {
@@ -368,5 +396,10 @@ public class CardOnFeild : MonoBehaviour
     public void CardSelectedEffect(bool on)
     {
         cardSelectAnimation.SetActive(on);
+    }
+
+    public void CardBreakEffect(bool on)
+    {
+        cardBreakAnimation.SetActive(on);
     }
 }

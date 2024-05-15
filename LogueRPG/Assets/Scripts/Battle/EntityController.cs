@@ -2,6 +2,7 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
@@ -12,14 +13,14 @@ public enum EntityStat
     Level,
     MaxHP,
     CurrentHP,
-    APChargeSpeed,
+    ManaChargeSpeed,
 
     Str,
     Int,
-    Def,
-    Wis,
-    DEX,
-    SAN
+    PDef,
+    MDef,
+    Acc,
+    Dodge
 };
 
 [System.Serializable]
@@ -37,12 +38,19 @@ public class Entity
     public int[] maxEquipDurabilities = { 0, 0, 0 };
     public bool[] isEnchanted = {false, false, false};
 
-    public bool apChargeBlock = false;
-    public float actionPoint = 0;
+    public bool manaChargeBlock = false;
+    public float mana = 0;
+
+    List<Buff> buffList = new List<Buff>();
+    List<Buff> debuffList = new List<Buff>();
+    public Transform buffTransform;
+    public Transform debuffTransform;
 
     public void UpdateEntity(CardOnFeild cof)
     {
         entityCard = cof;
+        buffTransform = cof.buffTrnasform;
+        debuffTransform = cof.debuffTransform;
         EnemyCard entityData = (EnemyCard)cof.card;
 
         skillCards.Clear();
@@ -78,19 +86,17 @@ public class Entity
             entityStat[stat] = 0;
         }
 
-        entityStat[EntityStat.Level] = level;
-        entityStat[EntityStat.MaxHP] = 100;
+        IncreaseStat(EntityStat.Level, level);
+        IncreaseStat(EntityStat.MaxHP, level * 10);
 
         for (int i =0; i< 3; i++)
         {
             foreach(EquipmentStats eStat in equipCards[i].equipStats)
             {
-                entityStat[eStat.equipStat] += eStat.basePow * enemyPenalty / 100;
-                entityStat[eStat.equipStat] += eStat.PowPL * level * enemyPenalty / 100;
+                IncreaseStat(eStat.equipStat, eStat.basePow * enemyPenalty / 100);
+                IncreaseStat(eStat.equipStat, eStat.PowPL * level * enemyPenalty / 100);
             }
         }
-
-        entityStat[EntityStat.CurrentHP] = entityStat[EntityStat.MaxHP];
 
         for (int i = 0; i < 3; i++)
         {
@@ -98,9 +104,8 @@ public class Entity
             currentEquipDurabilities[i] = maxEquipDurabilities[i];
         }
 
-        actionPoint = 0;
-        entityStat[EntityStat.APChargeSpeed] += 45;
-
+        mana = 0;
+        entityStat[EntityStat.CurrentHP] = entityStat[EntityStat.MaxHP];
         entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
     }
 
@@ -113,14 +118,36 @@ public class Entity
         switch (skillType)
         {
             case (SkillType.PscDamage):
-                damageAmount += "<color=red>" + damage.ToString();
+                int pDef = entityStat[EntityStat.PDef];
+
+                if (pDef > 0)
+                {
+                    damage = damage * 1 / (1 + pDef / 100);
+                }
+                else if (pDef < 0)
+                {
+                    damage = damage * 1 / (1 + pDef / 100);
+                }
+
+                damageAmount += Utils.color_pcsDamage + damage.ToString();
                 if (equipNum < 3)
                 {
                     TakeDurabilityDamage(equipNum, damage);
                 }
                 break;
+
             case (SkillType.MgcDamage):
-                damageAmount += "<color=#5B40FF>" + damage.ToString();
+                int mDef = entityStat[EntityStat.MDef];
+
+                if (mDef > 0)
+                {
+                    damage = damage * 1 / (1 + mDef / 100);
+                }
+                else if (mDef < 0)
+                {
+                    damage = damage * 1 / (1 + mDef / 100);
+                }
+                damageAmount += Utils.color_mgcDamage + damage.ToString();
                 break;
         }
 
@@ -151,10 +178,14 @@ public class Entity
         {
             currentEquipDurabilities[equipNum] = 0;
             if (isPlayer)
-                CardManager.instance.playerEquip[equipNum].CardPopUp("<color=grey>파괴됨!");
+            {
+                CardManager.instance.playerEquip[equipNum].CardBreakEffect(true);
+                CardManager.instance.playerEquip[equipNum].CardPopUp(Utils.color_broken + "Broken!");
+            }
             else
             {
-                CardManager.instance.enemyEquip[equipNum].CardPopUp("<color=grey>파괴됨!");
+                CardManager.instance.enemyEquip[equipNum].CardBreakEffect(true);
+                CardManager.instance.enemyEquip[equipNum].CardPopUp(Utils.color_broken + "Broken!");
                 EntityController.instance.rewardEquips.Add(equipCards[equipNum]);
             }
         }
@@ -176,13 +207,16 @@ public class Entity
         else
             entityStat[EntityStat.CurrentHP] = afterHp;
 
-        string healAmount = "<color=green>" + heal.ToString();
+        string healAmount = Utils.color_heal + heal.ToString();
         EntityPopUp(healAmount);
         entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
     }
 
     public void Die()
     {
+        buffList.Clear();
+        debuffList.Clear();
+
         EntityController.instance.EntityDied(this);
     }
 
@@ -191,17 +225,17 @@ public class Entity
         entityCard.CardPopUp(line);
     }
 
-    public void EntityApCharge(float apCharge)
+    public void EntityManaCharge(float manaCharge)
     {
-        if (apChargeBlock)
+        if (manaChargeBlock)
             return;
 
-        if (actionPoint < 4f)
-            actionPoint += (entityStat[EntityStat.APChargeSpeed] / 60f) * apCharge;
+        if (mana < 4f)
+            mana += (entityStat[EntityStat.ManaChargeSpeed] / 60f) * manaCharge;
         else
-            actionPoint = 4f;
+            mana = 4f;
 
-        entityCard.UpdateApGage(actionPoint);
+        entityCard.UpdateManaGage(mana);
     }
 
     public void ChangeEquip(EquipmentCard newEquip, int level)
@@ -209,8 +243,8 @@ public class Entity
         int equipNum = (int)newEquip.equipType;
         foreach (EquipmentStats eStat in equipCards[equipNum].equipStats)
         {
-            entityStat[eStat.equipStat] -= eStat.basePow;
-            entityStat[eStat.equipStat] -= eStat.PowPL * entityEquipLevels[equipNum];
+            DecreaseStat(eStat.equipStat, eStat.basePow);
+            DecreaseStat(eStat.equipStat, eStat.PowPL * entityEquipLevels[equipNum]);
         }
 
         equipCards[equipNum] = newEquip;
@@ -218,18 +252,72 @@ public class Entity
 
         foreach (EquipmentStats eStat in newEquip.equipStats)
         {
-            entityStat[eStat.equipStat] += eStat.basePow;
-            entityStat[eStat.equipStat] += eStat.PowPL * level;
-
-            Debug.Log(entityStat[eStat.equipStat]);
+            IncreaseStat(eStat.equipStat, eStat.basePow);
+            IncreaseStat(eStat.equipStat, eStat.PowPL * level);
         }
 
         entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
     }
 
+    public void IncreaseStat(EntityStat statType, int pow)
+    {
+        entityStat[statType] += pow;
+    }
+
+    public void DecreaseStat(EntityStat statType, int pow)
+    {
+        entityStat[statType] -= pow;
+    }
+
     public void ChangeSkill(SkillCard skill, int skillNum)
     {
         skillCards[skillNum] = skill;
+    }
+
+    public void AddBuff(Buff buff)
+    {
+        buffList.Add(buff);
+    }
+
+    public void RemoveBuff(Buff buff)
+    {
+        buffList.Remove(buff);
+    }
+
+    public void AddDebuff(Buff buff)
+    {
+        debuffList.Add(buff);
+    }
+
+    public void RemoveDebuff(Buff buff)
+    {
+        debuffList.Remove(buff);
+    }
+
+    public void StartAllBuffTimer()
+    {
+        foreach (Buff buff in buffList)
+        {
+            buff.ActivateBuff();
+        }
+
+        foreach (Buff buff in debuffList)
+        {
+            buff.ActivateBuff();
+        }
+    }
+
+    public void StopAllBuffTimer()
+    {
+        foreach (Buff buff in buffList)
+        {
+            buff.PauseBuffTimer();
+        }
+
+        foreach (Buff buff in debuffList)
+        {
+            buff.PauseBuffTimer();
+        }
     }
 }
 
@@ -251,20 +339,21 @@ public class EntityController : MonoBehaviour
     }
     #endregion
     SkillController skillController = null;
-
-    public GameObject popUpPrefeb;
     public GameObject handBlockSprite;
 
     public Entity player;
     public Entity enemy;
+
+    public GameObject buffPrefab;
+
     public Material hitFlashMaterial;
 
     public List<EquipmentCard> rewardEquips = new List<EquipmentCard>();
 
-    float apChargeTimer = 0f;
-    float apChargeInterval = 0.1f;
+    float manaChargeTimer = 0f;
+    float manaChargeInterval = 0.1f;
     float enemyActionTimer = 0f;
-    float enemyActionInterval = 0.5f;
+    float enemyActionInterval = 0.7f;
 
     SkillCard currentEnemySkill = null;
 
@@ -282,14 +371,14 @@ public class EntityController : MonoBehaviour
             else
                 handBlockSprite.SetActive(false);
 
-            apChargeTimer += Time.deltaTime;
+            manaChargeTimer += Time.deltaTime;
 
-            if (apChargeTimer >= apChargeInterval) 
+            if (manaChargeTimer >= manaChargeInterval) 
             {
-                player.EntityApCharge(apChargeTimer);
-                enemy.EntityApCharge(apChargeTimer);
+                player.EntityManaCharge(manaChargeTimer);
+                enemy.EntityManaCharge(manaChargeTimer);
 
-                apChargeTimer = 0f;
+                manaChargeTimer = 0f;
             }
 
             enemyActionTimer += Time.deltaTime;
@@ -298,13 +387,15 @@ public class EntityController : MonoBehaviour
             {
                 currentEnemySkill = CardManager.instance.ChooseRandomEnemySkill();
             }
-
-            if (enemyActionTimer > enemyActionInterval)
+            else if (enemy.entityStat[EntityStat.CurrentHP] > 0 && enemyActionTimer > enemyActionInterval)
             {
-                CardManager.instance.EnemyUseSkill(currentEnemySkill);
-                enemyActionTimer = 0f;
+                if (enemy.mana > currentEnemySkill.cost)
+                {
+                    CardManager.instance.EnemyUseSkill(currentEnemySkill);
+                    enemyActionTimer = 0f;
 
-                currentEnemySkill = null;
+                    currentEnemySkill = null;
+                }
             }
         }
     }
@@ -315,9 +406,14 @@ public class EntityController : MonoBehaviour
         player.isEnchanted[0] = false;
         player.isEnchanted[1] = false;
         player.isEnchanted[2] = false;
+        enemy.isEnchanted[0] = false;
+        enemy.isEnchanted[1] = false;
+        enemy.isEnchanted[2] = false;
+        player.manaChargeBlock = false;
+        enemy.manaChargeBlock = false;
+        currentEnemySkill = null;
 
-        player.apChargeBlock = false;
-        enemy.apChargeBlock = false;
+        player.StartAllBuffTimer();
 
         rewardEquips.Clear();
     }
@@ -344,12 +440,12 @@ public class EntityController : MonoBehaviour
             return false;
         //equipmentList에서 스킬 발동
 
-        if (entity.actionPoint >= skill.cost)
+        if (entity.mana >= skill.cost)
         {
             entity.isEnchanted[equipNum] = true;
 
-            entity.actionPoint -= skill.cost;
-            entity.entityCard.UpdateApGage(entity.actionPoint);
+            entity.mana -= skill.cost;
+            entity.entityCard.UpdateManaGage(entity.mana);
             if (isPlayer)
                 skillController.UseSkill(skill, enemy, player, equipNum);
             else
@@ -358,11 +454,41 @@ public class EntityController : MonoBehaviour
         else
         {
             if (entity.isPlayer)
-                entity.EntityPopUp("<color=#1E90FF>Not enough AP");
+                entity.EntityPopUp(Utils.color_mana + "Not enough Mana");
             return false;
         }
 
         return true;
+    }
+
+    public void AddBuff(SkillEffect buffEffect, Entity target)
+    {
+        Transform iconTarget = target.buffTransform;
+
+        if (buffEffect.skillType == SkillType.Debuff)
+        {
+            iconTarget = target.debuffTransform;
+        }
+
+        GameObject buffObject = Instantiate(buffPrefab, iconTarget);
+        Buff buff = buffObject.GetComponent<Buff>();
+        buff.InIt(buffEffect, target);
+
+        if (TurnManager.instance.currentState == GameState.Battle)
+            buff.ActivateBuff();
+
+        string buffPopup = "";
+        switch (buffEffect.skillStatType)
+        {
+            case EntityStat.PDef:
+                buffPopup += Utils.color_Str + "P.Def +" + buffEffect.pow;
+                break;
+            case EntityStat.MDef:
+                buffPopup += Utils.color_Int + "M.Def +" + buffEffect.pow;
+                break;
+        }
+
+        target.EntityPopUp(buffPopup);
     }
 
     public int GetEmptySlot(Entity entity)
@@ -385,10 +511,12 @@ public class EntityController : MonoBehaviour
 
     public void EntityDied(Entity entity)
     {
-        if (entity == enemy)
+        if (entity == player)
         {
-            StartCoroutine(EndBattle());
+            GameManager.instance.ShowGameOver();
+            return;
         }
+        StartCoroutine(EndBattle());
     }
 
     public void DamageReaction(Entity entity)
@@ -442,7 +570,8 @@ public class EntityController : MonoBehaviour
         GameManager.instance.AddControlBlock();
 
         yield return new WaitForSeconds(0.3f);
-        enemy.EntityPopUp("<color=#606060>Died");
+        player.StopAllBuffTimer();
+        enemy.EntityPopUp(Utils.color_cool + "Died");
         yield return new WaitForSeconds(0.3f);
         TurnManager.instance.ChangeTurnTo(GameState.Event);
         enemy.entityCard.NextDialogue();

@@ -5,12 +5,11 @@ public enum SkillType
 {
     PscDamage,
     MgcDamage,
+    TrueDamage,
     Dot,
     Heal,
-    AttackBuff,
-    DefenseBuff,
-    AttackDebuff,
-    DefenseDebuff
+    Buff,
+    Debuff
 };
 
 public class SkillController : MonoBehaviour
@@ -42,6 +41,11 @@ public class SkillController : MonoBehaviour
         user.TakeHeal((int)heal);
     }
 
+    void BuffSkill(SkillEffect skillEffect, Entity target)
+    {
+        EntityController.instance.AddBuff(skillEffect, target);
+    }
+
     float SkillVfxTiming(Entity target, GameObject skillPrefeb)
     {
         if (skillPrefeb == null)
@@ -56,11 +60,13 @@ public class SkillController : MonoBehaviour
         GameManager.instance.AddControlBlock();
         yield return new WaitForSeconds(0.2f);
 
-        user.apChargeBlock = true;
-        if (!Utils.CalculateProbability(skill.acc))
+        user.manaChargeBlock = true;
+        float accuracyCheck = (skill.acc + user.entityStat[EntityStat.Acc]) * (1 - user.entityStat[EntityStat.Dodge] / 100);
+        Debug.Log(accuracyCheck);
+        if (!Utils.CalculateProbability(accuracyCheck))
         {
-            user.apChargeBlock = false;
-            target.EntityPopUp("<color=#606060>MISS");
+            user.manaChargeBlock = false;
+            target.EntityPopUp(Utils.color_miss + "MISS");
         }
         else
         {
@@ -71,7 +77,7 @@ public class SkillController : MonoBehaviour
                     case SkillType.PscDamage:
                         if (target.entityStat[EntityStat.CurrentHP] == 0)
                         {
-                            user.apChargeBlock = false;
+                            user.manaChargeBlock = false;
                             break;
                         }
 
@@ -85,7 +91,7 @@ public class SkillController : MonoBehaviour
                     case SkillType.MgcDamage:
                         if (target.entityStat[EntityStat.CurrentHP] == 0)
                         {
-                            user.apChargeBlock = false;
+                            user.manaChargeBlock = false;
                             break;
                         }
 
@@ -104,10 +110,26 @@ public class SkillController : MonoBehaviour
 
                         yield return new WaitForSeconds(0.3f);
                         continue;
+
+                    case SkillType.Buff:
+                        yield return new WaitForSeconds(SkillVfxTiming(user, skillEffect.vfx));
+
+                        BuffSkill(skillEffect, user);
+
+                        yield return new WaitForSeconds(0.3f);
+                        continue;
+
+                    case SkillType.Debuff:
+                        yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
+
+                        BuffSkill(skillEffect, target);
+
+                        yield return new WaitForSeconds(0.3f);
+                        continue;
                 }
             }
 
-            user.apChargeBlock = false;
+            user.manaChargeBlock = false;
         }
 
         GameManager.instance.RemoveControlBlock();

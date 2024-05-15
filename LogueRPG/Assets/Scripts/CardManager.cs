@@ -540,12 +540,9 @@ public class CardManager : MonoBehaviour
             if (skill == cof.card && cof.isMoveable)
             {
                 int equipNum = EntityController.instance.GetEmptySlot(EntityController.instance.enemy);
-
                 if (EntityController.instance.UseSkill(skill, equipNum, false))
                     SetSkillCard(cof, equipNum, false);
             }
-            else
-                return;
         }
     }
 
@@ -697,6 +694,9 @@ public class CardManager : MonoBehaviour
 
     public void AcceptEvent()
     {
+        if (GameManager.instance.GetControlBlockCount() > 0)
+            return;
+
         if (main[0].card.type == CardType.Stage)
         {
             StageCard card = (StageCard)main[0].card;
@@ -728,6 +728,9 @@ public class CardManager : MonoBehaviour
 
     public void SkipEvent()
     {
+        if (GameManager.instance.GetControlBlockCount() > 0)
+            return;
+
         TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
         CardMoveTo(playerCard, playerCardPosition);
         acceptButtons.SetActive(false);
@@ -858,7 +861,7 @@ public class CardManager : MonoBehaviour
             Vector3 enlargePos = new Vector3(newX, newY, -50f);
             cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 1.8f), false);
 
-            Time.timeScale = 0f;
+            Time.timeScale = 0.1f;
         }
         else
         {

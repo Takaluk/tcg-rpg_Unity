@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] TMP_Text turnCountTMP;
     [SerializeField] int enemyPenalty = 100;
+    [SerializeField] GameObject gameOver;
     int controlBlock = 0;
     int turnCount = 0;
 
@@ -61,5 +63,15 @@ public class GameManager : MonoBehaviour
     public int GetEnemyPenalty()
     {
         return enemyPenalty;
+    }
+
+    public void ShowGameOver()
+    {
+        gameOver.SetActive(true);
+    }
+
+    public void LoadNewGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
