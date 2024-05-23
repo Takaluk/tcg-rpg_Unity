@@ -20,6 +20,14 @@ public enum EquipType
     Artifact
 }
 
+public enum EventType
+{
+    None = 0,
+    Skill,
+    Equip
+};
+
+
 [System.Serializable]
 public class Card
 {
@@ -79,6 +87,7 @@ public class EventCard : Card
 {
     public int[] eventLineIndexs;
     public SkillCard[] eventSkills;
+    public bool buttonEvent;
 }
 
 [System.Serializable]

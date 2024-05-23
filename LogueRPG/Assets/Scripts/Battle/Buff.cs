@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 public class Buff : MonoBehaviour
 {
-    EntityStat stat;
+    public EntityStat stat;
     public SkillType buffType;
-    int pow;
+    public int pow;
     float duration;
     public float currentTime;
-    Image icon;
+    public Image icon;
     Entity target;
 
     Coroutine buffCoroutine;

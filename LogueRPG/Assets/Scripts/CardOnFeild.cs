@@ -37,12 +37,14 @@ public class CardOnFeild : MonoBehaviour
 
     public bool isMinimized = false;
     public bool isMoveable = false;
+    public int setNum = -1;
     public float textSpeed = 0.3f;
 
     [SerializeField] GameObject popUpPrefeb;
     public Transform buffTrnasform;
     public Transform debuffTransform;
 
+    int popUpCount = 0;
 
     private void OnDestroy()
     {
@@ -69,7 +71,21 @@ public class CardOnFeild : MonoBehaviour
             case CardType.Enemy:
                 backgroundSprite.sprite = CardManager.instance.currentStageData.stageBackground;
                 cardTypeTMP.text = Utils.color_enemy + "Enemy";
-                symbolColor = new Color(1, 0, 0, 60f/255f);
+                if (card.weight <= 10)
+                {
+                    symbolColor = new Color(1, 0, 0, 1);
+                    nameTMP.text = Utils.color_bossEnemyName + name;
+                }
+                else if (card.weight <= 30)
+                {
+                    symbolColor = new Color(1, 0, 0, 140f / 255f);
+                    nameTMP.text = Utils.color_middleBossEnemyName + name;
+                }
+                else
+                {
+                    symbolColor = new Color(1, 0, 0, 60f / 255f);
+                    nameTMP.text = Utils.color_normalEnemyName + name;
+                }
                 cardBackSymbol.color = symbolColor;
                 break;
             case CardType.Skill:
@@ -82,60 +98,33 @@ public class CardOnFeild : MonoBehaviour
                 cardBackSymbol.color = symbolColor;
 
                 string skillDescription = "";
-                foreach(SkillEffect skillEffect in skill.skillEffects)
-                {
-                    switch (skillEffect.skillType)
+                if (skill.skillEffects == null && card.context.Length > 0)
+                    skillDescription = card.context[0];
+                else
+                    foreach (SkillEffect skillEffect in skill.skillEffects)
                     {
-                        case SkillType.PscDamage:
-                            skillDescription += "Deal " + Utils.color_pcsDamage + "Physical damage</color>";
-                            break;
-                        case SkillType.MgcDamage:
-                            skillDescription += "Deal " + Utils.color_mgcDamage + "Magical damage</color>";
-                            break;
-                        case SkillType.Heal:
-                            skillDescription += "Heal</color>";
-                            break;
-                        case SkillType.Buff:
-                            skillDescription += "Gain </color>";
-                            break;
+                        //utils.color
+                        skillDescription += Utils.GetSkillTypeColor(skillEffect.skillType);
+                        skillDescription += " (";
+                        skillDescription += Utils.GetStatColor(skillEffect.skillStatType);
+
+                        if (skillEffect.pow > 0)
+                        {
+                            skillDescription += "/";
+                            if (skillEffect.skillType == SkillType.Buff)
+                                skillDescription += "+";
+                            else if (skillEffect.skillType == SkillType.Debuff)
+                                skillDescription += "-";
+                            skillDescription += skillEffect.pow;
+                        }
+
+                        if (skillEffect.buffDur > 0)
+                        {
+                            skillDescription += "/" + skillEffect.buffDur + "s";
+                        }
+                        skillDescription += ")\n";
                     }
-
-                    skillDescription += " (";
-
-                    switch (skillEffect.skillStatType)
-                    {
-                        case EntityStat.Str:
-                            skillDescription += Utils.color_Str + "Str</color>/";
-                            break;
-                        case EntityStat.Int:
-                            skillDescription += Utils.color_Int + "Int</color>/";
-                            break;
-                        case EntityStat.MaxHP:
-                            skillDescription += Utils.color_HP + "MaxHP</color>/";
-                            break;
-                        case EntityStat.PDef:
-                            skillDescription += Utils.color_Str + "Physical Defence</color>/";
-                            break;
-                        case EntityStat.MDef:
-                            skillDescription += Utils.color_Int + "Magical Defence</color>/";
-                            break;
-                        case EntityStat.Dodge:
-                            skillDescription += Utils.color_miss + "Dodge</color>/";
-                            break;
-                        case EntityStat.Acc:
-                            skillDescription += Utils.color_miss + "Accuracy</color>/";
-                            break;
-                    }
-                    skillDescription += skillEffect.pow;
-
-                    if (skillEffect.buffDur > 0)
-                    {
-                        skillDescription += "/" + skillEffect.buffDur + "s";
-                    }
-
-                    skillDescription += ")\n";
-                }
-                skillDescription += "(acc/" + skill.acc + ")";
+                skillDescription += "(Acc/" + skill.acc + ")";
                 descriptionTMP.text = skillDescription;
                 break;
             case CardType.Event:
@@ -165,20 +154,8 @@ public class CardOnFeild : MonoBehaviour
         string equipDescription = "";
         foreach (EquipmentStats stat in equip.equipStats)
         {
-            switch (stat.equipStat)
-            {
-                case EntityStat.MaxHP:
-                    equipDescription += Utils.color_HP + "MaxHP</color> +";
-                    break;
-                case EntityStat.Str:
-                    equipDescription += Utils.color_Str + "Str</color> +";
-                    break;
-                case EntityStat.Int:
-                    equipDescription += Utils.color_Int + "Int</color> +";
-                    break;
-            }
+            equipDescription += Utils.GetStatColor(stat.equipStat) + " +";
             int equipPow = stat.basePow + stat.PowPL * entity.entityEquipLevels[(int)equip.equipType];
-
             equipDescription += equipPow + "\n";
         }
         descriptionTMP.text = equipDescription;
@@ -245,6 +222,18 @@ public class CardOnFeild : MonoBehaviour
     {
         if (lineIndex < card.context.Length)
         {
+            if (card.type == CardType.Event)
+            {
+                EventCard ecard = (EventCard)card;
+
+                if (ecard.eventLineIndexs.Length > 0)
+                    for (int i = 0; i < ecard.eventLineIndexs.Length; i++)
+                    {
+                        if (ecard.eventLineIndexs[i] == lineIndex)
+                            EntityController.instance.UseSkill(ecard.eventSkills[i], 3, true);
+                    }
+            }
+
             if (typeCoroutine == null)
             {
                 typeCoroutine = StartCoroutine(Type(card.context[lineIndex].Replace("\\n", "\n")));
@@ -256,25 +245,12 @@ public class CardOnFeild : MonoBehaviour
                 descriptionTMP.text = card.context[lineIndex].Replace("\\n", "\n");
                 lineIndex++;
             }
-
-            if (card.type == CardType.Event)
-            {
-/*                EventCard ecard = (EventCard)card;
-
-                foreach (int i in ecard.eventLineIndexs)
-                {
-                    if (lineIndex == i)
-                    {
-                        EntityController.instance.UseSkill(ecard.eventSkills[0], 3, true);
-                    }
-                }*/
-            }
         }
         else
         {
             if (card.type == CardType.Enemy)
             {
-                TurnManager.instance.ChangeTurnTo(GameState.Reward);
+                EntityController.instance.BattleReward();
             }
             else if (card.type == CardType.Stage)
             {
@@ -314,12 +290,21 @@ public class CardOnFeild : MonoBehaviour
                 yield return new WaitForSeconds(textSpeed);
         }
 
+        typeCoroutine = null;
         lineIndex++;
     }
     #endregion
 
     public void CardPopUp(string line)
     {
+        StartCoroutine(PopUp(line));
+    }
+
+    IEnumerator PopUp(string line)
+    {
+        popUpCount++;
+        yield return new WaitForSeconds(0.2f * popUpCount);
+        popUpCount--;
         Transform popUpPosition = transform;
         var popUp = Instantiate(popUpPrefeb, popUpPosition);
         TMP_Text popUpTmp = popUp.GetComponent<TextMeshPro>();
@@ -327,16 +312,21 @@ public class CardOnFeild : MonoBehaviour
         Vector3 dest = new Vector3(popUpPosition.position.x, popUpPosition.position.y + 1f, popUpPosition.position.z - 20f);
         if (isMinimized)
         {
-            dest.y -= 2f;
-            popUp.transform.localScale = Vector3.one * 1f;
-            popUp.gameObject.transform.DOMove(dest, 1f)
-                .OnComplete(() => Destroy(popUp));
+            dest.y -= 4f;
+            popUp.transform.localScale = Vector3.one * 2f;
+            popUp.gameObject.transform.DOMove(dest, 1.5f)
+                .OnComplete(() => DestroyPopUp(popUp));
         }
         else
         {
-            popUp.gameObject.transform.DOMove(dest, 1f)
-                .OnComplete(() => Destroy(popUp));
+            popUp.gameObject.transform.DOMove(dest, 1.5f)
+                .OnComplete(() => DestroyPopUp(popUp));
         }
+    }
+
+    void DestroyPopUp(GameObject popUp)
+    {
+        Destroy(popUp);
     }
 
     public void ShowHealthbar(bool on)

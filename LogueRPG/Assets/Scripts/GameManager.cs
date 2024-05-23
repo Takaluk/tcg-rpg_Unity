@@ -24,14 +24,14 @@ public class GameManager : MonoBehaviour
     #endregion
 
     [SerializeField] TMP_Text turnCountTMP;
-    [SerializeField] int enemyPenalty = 100;
+    [SerializeField] TMP_Text gameOverTurnCountTMP;
     [SerializeField] GameObject gameOver;
     int controlBlock = 0;
     int turnCount = 0;
 
     public int GetEnemyLevel()
     {
-        return turnCount / 2;
+        return 1 + turnCount / 2;
     }
 
     public int GetControlBlockCount()
@@ -60,18 +60,19 @@ public class GameManager : MonoBehaviour
         return turnCount;
     }
 
-    public int GetEnemyPenalty()
-    {
-        return enemyPenalty;
-    }
-
     public void ShowGameOver()
     {
+        gameOverTurnCountTMP.text = "You survived " + turnCount + " stages";
         gameOver.SetActive(true);
     }
 
     public void LoadNewGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void SetTimeScale(float scale)
+    {
+        Time.timeScale = scale;
     }
 }

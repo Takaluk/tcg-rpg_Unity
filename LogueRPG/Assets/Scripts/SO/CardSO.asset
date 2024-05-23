@@ -15,17 +15,17 @@ MonoBehaviour:
   mainCardTypes:
   - name: "\uC801"
     context: []
-    weight: 2
+    weight: 1
     type: 2
     sprite: {fileID: 0}
   - name: "\uC774\uBCA4\uD2B8"
     context: []
-    weight: 1
+    weight: 0
     type: 3
     sprite: {fileID: 0}
   - name: "\uC9C0\uC5ED"
     context: []
-    weight: 1
+    weight: 0
     type: 7
     sprite: {fileID: 0}
   playerCharacters:
@@ -33,7 +33,7 @@ MonoBehaviour:
     context:
     - You shield yourself in heavy, unyielding armor.
     - 
-    weight: 1
+    weight: 100
     type: 1
     sprite: {fileID: 21300000, guid: a9899da493bf9bb4395c303b7d8867a9, type: 3}
     equipmentCards:
@@ -44,7 +44,10 @@ MonoBehaviour:
       sprite: {fileID: 21300000, guid: e0a7a04a891ca5241adea5984e0e854a, type: 3}
       equipType: 0
       equipStats:
-      - equipStat: 5
+      - equipStat: 6
+        basePow: 100
+        PowPL: 3
+      - equipStat: 13
         basePow: 100
         PowPL: 3
       Durability: 20
@@ -55,11 +58,14 @@ MonoBehaviour:
       sprite: {fileID: 21300000, guid: 8b63f3e3de155e9439db6757f3a42467, type: 3}
       equipType: 1
       equipStats:
-      - equipStat: 2
+      - equipStat: 1
         basePow: 512
         PowPL: 128
       - equipStat: 8
-        basePow: 300
+        basePow: 100
+        PowPL: 10
+      - equipStat: 9
+        basePow: 100
         PowPL: 10
       Durability: 40
     - name: Parring Dagger
@@ -69,12 +75,12 @@ MonoBehaviour:
       sprite: {fileID: 21300000, guid: 0184f7d7a8628c0418660d85ecf3c270, type: 3}
       equipType: 2
       equipStats:
+      - equipStat: 12
+        basePow: 50
+        PowPL: 0
       - equipStat: 5
-        basePow: 50
-        PowPL: 2
-      - equipStat: 4
-        basePow: 50
-        PowPL: 30
+        basePow: 90
+        PowPL: 0
       Durability: 10
     enemySkills:
     - name: Slash
@@ -87,7 +93,7 @@ MonoBehaviour:
       acc: 80
       skillEffects:
       - skillType: 0
-        skillStatType: 5
+        skillStatType: 6
         pow: 120
         buffDur: 0
         buffIcon: {fileID: 0}
@@ -98,15 +104,21 @@ MonoBehaviour:
       type: 5
       sprite: {fileID: 21300000, guid: 46b268e4c30c82c4a9ffc35974f1550c, type: 3}
       cost: 1
-      coolTime: 6
-      acc: 50
+      coolTime: 0
+      acc: 100
       skillEffects:
       - skillType: 0
-        skillStatType: 5
+        skillStatType: 6
         pow: 300
         buffDur: 0
         buffIcon: {fileID: 0}
         vfx: {fileID: 33315577706756320, guid: 1d78b496ff68e184bb30242a66cb1d53, type: 3}
+      - skillType: 6
+        skillStatType: 8
+        pow: 50
+        buffDur: 10
+        buffIcon: {fileID: 21300000, guid: 81d0cbe2dd990bb418c2bc22c77201c3, type: 3}
+        vfx: {fileID: 0}
     - name: Armor Up
       context: []
       weight: 0
@@ -118,30 +130,36 @@ MonoBehaviour:
       skillEffects:
       - skillType: 5
         skillStatType: 7
-        pow: 50
+        pow: 0
         buffDur: 5
         buffIcon: {fileID: 21300000, guid: 682d0be4ea446144ea17fdd5afadb330, type: 3}
         vfx: {fileID: 6431087074095537180, guid: 3d271e79b7fa14f41a7954473c063d72, type: 3}
       - skillType: 5
         skillStatType: 8
-        pow: 50
+        pow: 100
         buffDur: 5
-        buffIcon: {fileID: 21300000, guid: 682d0be4ea446144ea17fdd5afadb330, type: 3}
+        buffIcon: {fileID: 21300000, guid: 7f5e2c756741fd44bb18e0cd983d9846, type: 3}
         vfx: {fileID: 0}
     - name: Focus
       context: []
       weight: 0
       type: 5
-      sprite: {fileID: 0}
+      sprite: {fileID: 21300000, guid: 8dabc3045ca2ab7478b19da75ec25aa0, type: 3}
       cost: 3
-      coolTime: 5
+      coolTime: 20
       acc: 1000
       skillEffects:
       - skillType: 5
-        skillStatType: 9
-        pow: 10
+        skillStatType: 10
+        pow: 30
         buffDur: 10
-        buffIcon: {fileID: 21300000, guid: 682d0be4ea446144ea17fdd5afadb330, type: 3}
+        buffIcon: {fileID: 21300000, guid: 9fc9183ac7f62d6458350d0d1d587b68, type: 3}
+        vfx: {fileID: 8098002744869293299, guid: cf8d155804802f849abd58af5dfb1069, type: 3}
+      - skillType: 5
+        skillStatType: 12
+        pow: 50
+        buffDur: 10
+        buffIcon: {fileID: 21300000, guid: 9fc9183ac7f62d6458350d0d1d587b68, type: 3}
         vfx: {fileID: 0}
     - name: First Aid
       context: []
@@ -153,7 +171,7 @@ MonoBehaviour:
       acc: 1000
       skillEffects:
       - skillType: 4
-        skillStatType: 2
+        skillStatType: 1
         pow: 30
         buffDur: 0
         buffIcon: {fileID: 0}
@@ -201,21 +219,93 @@ MonoBehaviour:
         PowPL: 10
       Durability: 10
     enemySkills:
-    - name: 
+    - name: Slash
       context: []
       weight: 0
       type: 5
-      sprite: {fileID: 21300000, guid: 657f8a2c3ee2d0340847425ef27508b6, type: 3}
-      cost: 2
+      sprite: {fileID: 21300000, guid: 39605b01c89417c4eafdea6fa3adff5f, type: 3}
+      cost: 1
+      coolTime: 3
+      acc: 80
+      skillEffects:
+      - skillType: 0
+        skillStatType: 5
+        pow: 120
+        buffDur: 0
+        buffIcon: {fileID: 0}
+        vfx: {fileID: 7374276855283757890, guid: a125cf2a35ef4e44a90edc4ccd5f1d9f, type: 3}
+    - name: Murder-Strike
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 46b268e4c30c82c4a9ffc35974f1550c, type: 3}
+      cost: 1
       coolTime: 0
       acc: 100
       skillEffects:
-      - skillType: 1
-        skillStatType: 6
-        pow: 500
+      - skillType: 0
+        skillStatType: 5
+        pow: 300
         buffDur: 0
         buffIcon: {fileID: 0}
-        vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
+        vfx: {fileID: 33315577706756320, guid: 1d78b496ff68e184bb30242a66cb1d53, type: 3}
+      - skillType: 6
+        skillStatType: 7
+        pow: 50
+        buffDur: 10
+        buffIcon: {fileID: 21300000, guid: 81d0cbe2dd990bb418c2bc22c77201c3, type: 3}
+        vfx: {fileID: 0}
+    - name: Armor Up
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 9bdf1e9ad68a4cb4f9a616ef87023e29, type: 3}
+      cost: 2
+      coolTime: 4
+      acc: 1000
+      skillEffects:
+      - skillType: 5
+        skillStatType: 7
+        pow: 0
+        buffDur: 5
+        buffIcon: {fileID: 21300000, guid: 682d0be4ea446144ea17fdd5afadb330, type: 3}
+        vfx: {fileID: 6431087074095537180, guid: 3d271e79b7fa14f41a7954473c063d72, type: 3}
+      - skillType: 5
+        skillStatType: 8
+        pow: 100
+        buffDur: 5
+        buffIcon: {fileID: 21300000, guid: 7f5e2c756741fd44bb18e0cd983d9846, type: 3}
+        vfx: {fileID: 0}
+    - name: Focus
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 8dabc3045ca2ab7478b19da75ec25aa0, type: 3}
+      cost: 3
+      coolTime: 5
+      acc: 1000
+      skillEffects:
+      - skillType: 5
+        skillStatType: 9
+        pow: 10
+        buffDur: 10
+        buffIcon: {fileID: 21300000, guid: 9fc9183ac7f62d6458350d0d1d587b68, type: 3}
+        vfx: {fileID: 8098002744869293299, guid: cf8d155804802f849abd58af5dfb1069, type: 3}
+    - name: First Aid
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: db2dd78343cfaa247948e34de8bdeb06, type: 3}
+      cost: 3
+      coolTime: 5
+      acc: 1000
+      skillEffects:
+      - skillType: 4
+        skillStatType: 2
+        pow: 30
+        buffDur: 0
+        buffIcon: {fileID: 0}
+        vfx: {fileID: 0}
   - name: Pirate
     context:
     - "\uACE0\uC591\uC774\uAC00 \uC138\uC0C1\uC744 \uC9C0\uBC30\uD55C\uB2E4. \\n
@@ -275,8 +365,196 @@ MonoBehaviour:
         buffDur: 0
         buffIcon: {fileID: 0}
         vfx: {fileID: 3061336347694939244, guid: 90b56828c272a504497b5b594c00b382, type: 3}
+  - name: Dummy
+    context:
+    - You shield yourself in heavy, unyielding armor.
+    - 
+    weight: 100
+    type: 1
+    sprite: {fileID: 21300000, guid: a9899da493bf9bb4395c303b7d8867a9, type: 3}
+    equipmentCards:
+    - name: Longsword
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: e0a7a04a891ca5241adea5984e0e854a, type: 3}
+      equipType: 0
+      equipStats:
+      - equipStat: 6
+        basePow: 100
+        PowPL: 3
+      - equipStat: 13
+        basePow: 100
+        PowPL: 3
+      Durability: 20
+    - name: Heavy Armor
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 8b63f3e3de155e9439db6757f3a42467, type: 3}
+      equipType: 1
+      equipStats:
+      - equipStat: 1
+        basePow: 512
+        PowPL: 128
+      - equipStat: 8
+        basePow: 100
+        PowPL: 10
+      - equipStat: 9
+        basePow: 100
+        PowPL: 10
+      Durability: 40
+    - name: Parring Dagger
+      context: []
+      weight: 0
+      type: 6
+      sprite: {fileID: 21300000, guid: 0184f7d7a8628c0418660d85ecf3c270, type: 3}
+      equipType: 2
+      equipStats:
+      - equipStat: 12
+        basePow: 50
+        PowPL: 0
+      - equipStat: 5
+        basePow: 90
+        PowPL: 0
+      Durability: 10
+    enemySkills:
+    - name: Slash
+      context: []
+      weight: 0
+      type: 5
+      sprite: {fileID: 21300000, guid: 39605b01c89417c4eafdea6fa3adff5f, type: 3}
+      cost: 0
+      coolTime: 0
+      acc: 100
+      skillEffects:
+      - skillType: 6
+        skillStatType: 8
+        pow: 120
+        buffDur: 11
+        buffIcon: {fileID: 0}
+        vfx: {fileID: 8380613567369524535, guid: ae20b7db093614c449127b73426c7382, type: 3}
   woodStageData:
     stageBackground: {fileID: 21300000, guid: 4b44e8eed6c03104790fd44f26e2caf6, type: 3}
+    enemies:
+    - name: 'Witch of Salem '
+      context:
+      - ....
+      weight: 10
+      type: 2
+      sprite: {fileID: 21300000, guid: 8bbb49b58fd2c88418549a6116c08c85, type: 3}
+      equipmentCards:
+      - name: 
+        context: []
+        weight: 0
+        type: 6
+        sprite: {fileID: 21300000, guid: 26a0d23b3b166ef4f9b8222edb59365f, type: 3}
+        equipType: 0
+        equipStats:
+        - equipStat: 7
+          basePow: 11
+          PowPL: 4
+        Durability: 100
+      - name: 
+        context: []
+        weight: 0
+        type: 6
+        sprite: {fileID: 21300000, guid: b8a02d896413af54ea3f802bce33b2b5, type: 3}
+        equipType: 1
+        equipStats:
+        - equipStat: 1
+          basePow: 512
+          PowPL: 128
+        Durability: 100
+      - name: 
+        context: []
+        weight: 0
+        type: 6
+        sprite: {fileID: 21300000, guid: 865437b894d23d54c992483b37a021a8, type: 3}
+        equipType: 2
+        equipStats:
+        - equipStat: 7
+          basePow: 1
+          PowPL: 3
+        - equipStat: 5
+          basePow: 30
+          PowPL: 0
+        Durability: 100
+      enemySkills:
+      - name: Black Flame
+        context: []
+        weight: 100
+        type: 5
+        sprite: {fileID: 21300000, guid: 66c03e0e9c1a8dd4b959d33c6aaf97d9, type: 3}
+        cost: 3
+        coolTime: 1
+        acc: 100
+        skillEffects:
+        - skillType: 1
+          skillStatType: 7
+          pow: 100
+          buffDur: 0
+          buffIcon: {fileID: 0}
+          vfx: {fileID: 5147851105986684181, guid: 7c8843ad7b8e65f4c955ebd4e595f25d, type: 3}
+    events:
+    - name: "\uAE30\uB3C4\uD558\uB294 \uC11D\uC0C1"
+      context:
+      - null................................
+      - "\uD68C\uBCF5\uD574\uC8FC\uAE30"
+      - "\uB450\uBC88\uD574\uC8FC\uAE30"
+      weight: 1
+      type: 3
+      sprite: {fileID: 21300000, guid: c0d77658dfcf49c40baad95cf03693d5, type: 3}
+      eventLineIndexs: 0100000002000000
+      eventSkills:
+      - name: First Aid
+        context: []
+        weight: 0
+        type: 5
+        sprite: {fileID: 21300000, guid: db2dd78343cfaa247948e34de8bdeb06, type: 3}
+        cost: 3
+        coolTime: 5
+        acc: 1000
+        skillEffects:
+        - skillType: 4
+          skillStatType: 2
+          pow: 100
+          buffDur: 0
+          buffIcon: {fileID: 0}
+          vfx: {fileID: 0}
+      - name: First Aid
+        context: []
+        weight: 0
+        type: 5
+        sprite: {fileID: 21300000, guid: db2dd78343cfaa247948e34de8bdeb06, type: 3}
+        cost: 3
+        coolTime: 5
+        acc: 1000
+        skillEffects:
+        - skillType: 4
+          skillStatType: 2
+          pow: 100
+          buffDur: 0
+          buffIcon: {fileID: 0}
+          vfx: {fileID: 0}
+      buttonEvent: 0
+    mainEnemies: []
+    mainEvents: []
+    connectedStages:
+    - name: town
+      context: []
+      weight: 1
+      type: 7
+      sprite: {fileID: 21300000, guid: 26fbc37d23b68724b91c8ad4ccc7aa12, type: 3}
+      stageType: 1
+    - name: castle
+      context: []
+      weight: 1
+      type: 7
+      sprite: {fileID: 21300000, guid: 35e21028124c798419ba45a76134c40c, type: 3}
+      stageType: 2
+  castleStageData:
+    stageBackground: {fileID: 21300000, guid: 35e21028124c798419ba45a76134c40c, type: 3}
     enemies:
     - name: 'Witch of Salem '
       context:
@@ -362,49 +640,116 @@ MonoBehaviour:
       sprite: {fileID: 0}
       eventLineIndexs: 
       eventSkills: []
-    mainEnemies: []
-    mainEvents: []
-    connectedStages:
-    - name: town
-      context: []
-      weight: 1
-      type: 7
-      sprite: {fileID: 21300000, guid: 26fbc37d23b68724b91c8ad4ccc7aa12, type: 3}
-      stageType: 1
-  castleStageData:
-    stageBackground: {fileID: 21300000, guid: 18be5ef368a46f44a9291631e680d4fb, type: 3}
-    enemies: []
-    events: []
-    mainEnemies: []
-    mainEvents: []
-    connectedStages: []
-  townStageData:
-    stageBackground: {fileID: 21300000, guid: 26fbc37d23b68724b91c8ad4ccc7aa12, type: 3}
-    enemies:
-    - name: 
-      context: []
-      weight: 0
-      type: 0
-      sprite: {fileID: 0}
-      equipmentCards: []
-      enemySkills: []
-    events:
-    - name: 
-      context: []
-      weight: 0
-      type: 0
-      sprite: {fileID: 0}
-      eventLineIndexs: 
-      eventSkills: []
+      buttonEvent: 0
     mainEnemies: []
     mainEvents: []
     connectedStages:
     - name: Dindraine's Forest
       context:
-      - 
-      weight: 0
+      - You awaken in a forest that feels all too familiar, like a nightmare you've
+        had before.
+      weight: 1
       type: 7
+      sprite: {fileID: 21300000, guid: 4b44e8eed6c03104790fd44f26e2caf6, type: 3}
+      stageType: 0
+  townStageData:
+    stageBackground: {fileID: 21300000, guid: 26fbc37d23b68724b91c8ad4ccc7aa12, type: 3}
+    enemies:
+    - name: 'Witch of Salem '
+      context:
+      - ....
+      weight: 1
+      type: 2
+      sprite: {fileID: 21300000, guid: 8bbb49b58fd2c88418549a6116c08c85, type: 3}
+      equipmentCards:
+      - name: 
+        context: []
+        weight: 0
+        type: 6
+        sprite: {fileID: 21300000, guid: 26a0d23b3b166ef4f9b8222edb59365f, type: 3}
+        equipType: 0
+        equipStats:
+        - equipStat: 6
+          basePow: 120
+          PowPL: 4
+        Durability: 40
+      - name: 
+        context: []
+        weight: 0
+        type: 6
+        sprite: {fileID: 21300000, guid: b8a02d896413af54ea3f802bce33b2b5, type: 3}
+        equipType: 1
+        equipStats:
+        - equipStat: 2
+          basePow: 512
+          PowPL: 128
+        Durability: 40
+      - name: 
+        context: []
+        weight: 0
+        type: 6
+        sprite: {fileID: 21300000, guid: 865437b894d23d54c992483b37a021a8, type: 3}
+        equipType: 2
+        equipStats:
+        - equipStat: 6
+          basePow: 50
+          PowPL: 3
+        - equipStat: 4
+          basePow: 60
+          PowPL: 0
+        Durability: 10
+      enemySkills:
+      - name: Black Flame
+        context: []
+        weight: 1
+        type: 5
+        sprite: {fileID: 21300000, guid: 66c03e0e9c1a8dd4b959d33c6aaf97d9, type: 3}
+        cost: 1
+        coolTime: 1
+        acc: 80
+        skillEffects:
+        - skillType: 1
+          skillStatType: 6
+          pow: 100
+          buffDur: 0
+          buffIcon: {fileID: 0}
+          vfx: {fileID: 5147851105986684181, guid: 7c8843ad7b8e65f4c955ebd4e595f25d, type: 3}
+      - name: Armor Up
+        context: []
+        weight: 0
+        type: 5
+        sprite: {fileID: 0}
+        cost: 3
+        coolTime: 2
+        acc: 100
+        skillEffects:
+        - skillType: 5
+          skillStatType: 7
+          pow: 0
+          buffDur: 5
+          buffIcon: {fileID: 21300000, guid: 682d0be4ea446144ea17fdd5afadb330, type: 3}
+          vfx: {fileID: 0}
+    events:
+    - name: null
+      context:
+      - null................................
+      - .................................
+      weight: 1
+      type: 3
       sprite: {fileID: 0}
+      eventLineIndexs: 
+      eventSkills: []
+      buttonEvent: 0
+    mainEnemies: []
+    mainEvents: []
+    connectedStages:
+    - name: Dindraine's Forest
+      context:
+      - You awaken in a forest that feels all too familiar, like a nightmare you've
+        had before.
+      weight: 1
+      type: 7
+      sprite: {fileID: 21300000, guid: 4b44e8eed6c03104790fd44f26e2caf6, type: 3}
       stageType: 0
   skillBakcground: {fileID: 21300000, guid: 8efde8d4e6c526948a04157473d9f05a, type: 3}
   equipBakcground: {fileID: 21300000, guid: ccd19f97100e0824499c7c79d883c574, type: 3}

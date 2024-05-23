@@ -6,7 +6,8 @@ public enum GameState
     Battle,
     Event,
     Reward,
-    PlayerCharacterSelection
+    PlayerCharacterSelection,
+    Stage
 };
 
 public enum StageType
@@ -58,10 +59,12 @@ public class TurnManager : MonoBehaviour
                 CardManager.instance.EmptyHand();
                 CardManager.instance.SetBattlePosition(false);
                 CardManager.instance.ShowMainCardSelection();
+                CardManager.instance.ShowInventoryUI(true);
                 return;
 
             case GameState.Battle:
                 currentState = GameState.Battle;
+                CardManager.instance.ShowInventoryUI(false);
                 EntityController.instance.StartBattle();
                 CardManager.instance.SetBattlePosition(true);
                 CardManager.instance.ShowSkillCards();
@@ -69,16 +72,20 @@ public class TurnManager : MonoBehaviour
 
             case GameState.Event:
                 currentState = GameState.Event;
-                CardManager.instance.EmptyHand();
+                CardManager.instance.ShowInventoryUI(true);
                 CardManager.instance.SetBattlePosition(false);
                 return;
 
             case GameState.Reward:
                 currentState = GameState.Reward;
-                CardManager.instance.EmptyHand();
-                //CardManager.instance.SetBattlePosition(false);
+                CardManager.instance.ShowInventoryUI(false);
+                CardManager.instance.ShowRewardAcceptUI(true);
+                return;
 
-                EntityController.instance.BattleReward();
+            case GameState.Stage:
+                currentState = GameState.Stage;
+                CardManager.instance.ShowInventoryUI(false);
+                CardManager.instance.ShowRewardAcceptUI(true);
                 return;
 
             case GameState.PlayerCharacterSelection:

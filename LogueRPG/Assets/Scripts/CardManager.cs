@@ -3,10 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
 
 
 public class CardManager : MonoBehaviour
@@ -57,7 +55,6 @@ public class CardManager : MonoBehaviour
     public Transform mainCardPosition;
 
     public Transform playerCardPosition;
-    public Transform playerCardPositionMin;
     public Transform playerBattlePosition;
     public Transform playerEquipSpawnPosition;
     public Transform[] playerEquipPositions;
@@ -73,8 +70,17 @@ public class CardManager : MonoBehaviour
     public GameObject enemySkillBackground;
     public GameObject acceptButtons;
     public GameObject selectPlayerUI;
+    public GameObject inventoryUI;
+
     public Button acceptButton;
     public Button selectPlayerButton;
+    public Button showEquipButton;
+    public Button showSkillButton;
+    public Button showMenuButton;
+
+    Image showEquipButtonImage;
+    Image showSkillButtonImage;
+
 
     System.Random random = new System.Random();
     WaitForSeconds delay01 = new WaitForSeconds(0.1f);
@@ -91,6 +97,8 @@ public class CardManager : MonoBehaviour
     {
         main.Add(DrawCard(firstStageCard, cardSpawnPoint));
         CardMoveTo(main[0], mainCardPosition);
+        showEquipButtonImage = showEquipButton.GetComponent<Image>();
+        showSkillButtonImage = showSkillButton.GetComponent<Image>();
     }
 
     private void Update()
@@ -109,7 +117,7 @@ public class CardManager : MonoBehaviour
             chosenHand.CardSelectedEffect(false);
             chosenHand.GetComponent<RenderOrder>().SetOrder(-1);
             SetPlayerCard(chosenHand);
-            selectPlayerUI.SetActive(false);
+            selectPlayerUI.GetComponent<UIEnableAnimation>().ShowUI(false);
             CardMoveTo(playerCard, playerCardPosition);
 
             TurnManager.instance.ChangeStageTo(StageType.Wood);
@@ -164,6 +172,7 @@ public class CardManager : MonoBehaviour
             }
             if (enemyCard != null)
             {
+                EmptyHand();
                 foreach (CardOnFeild cof in enemyEquip)
                 {
                     cof.DiscardTo(cardSpawnPoint, Vector3.one);
@@ -207,6 +216,27 @@ public class CardManager : MonoBehaviour
         //change turn to selectedcard
     }
 
+    public void ShowRewardAcceptUI(bool on)
+    {
+        if (acceptButtons.activeSelf != on)
+            acceptButtons.GetComponent<UIEnableAnimation>().ShowUI(on);
+        if (TurnManager.instance.currentState == GameState.Reward)
+        {
+            acceptButton.interactable = false;
+        }
+    }
+
+    public void ShowInventoryUI(bool on)
+    {
+        if (inventoryUI.activeSelf != on)
+        {
+            inventoryUI.GetComponent<UIEnableAnimation>().ShowUI(on);
+
+            showSkillButtonImage.color = Color.white;
+            showEquipButtonImage.color = Color.white;
+        }
+    }
+
     public void ShowPlayerSelection()
     {
         List<Card> cards = new List<Card>();
@@ -218,7 +248,7 @@ public class CardManager : MonoBehaviour
 
         StartCoroutine(PutCardInHand(cards));
 
-        selectPlayerUI.SetActive(true);
+        selectPlayerUI.GetComponent<UIEnableAnimation>().ShowUI(true);
         selectPlayerButton.interactable = false;
     }
 
@@ -243,6 +273,20 @@ public class CardManager : MonoBehaviour
 
     public void ShowSkillCards()
     {
+        if (TurnManager.instance.currentState != GameState.Battle)
+        {
+            if (GameManager.instance.GetControlBlockCount() > 0)
+                return;
+            if (hand.Count > 0 && hand[0].card.type == CardType.Skill)
+            {
+                EmptyHand();
+                showSkillButtonImage.color = Color.white;
+                return;
+            }
+            showEquipButtonImage.color = Color.white;
+            showSkillButtonImage.color = Color.gray;
+        }
+
         List<Card> cards = new List<Card>();
 
         foreach (SkillCard skill in EntityController.instance.player.skillCards)
@@ -255,6 +299,20 @@ public class CardManager : MonoBehaviour
 
     public void ShowEquipCards()
     {
+        if (TurnManager.instance.currentState == GameState.PathSelection || TurnManager.instance.currentState == GameState.Event)
+        {
+            if (GameManager.instance.GetControlBlockCount() > 0)
+                return;
+            if (hand.Count > 0 && hand[0].card.type == CardType.Equip)
+            {
+                EmptyHand();
+                showEquipButtonImage.color = Color.white;
+                return;
+            }
+            showEquipButtonImage.color = Color.gray;
+            showSkillButtonImage.color = Color.white;
+        }
+
         List<Card> cards = new List<Card>();
 
         foreach (EquipmentCard equip in EntityController.instance.player.equipCards)
@@ -271,9 +329,11 @@ public class CardManager : MonoBehaviour
         main[0].DiscardTo(dummyBackCard.transform, Vector3.one * 2);
         main.Clear();
 
-        List<Card> rewards = new List<Card>();
-        rewards.Add(rewardEquip);
-        rewards.Add(rewardSkill);
+        List<Card> rewards = new List<Card>
+        {
+            rewardEquip,
+            rewardSkill
+        };
 
         StartCoroutine(PutCardInSelection(rewards, false));
 
@@ -653,6 +713,7 @@ public class CardManager : MonoBehaviour
         cof.handPRS = cof.originPRS;
         cof.originPRS = targetPRS;
         cof.isMoveable = false;
+        cof.setNum = equipNum;
 
         StartCoroutine(UnsetSkillCard(cof, equipNum, isPlayer));
     }
@@ -678,6 +739,7 @@ public class CardManager : MonoBehaviour
         cof.originPRS = cof.handPRS;
         cof.MoveTransform(cof.originPRS, true, 0.1f);
         cof.isMoveable = true;
+        cof.setNum = -1;
         if (isPlayer)
             EntityController.instance.player.isEnchanted[equipNum] = false;
         else
@@ -723,7 +785,7 @@ public class CardManager : MonoBehaviour
 
         TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
         CardMoveTo(playerCard, playerCardPosition);
-        acceptButtons.SetActive(false);
+        ShowRewardAcceptUI(false);
     }
 
     public void SkipEvent()
@@ -733,7 +795,7 @@ public class CardManager : MonoBehaviour
 
         TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
         CardMoveTo(playerCard, playerCardPosition);
-        acceptButtons.SetActive(false);
+        ShowRewardAcceptUI(false);
     }
 
     public void CardMouseDown(CardOnFeild cof)
@@ -750,39 +812,32 @@ public class CardManager : MonoBehaviour
                 return;
 
             case (CardType.Skill):
-                if (TurnManager.instance.currentState == GameState.Reward)
+                if (TurnManager.instance.currentState == GameState.Event)
                 {
                     if (main.Count == 0 && selection.Contains(cof))
                     {
-                        SelectToMain(cof);
-
                         ShowSkillCards();
-                        CardMoveTo(playerCard, playerCardPositionMin);
-                        acceptButtons.SetActive(true);
-                        acceptButton.interactable = false;
+                        TurnManager.instance.ChangeTurnTo(GameState.Reward);
 
+                        SelectToMain(cof);
                         cof.CardSelectedEffect(true);
                     }
                 }
                 return;
 
             case (CardType.Equip):
-                if (TurnManager.instance.currentState == GameState.Reward)
+                if (TurnManager.instance.currentState == GameState.Event)
                 {
                     if (main.Count == 0 && selection.Contains(cof))
                     {
-                        SelectToMain(cof);
+                        TurnManager.instance.ChangeTurnTo(GameState.Reward);
 
+                        SelectToMain(cof);
                         EquipmentCard rewardEquip = (EquipmentCard)main[0].card;
                         List<Card> cards = new List<Card>();
                         EquipmentCard equip = EntityController.instance.player.equipCards[(int)rewardEquip.equipType];
                         cards.Add(equip);
                         StartCoroutine(PutCardInHand(cards));
-
-                        CardMoveTo(playerCard, playerCardPositionMin);
-                        acceptButtons.SetActive(true);
-                        acceptButton.interactable = false;
-
                         cof.CardSelectedEffect(true);
                     }
                 }
@@ -797,7 +852,7 @@ public class CardManager : MonoBehaviour
                 }
                 else if (TurnManager.instance.currentState == GameState.Battle)
                 {
-                    Debug.Log("enemy status");
+                    StatusDataController.instance.PopupEntityStatus(EntityController.instance.enemy);
                 }
                 else if (TurnManager.instance.currentState == GameState.Event)
                 {
@@ -806,15 +861,18 @@ public class CardManager : MonoBehaviour
                 return;
 
             case (CardType.Player):
+                if (TurnManager.instance.currentState != GameState.PlayerCharacterSelection)
+                {
+                    StatusDataController.instance.PopupEntityStatus(EntityController.instance.player);
+                }
                 return;
 
             case CardType.Stage:
                 if (TurnManager.instance.currentState == GameState.PathSelection)
                 {
+                    TurnManager.instance.ChangeTurnTo(GameState.Stage);
+                    acceptButton.interactable = false;
                     SelectToMain(cof);
-                    CardMoveTo(playerCard, playerCardPositionMin);
-                    acceptButtons.SetActive(true);
-                    acceptButton.interactable = true;
                 }
                 else if (TurnManager.instance.currentState == GameState.PlayerCharacterSelection)
                 {
@@ -861,12 +919,12 @@ public class CardManager : MonoBehaviour
             Vector3 enlargePos = new Vector3(newX, newY, -50f);
             cof.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 1.8f), false);
 
-            Time.timeScale = 0.1f;
+            GameManager.instance.SetTimeScale(0f);
         }
         else
         {
             cof.MoveTransform(cof.originPRS, true, 0.1f);
-            Time.timeScale = 1f;
+            GameManager.instance.SetTimeScale(1f);
         }
         cof.GetComponent<RenderOrder>().setMostFrontOrder(isEnlarge);
     }
