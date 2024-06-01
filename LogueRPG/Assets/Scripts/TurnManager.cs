@@ -7,7 +7,8 @@ public enum GameState
     Event,
     Reward,
     PlayerCharacterSelection,
-    Stage
+    Stage,
+    ButtonEvent
 };
 
 public enum StageType
@@ -74,6 +75,12 @@ public class TurnManager : MonoBehaviour
                 currentState = GameState.Event;
                 CardManager.instance.ShowInventoryUI(true);
                 CardManager.instance.SetBattlePosition(false);
+                return;
+
+            case GameState.ButtonEvent:
+                currentState = GameState.ButtonEvent;
+                CardManager.instance.ShowInventoryUI(false);
+                CardManager.instance.ShowRewardAcceptUI(true);
                 return;
 
             case GameState.Reward:

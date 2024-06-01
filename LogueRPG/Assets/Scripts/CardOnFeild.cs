@@ -1,11 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using Unity.VisualScripting;
-using static UnityEngine.GraphicsBuffer;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class CardOnFeild : MonoBehaviour
 {
@@ -55,7 +55,7 @@ public class CardOnFeild : MonoBehaviour
     {
         this.card = card;
         characterSprite.sprite = card.sprite;
-        string name = card.name.Replace("\\n", "\n");
+        string name = GameManager.instance.GetLocaleString(card.name).Replace("\\n", "\n");
         nameTMP.text = name;
         Color symbolColor = Color.white;
         switch (card.type)
@@ -66,7 +66,7 @@ public class CardOnFeild : MonoBehaviour
                 symbolColor = new Color(1, 1, 1, 60f / 255f);
                 cardBackSymbol.color = symbolColor;
                 lineIndex++;
-                descriptionTMP.text = card.context[0].Replace("\\n", "\n"); ;
+                descriptionTMP.text = GameManager.instance.GetLocaleString(card.context[0]).Replace("\\n", "\n"); ;
                 break;
             case CardType.Enemy:
                 backgroundSprite.sprite = CardManager.instance.currentStageData.stageBackground;
@@ -98,33 +98,32 @@ public class CardOnFeild : MonoBehaviour
                 cardBackSymbol.color = symbolColor;
 
                 string skillDescription = "";
-                if (skill.skillEffects == null && card.context.Length > 0)
-                    skillDescription = card.context[0];
-                else
-                    foreach (SkillEffect skillEffect in skill.skillEffects)
+
+                foreach (SkillEffect skillEffect in skill.skillEffects)
+                {
+                    //utils.color
+                    skillDescription += "*";
+                    skillDescription += Utils.GetSkillTypeDescription(skillEffect.skillType);
+                    skillDescription += " (";
+                    skillDescription += Utils.GetStatName(skillEffect.skillStatType);
+
+                    if (skillEffect.pow > 0)
                     {
-                        //utils.color
-                        skillDescription += Utils.GetSkillTypeColor(skillEffect.skillType);
-                        skillDescription += " (";
-                        skillDescription += Utils.GetStatColor(skillEffect.skillStatType);
-
-                        if (skillEffect.pow > 0)
-                        {
-                            skillDescription += "/";
-                            if (skillEffect.skillType == SkillType.Buff)
-                                skillDescription += "+";
-                            else if (skillEffect.skillType == SkillType.Debuff)
-                                skillDescription += "-";
-                            skillDescription += skillEffect.pow;
-                        }
-
-                        if (skillEffect.buffDur > 0)
-                        {
-                            skillDescription += "/" + skillEffect.buffDur + "s";
-                        }
-                        skillDescription += ")\n";
+                        skillDescription += "/";
+                        if (skillEffect.skillType == SkillType.Buff)
+                            skillDescription += "+";
+                        else if (skillEffect.skillType == SkillType.Debuff)
+                            skillDescription += "-";
+                        skillDescription += skillEffect.pow;
                     }
-                skillDescription += "(Acc/" + skill.acc + ")";
+
+                    if (skillEffect.buffDur > 0)
+                    {
+                        skillDescription += "/" + skillEffect.buffDur + "s";
+                    }
+                    skillDescription += ")\n";
+                }
+                skillDescription += Utils.color_miss + "<align=right>(" + Utils.GetStatName(EntityStat.Acc) +"/" + skill.acc + ")";
                 descriptionTMP.text = skillDescription;
                 break;
             case CardType.Event:
@@ -148,17 +147,45 @@ public class CardOnFeild : MonoBehaviour
         }
     }
 
-    public void SetEquipDescription(Entity entity)
+    public void SetEquipDescription(bool isPlayer)
     {
-        EquipmentCard equip = (EquipmentCard)card;
-        string equipDescription = "";
-        foreach (EquipmentStats stat in equip.equipStats)
+        if (TurnManager.instance.currentState == GameState.Battle)
         {
-            equipDescription += Utils.GetStatColor(stat.equipStat) + " +";
-            int equipPow = stat.basePow + stat.PowPL * entity.entityEquipLevels[(int)equip.equipType];
-            equipDescription += equipPow + "\n";
+            EquipmentCard equip = (EquipmentCard)card;
+
+            switch (equip.equipType)
+            {
+                case EquipType.Weapon:
+                    descriptionTMP.text = GameManager.instance.GetLocaleString("Card-Equip-WeaponBrokenDescription");
+                    return;
+                case EquipType.Armor:
+                    descriptionTMP.text = GameManager.instance.GetLocaleString("Card-Equip-ArmorBrokenDescription");
+                    return;
+                case EquipType.Artifact:
+                    descriptionTMP.text = GameManager.instance.GetLocaleString("Card-Equip-ArtifactBrokenDescription");
+                    return;
+            }
         }
-        descriptionTMP.text = equipDescription;
+        else
+        {
+            EquipmentCard equip = (EquipmentCard)card;
+            string equipDescription = "";
+            foreach (EquipmentStats stat in equip.equipStats)
+            {
+                equipDescription += Utils.GetStatName(stat.equipStat) + " +";
+
+                int equipPow;
+                if (isPlayer)
+                    equipPow = stat.basePow + stat.PowPL * EntityController.instance.player.entityEquipLevels[(int)equip.equipType];
+                else
+                    equipPow = stat.basePow + stat.PowPL * GameManager.instance.GetEnemyLevel();
+                equipDescription += equipPow + "\n";
+            }
+
+            equipDescription += Utils.color_miss + "<align=right>(" + GameManager.instance.GetLocaleString("Battle-Equip-Durability") + "/" + equip.Durability + ")";
+
+            descriptionTMP.text = equipDescription;
+        }
     }
 
     public void MoveTransform(PRS prs, bool useDotween, float dotweenTime = 0)
@@ -217,50 +244,51 @@ public class CardOnFeild : MonoBehaviour
     }
 
     #region Dialogue
-
     public void NextDialogue()
     {
         if (lineIndex < card.context.Length)
         {
-            if (card.type == CardType.Event)
-            {
-                EventCard ecard = (EventCard)card;
-
-                if (ecard.eventLineIndexs.Length > 0)
-                    for (int i = 0; i < ecard.eventLineIndexs.Length; i++)
-                    {
-                        if (ecard.eventLineIndexs[i] == lineIndex)
-                            EntityController.instance.UseSkill(ecard.eventSkills[i], 3, true);
-                    }
-            }
-
             if (typeCoroutine == null)
             {
-                typeCoroutine = StartCoroutine(Type(card.context[lineIndex].Replace("\\n", "\n")));
+                if (card.type == CardType.Event)
+                {
+                    EventCard ecard = (EventCard)card;
+                    if (ecard.eventRewardType == EventRewardType.Effect || ecard.eventRewardType == EventRewardType.Trap)
+                        if (ecard.eventLineIndex == lineIndex)
+                            EntityController.instance.UseSkill(ecard.eventEffect, 3, true);
+                }
+
+                typeCoroutine = StartCoroutine(Type(GameManager.instance.GetLocaleString(card.context[lineIndex]).Replace("\\n", "\n")));
             }
             else
             {
                 StopCoroutine(typeCoroutine);
                 typeCoroutine = null;
-                descriptionTMP.text = card.context[lineIndex].Replace("\\n", "\n");
+                descriptionTMP.text = " " + GameManager.instance.GetLocaleString(card.context[lineIndex]).Replace("\\n", "\n");
                 lineIndex++;
             }
         }
         else
         {
-            if (card.type == CardType.Enemy)
+            switch (card.type)
             {
-                EntityController.instance.BattleReward();
-            }
-            else if (card.type == CardType.Stage)
-            {
-                if (TurnManager.instance.currentState == GameState.PlayerCharacterSelection)
-                    TurnManager.instance.ChangeTurnTo(GameState.PlayerCharacterSelection);
-                return;
-            }
-            else
-            {
-                TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+                case CardType.Enemy:
+                    EntityController.instance.BattleReward();
+                    return;
+                case CardType.Stage:
+                    if (TurnManager.instance.currentState == GameState.PlayerCharacterSelection)
+                        TurnManager.instance.ChangeTurnTo(GameState.PlayerCharacterSelection);
+                    return;
+                case CardType.Event:
+                    EventCard ecard = (EventCard)card;
+                    if (ecard.eventRewardType == EventRewardType.Card)
+                        CardManager.instance.SetRewardCards(ecard.rewardEquip, ecard.rewardSkill);
+                    else
+                        TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+                    return;
+                default:
+                    TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
+                    return;
             }
         }
             
@@ -268,7 +296,7 @@ public class CardOnFeild : MonoBehaviour
 
     IEnumerator Type(string line)
     {
-        descriptionTMP.text = "";
+        descriptionTMP.text = " ";
 
         GameManager.instance.AddControlBlock();
         yield return new WaitForSeconds(textSpeed);

@@ -72,6 +72,10 @@ public class CardManager : MonoBehaviour
     public GameObject selectPlayerUI;
     public GameObject inventoryUI;
 
+    public GameObject coinToss_success;
+    public GameObject coinToss_failure;
+    public Transform[] coinTransfoms;
+
     public Button acceptButton;
     public Button selectPlayerButton;
     public Button showEquipButton;
@@ -118,7 +122,6 @@ public class CardManager : MonoBehaviour
             chosenHand.GetComponent<RenderOrder>().SetOrder(-1);
             SetPlayerCard(chosenHand);
             selectPlayerUI.GetComponent<UIEnableAnimation>().ShowUI(false);
-            CardMoveTo(playerCard, playerCardPosition);
 
             TurnManager.instance.ChangeStageTo(StageType.Wood);
             TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
@@ -221,9 +224,10 @@ public class CardManager : MonoBehaviour
         if (acceptButtons.activeSelf != on)
             acceptButtons.GetComponent<UIEnableAnimation>().ShowUI(on);
         if (TurnManager.instance.currentState == GameState.Reward)
-        {
             acceptButton.interactable = false;
-        }
+        else
+            acceptButton.interactable = true;
+
     }
 
     public void ShowInventoryUI(bool on)
@@ -262,11 +266,24 @@ public class CardManager : MonoBehaviour
 
         List<Card> selectionCards = new List<Card>();
 
-        for (int i = 0; i < 3; i++) //player data
+        int currenTurn = GameManager.instance.GetTurnCount();
+        int mainEnemyIndex = Array.IndexOf(currentStageData.mainEnemyTurns, currenTurn);
+        int mainEventIndex = Array.IndexOf(currentStageData.mainEventTurns, currenTurn);
+
+        if (mainEnemyIndex > -1)
         {
-            Card mainCardData = ChooseRandomCard(cardSO.mainCardTypes, random);
-            selectionCards.Add(GetRandomCard(mainCardData.type));
+            selectionCards.Add(currentStageData.mainEnemies[mainEnemyIndex]);
         }
+        else if (mainEventIndex > -1)
+        {
+            selectionCards.Add(currentStageData.mainEvents[mainEventIndex]);
+        }
+        else
+            for (int i = 0; i < 3; i++) //player data
+            {
+                Card mainCardData = ChooseRandomCard(cardSO.mainCardTypes, random);
+                selectionCards.Add(GetRandomCard(mainCardData.type));
+            }
 
         StartCoroutine(PutCardInSelection(selectionCards, false));
     }
@@ -337,7 +354,7 @@ public class CardManager : MonoBehaviour
 
         StartCoroutine(PutCardInSelection(rewards, false));
 
-        selection[0].SetEquipDescription(EntityController.instance.enemy);
+        selection[0].SetEquipDescription(false);
     }
 
     public void EmptyHand()
@@ -379,7 +396,7 @@ public class CardManager : MonoBehaviour
         {
             CardOnFeild cof = DrawCard(card, handSpawnPoint);
             if (cof.card.type == CardType.Equip)
-                cof.SetEquipDescription(EntityController.instance.player);
+                cof.SetEquipDescription(true);
             cof.isMinimized = true;
             cof.isMoveable = true;
             hand.Add(cof);
@@ -442,18 +459,19 @@ public class CardManager : MonoBehaviour
             for (int i = 0; i < 3; i++)
             {
                 playerEquip.Add(DrawCard(player.equipCards[i], playerEquipSpawnPosition));
-                //playerEquip[i].SetEquipDescription(player.entityEquipLevels[i]);
+                playerEquip[i].SetEquipDescription(true);
                 playerEquip[i].gameObject.SetActive(false);
                 playerEquip[i].isMinimized = true;
                 playerEquip[i].ShowEquipDurability(true);
+                playerEquip[i].GetComponent<RenderOrder>().SetOriginOrder(-1);
 
                 enemyEquip.Add(DrawCard(enemy.equipCards[i], enemyEquipSpawnPosition));
-                //enemyEquip[i].SetEquipDescription(enemy.entityEquipLevels[i]);
+                enemyEquip[i].SetEquipDescription(false);
                 enemyEquip[i].gameObject.SetActive(false);
                 enemyEquip[i].isMinimized = true;
                 enemyEquip[i].ShowEquipDurability(true);
+                enemyEquip[i].GetComponent<RenderOrder>().SetOriginOrder(-1);
             }
-
 
             yield return delay03;
 
@@ -588,22 +606,19 @@ public class CardManager : MonoBehaviour
         return ChooseRandomCard(currentStageData.connectedStages, random);
     }
 
-    public SkillCard ChooseRandomEnemySkill()
+    public CardOnFeild GetRandomEnemySkillCard()
     {
-        return (SkillCard)ChooseRandomCard(EntityController.instance.enemy.skillCards.ToArray(), random);
-    }
+        SkillCard skill = (SkillCard)ChooseRandomCard(EntityController.instance.enemy.skillCards.ToArray(), random);
 
-    public void EnemyUseSkill(SkillCard skill)
-    {
         foreach (CardOnFeild cof in enemySkill)
         {
             if (skill == cof.card && cof.isMoveable)
             {
-                int equipNum = EntityController.instance.GetEmptySlot(EntityController.instance.enemy);
-                if (EntityController.instance.UseSkill(skill, equipNum, false))
-                    SetSkillCard(cof, equipNum, false);
+                return cof;
             }
         }
+
+        return null;
     }
 
     Card ChooseRandomCard(Card[] cards, System.Random random)
@@ -759,33 +774,69 @@ public class CardManager : MonoBehaviour
         if (GameManager.instance.GetControlBlockCount() > 0)
             return;
 
-        if (main[0].card.type == CardType.Stage)
+        switch (TurnManager.instance.currentState)
         {
-            StageCard card = (StageCard)main[0].card;
-            TurnManager.instance.ChangeStageTo(card.stageType);
-        }
-        else
-        {
-            if (chosenHand.card.type == CardType.Equip)
-                EntityController.instance.player.ChangeEquip((EquipmentCard)main[0].card, GameManager.instance.GetEnemyLevel());
-            else if (chosenHand.card.type == CardType.Skill)
-            {
-                for (int i = 0; i < hand.Count; i++)
+            case GameState.Stage:
+                StageCard card = (StageCard)main[0].card;
+                TurnManager.instance.ChangeStageTo(card.stageType);
+                break;
+            case GameState.Reward:
+                if (chosenHand.card.type == CardType.Equip)
+                    EntityController.instance.player.ChangeEquip((EquipmentCard)main[0].card, GameManager.instance.GetEnemyLevel());
+                else if (chosenHand.card.type == CardType.Skill)
                 {
-                    if (hand[i] == chosenHand)
+                    for (int i = 0; i < hand.Count; i++)
                     {
-                        EntityController.instance.player.ChangeSkill((SkillCard)main[0].card, i);
+                        if (hand[i] == chosenHand)
+                        {
+                            EntityController.instance.player.ChangeSkill((SkillCard)main[0].card, i);
+                        }
                     }
                 }
-            }
-            hand.Remove(chosenHand);
-            hand.Add(main[0]);
-            main[0] = chosenHand;
+                hand.Remove(chosenHand);
+                hand.Add(main[0]);
+                main[0] = chosenHand;
+                break;
+            case GameState.ButtonEvent:
+                ShowRewardAcceptUI(false);
+                EventCointToss();
+                return;
         }
 
         TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
-        CardMoveTo(playerCard, playerCardPosition);
         ShowRewardAcceptUI(false);
+    }
+
+    public void EventCointToss()
+    {
+        if (main[0] == null || main[0].card.type != CardType.Event)
+            return;
+        GameManager.instance.AddControlBlock();
+        GameObject coin;
+        EventCard ecard = (EventCard)main[0].card;
+        if (ecard.eventRewardType == EventRewardType.Trap)
+        {
+            coin = Instantiate(coinToss_failure, coinTransfoms[0]);
+        }
+        else
+        {
+            coin = Instantiate(coinToss_success, coinTransfoms[0]);
+        }
+        Sequence coinSequence = DOTween.Sequence();
+        coinSequence.Append(coin.transform.DOMove(coinTransfoms[1].position, 0.5f));
+        coinSequence.Join(coin.transform.DOScale(coinTransfoms[1].localScale, 0.5f));
+        coinSequence.Append(coin.transform.DOMove(coinTransfoms[2].position, 0.5f));
+        coinSequence.Join(coin.transform.DOScale(coinTransfoms[2].localScale, 0.5f));
+        coinSequence.AppendInterval(1f);
+        coinSequence.OnComplete(() =>
+        {
+            GameManager.instance.RemoveControlBlock();
+            coin.transform.DOKill();
+            Destroy(coin);
+
+            TurnManager.instance.ChangeTurnTo(GameState.Event);
+            main[0].NextDialogue();
+        });
     }
 
     public void SkipEvent()
@@ -794,7 +845,6 @@ public class CardManager : MonoBehaviour
             return;
 
         TurnManager.instance.ChangeTurnTo(GameState.PathSelection);
-        CardMoveTo(playerCard, playerCardPosition);
         ShowRewardAcceptUI(false);
     }
 
@@ -803,10 +853,18 @@ public class CardManager : MonoBehaviour
         switch (cof.card.type)
         {
             case(CardType.Event):
+                if (TurnManager.instance.currentState == GameState.ButtonEvent)
+                    return;
                 if (TurnManager.instance.currentState == GameState.PathSelection)
                 {
                     SelectToMain(cof);
-                    TurnManager.instance.ChangeTurnTo(GameState.Event);
+                    EventCard ecard = (EventCard)cof.card;
+                    if (ecard.buttonEvent)
+                    {
+                        TurnManager.instance.ChangeTurnTo(GameState.ButtonEvent);
+                    }
+                    else
+                        TurnManager.instance.ChangeTurnTo(GameState.Event);
                 }
                 cof.NextDialogue();
                 return;
@@ -871,7 +929,7 @@ public class CardManager : MonoBehaviour
                 if (TurnManager.instance.currentState == GameState.PathSelection)
                 {
                     TurnManager.instance.ChangeTurnTo(GameState.Stage);
-                    acceptButton.interactable = false;
+                    acceptButton.interactable = false; //Stage제한
                     SelectToMain(cof);
                 }
                 else if (TurnManager.instance.currentState == GameState.PlayerCharacterSelection)

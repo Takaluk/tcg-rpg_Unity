@@ -38,29 +38,33 @@ public class StatusDataController : MonoBehaviour
         entityStatusPanel.SetActive(true);
         entityStatusTMP.text = "";
         string entityStatusText = "";
-        entityStatusText += "<b><size=0.7>" + entity.entityCard.card.name + "</size></b>\n";
+        entityStatusText += "<b><size=0.7>" + GameManager.instance.GetLocaleString(entity.entityCard.card.name) + "</size></b>\n";
         entityStatusText += "\n";
-        entityStatusText += "<b>Stat</b>\n";
-        foreach (EntityStat stat in Enum.GetValues(typeof(EntityStat)))
+
+        if (true)
         {
-            if (entity.entityStat[stat] != 0)
+            entityStatusText += "<b><size=0.55>" + GameManager.instance.GetLocaleString("Battle-Stat-Status") + "</size></b>\n";
+            foreach (EntityStat stat in Enum.GetValues(typeof(EntityStat)))
             {
-                entityStatusText += "<u><link=" + stat.ToString() + ">" + Utils.GetStatColor(stat) + "</link></u>: " + entity.entityStat[stat].ToString() + "\n";
+                if (entity.entityStat[stat] != 0)
+                {
+                    entityStatusText += "<link=" + stat.ToString() + ">" + Utils.GetStatName(stat) + ": " + entity.entityStat[stat].ToString() + "</link>\n";
+                }
             }
+            entityStatusText += "\n";
         }
 
-        entityStatusText += "\n";
-        entityStatusText += "<b>Buff</b>\n";
+        entityStatusText += "<b><size=0.55>" + GameManager.instance.GetLocaleString("Battle-Stat-Buff") + "</size></b>\n";
         foreach (Buff buff in entity.buffList)
         {
-            entityStatusText += "<u><link=" + buff.stat.ToString() + ">" + Utils.GetStatColor(buff.stat) + "</link></u> (" + Utils.color_buff + "+" + buff.pow + "</color>/" + (int)buff.currentTime + "s)\n";
+            entityStatusText += "<link=" + buff.stat.ToString() + ">" + Utils.GetStatName(buff.stat) + " (" + Utils.color_buff + "+" + buff.pow + "</color>/" + (int)buff.currentTime + "s)</link>\n";
         }
-
         entityStatusText += "\n";
-        entityStatusText += "<b>Debuff</b>\n";
+
+        entityStatusText += "<b><size=0.55>" + GameManager.instance.GetLocaleString("Battle-Stat-Debuff") + "</size></b>\n";
         foreach (Buff buff in entity.debuffList)
         {
-            entityStatusText += "<u><link=" + buff.stat.ToString() + ">" + Utils.GetStatColor(buff.stat) + "</link></u> (" + Utils.color_debuff + "-" + buff.pow + "</color>/" + (int)buff.currentTime + "s)\n";
+            entityStatusText += "<link=" + buff.stat.ToString() + ">" + Utils.GetStatName(buff.stat) + " (" + Utils.color_debuff + "-" + buff.pow + "</color>/" + (int)buff.currentTime + "s)</link>\n";
         }
 
         entityStatusTMP.text += entityStatusText;
@@ -73,9 +77,8 @@ public class StatusDataController : MonoBehaviour
         statusDescriptionPanel.SetActive(true);
         var data = stats.FirstOrDefault(t => t.Key == key);
 
-        statNameTMP.text = data.Name;
-        statDescriptionTMP.text = data.Description;
-        //statSprite.sprite = data.sprite;
+        statNameTMP.text = GameManager.instance.GetLocaleString(data.Name);
+        statDescriptionTMP.text = GameManager.instance.GetLocaleString(data.Description);
     }
 
     public void CloseEntityStatus()

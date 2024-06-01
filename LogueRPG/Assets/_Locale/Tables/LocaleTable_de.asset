@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: LocaleTable_de
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: de
+  m_SharedData: {fileID: 11400000, guid: 64103a896f9584342861756f1977d54c, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 47341585469440
+    m_Localized: "Ausr\xFCsten"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44093629698048
+    m_Localized: Weiter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42933858504704
+    m_Localized: "Bitte w\xE4hlen Sie den Spieler aus."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46280929873920
+    m_Localized: "\xDCberspringen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 48010660843520
+    m_Localized: Fertigkeit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50775604760576
+    m_Localized: Akzeptieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 58414564806656
+    m_Localized: Dindraine's Wald
+    m_Metadata:
+      m_Items: []
+  - m_Id: 354976457199616
+    m_Localized: ' '
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

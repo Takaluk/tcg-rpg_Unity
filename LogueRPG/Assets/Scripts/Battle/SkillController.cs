@@ -25,7 +25,7 @@ public class SkillController : MonoBehaviour
 
     void DamageSkill(SkillEffect skillEffect, Entity target, Entity user, int equipNum)
     {
-        float damage = 1;
+        float damage = 0;
         bool criCheck = user.CriticalCheck();
 
         damage += skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
@@ -41,13 +41,12 @@ public class SkillController : MonoBehaviour
             }
         }
 
-        if (damage > 0)
-            target.TakeDamage(skillEffect.skillType, (int)damage, equipNum, criCheck);
+        target.TakeDamage(skillEffect.skillType, (int)damage, equipNum, criCheck);
     }
 
     void HealSkill(SkillEffect skillEffect, Entity user)
     {
-        float heal = 1;
+        float heal = 0;
         if (skillEffect.skillStatType == EntityStat.MaxHP)
         {
             heal += skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
@@ -86,11 +85,15 @@ public class SkillController : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         user.manaChargeBlock = true;
-        float accuracyCheck = (skill.acc + user.entityStat[EntityStat.Acc]) * (1 - user.entityStat[EntityStat.Dodge] / 100f);
+
+        float accuracyCheck = 100;
+        if (TurnManager.instance.currentState == GameState.Battle)
+            accuracyCheck = (skill.acc + user.entityStat[EntityStat.Acc]) * (1 - target.entityStat[EntityStat.Dodge] / 100f);
+        Debug.Log(accuracyCheck);
         if (!Utils.CalculateProbability(accuracyCheck))
         {
             user.manaChargeBlock = false;
-            target.EntityPopUp(Utils.color_miss + "MISS");
+            target.EntityPopUp(Utils.color_miss + GameManager.instance.GetLocaleString("Battle-Miss"));
         }
         else
         {

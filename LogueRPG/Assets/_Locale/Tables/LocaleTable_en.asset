@@ -1,0 +1,212 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: LocaleTable_en
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 64103a896f9584342861756f1977d54c, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 47341585469440
+    m_Localized: Equip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44093629698048
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42933858504704
+    m_Localized: Please select player.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46280929873920
+    m_Localized: Skip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 48010660843520
+    m_Localized: Skill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50775604760576
+    m_Localized: Accept
+    m_Metadata:
+      m_Items: []
+  - m_Id: 58414564806656
+    m_Localized: Dindraine's Forest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 155867171426304
+    m_Localized: Knight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266716892532736
+    m_Localized: Status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266989241274368
+    m_Localized: Buff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 267140886335488
+    m_Localized: Debuff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 267726205652992
+    m_Localized: Str
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272352564908032
+    m_Localized: Int
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272393232879616
+    m_Localized: MPCharge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272531271618560
+    m_Localized: MaxHP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272600272113664
+    m_Localized: CurrentHP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272640428380160
+    m_Localized: PDef
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272676704915456
+    m_Localized: MDef
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272712067092480
+    m_Localized: Dodge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272771080949760
+    m_Localized: Acc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284795869499392
+    m_Localized: Shild
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284503295823872
+    m_Localized: Critical
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284576872304640
+    m_Localized: CriticalDamage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284652092952576
+    m_Localized: Charge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284679011995648
+    m_Localized: Leech
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284733911240704
+    m_Localized: Reflect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284764940701696
+    m_Localized: Resist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 309290671968256
+    m_Localized: MISS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 309233793011712
+    m_Localized: Broken!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314927480999936
+    m_Localized: Not enough Mana
+    m_Metadata:
+      m_Items: []
+  - m_Id: 323590279041024
+    m_Localized: Deal  <color=#FB4000>PcsDamage</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 326475368796160
+    m_Localized: Deal  <color=#5864E0> MgcDamage</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 326794727297024
+    m_Localized: <color=green>Heal</color> current HP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 327242083373056
+    m_Localized: 'Gain <color=#7ed1ff>Buff Effect</color> for a while
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 327277076451328
+    m_Localized: 'Inflict <color=#c90223>Debuff  Effect</color> for a while
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 354845532000256
+    m_Localized: '* Equipment destruction through physical attacks
+
+      * High
+      durability'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 359965980266496
+    m_Localized: You are walking through the fog, unaware of where you came from
+      or where you are going.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 360052802359296
+    m_Localized: "Amidst the heavy sense of helplessness and drowsiness, you discover
+      a blurry forest landscape that gives you a sense of d\xE9j\xE0 vu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 354976457199616
+    m_Localized: ' '
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837414614634496
+    m_Localized: Watcher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 853162191917056
+    m_Localized: Hand of Specter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 878823853953024
+    m_Localized: Black Flame
+    m_Metadata:
+      m_Items: []
+  - m_Id: 878928069824512
+    m_Localized: Magic Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 879532779409408
+    m_Localized: Fog Shroud
+    m_Metadata:
+      m_Items: []
+  - m_Id: 991880286474240
+    m_Localized: Durability
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

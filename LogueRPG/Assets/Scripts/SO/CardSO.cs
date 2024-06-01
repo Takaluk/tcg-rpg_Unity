@@ -20,11 +20,12 @@ public enum EquipType
     Artifact
 }
 
-public enum EventType
+public enum EventRewardType
 {
     None = 0,
-    Skill,
-    Equip
+    Effect,
+    Card,
+    Trap
 };
 
 
@@ -85,9 +86,15 @@ public class EquipmentStats
 [System.Serializable]
 public class EventCard : Card
 {
-    public int[] eventLineIndexs;
-    public SkillCard[] eventSkills;
     public bool buttonEvent;
+    public EventRewardType eventRewardType;
+    public int eventLineIndex;
+
+    public SkillCard eventEffect;
+    //public SkillCard trapEffect;
+
+    public SkillCard rewardSkill;
+    public EquipmentCard rewardEquip;
 }
 
 [System.Serializable]
@@ -103,11 +110,12 @@ public class StageData
 
     public EnemyCard[] enemies;
     public EventCard[] events;
-    public EnemyCard[] mainEnemies;
-    public EventCard[] mainEvents;
     public StageCard[] connectedStages;
-    //고정이벤트(
-    //quests;
+
+    public int[] mainEnemyTurns;
+    public EnemyCard[] mainEnemies;
+    public int[] mainEventTurns;
+    public EventCard[] mainEvents;
 }
 
 [CreateAssetMenu(fileName = "CardSO", menuName = "Scriptable Object/CardSO")]

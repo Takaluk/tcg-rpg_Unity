@@ -49,47 +49,84 @@ public class Utils : MonoBehaviour
 
     public static Quaternion QI => Quaternion.identity;
 
-    public static string GetStatColor(EntityStat stat)
+    public static string GetStatName(EntityStat stat, bool withColor = true)
     {
         switch (stat)
         {
             case EntityStat.Str:
-                return color_Str + "Str</color>";
+                if (withColor)
+                    return color_Str + GameManager.instance.GetLocaleString("Battle-Stat-Str") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-Str");
             case EntityStat.Int:
-                return color_Int + "Int</color>";
+                if (withColor)
+                    return color_Int + GameManager.instance.GetLocaleString("Battle-Stat-Int") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-Int");
             case EntityStat.MPChargeSpeed:
-                return color_mana + "MPCharge</color>";
+                if (withColor)
+                    return color_mana + GameManager.instance.GetLocaleString("Battle-Stat-MPChargeSpeed") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-MPChargeSpeed");
             case EntityStat.MaxHP:
-                return color_HP + "MaxHP</color>";
+                if (withColor)
+                    return color_HP + GameManager.instance.GetLocaleString("Battle-Stat-MaxHP") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-MaxHP");
             case EntityStat.CurrentHP:
-                return color_HP + "CurrentHP</color>";
+                if (withColor)
+                    return color_HP + GameManager.instance.GetLocaleString("Battle-Stat-CurrentHP") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-CurrentHP");
             case EntityStat.PDef:
-                return color_Str + "PscDef</color>";
+                if (withColor)
+                    return color_Str + GameManager.instance.GetLocaleString("Battle-Stat-PDef") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-PDef");
             case EntityStat.MDef:
-                return color_Int + "MgcDef</color>";
+                return color_Int + GameManager.instance.GetLocaleString("Battle-Stat-MDef") + "</color>";
             case EntityStat.Dodge:
-                return color_miss + "Dodge</color>";
+                if (withColor)
+                    return color_miss + GameManager.instance.GetLocaleString("Battle-Stat-Dodge") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-Dodge");
             case EntityStat.Acc:
-                return color_miss + "Acc</color>";
+                return GameManager.instance.GetLocaleString("Battle-Stat-Acc");
+            case EntityStat.AdditionalHit:
+                return GameManager.instance.GetLocaleString("Battle-Stat-AdditionalHit");
+            case EntityStat.Critical:
+                return GameManager.instance.GetLocaleString("Battle-Stat-Critical");
+            case EntityStat.CriticalDamage:
+                return GameManager.instance.GetLocaleString("Battle-Stat-CriticalDamage");
+            case EntityStat.Charge:
+                return GameManager.instance.GetLocaleString("Battle-Stat-Charge");
+            case EntityStat.Leech:
+                return GameManager.instance.GetLocaleString("Battle-Stat-Leech");
+            case EntityStat.Reflect:
+                return GameManager.instance.GetLocaleString("Battle-Stat-Reflect");
+            case EntityStat.Resist:
+                return GameManager.instance.GetLocaleString("Battle-Stat-Resist");
+            case EntityStat.Shild:
+                return GameManager.instance.GetLocaleString("Battle-Stat-Shild");
             default:
                 return "";
         }
     }
 
-    public static string GetSkillTypeColor(SkillType skillType)
+    public static string GetSkillTypeDescription(SkillType skillType)
     {
         switch (skillType)
         {
             case SkillType.PscDamage:
-                return "Deal " + color_pcsDamage + "PscDamge</color>";
+                return GameManager.instance.GetLocaleString("Battle-SkillDescription-PcsDamage");
             case SkillType.MgcDamage:
-                return "Deal " + color_mgcDamage + "MgcDamge</color>";
+                return GameManager.instance.GetLocaleString("Battle-SkillDescription-MgcDamage");
             case SkillType.Heal:
-                return color_HP + "Heal</color>";
+                return GameManager.instance.GetLocaleString("Battle-SkillDescription-Heal");
             case SkillType.Buff:
-                return color_buff + "Gain</color>";
+                return GameManager.instance.GetLocaleString("Battle-SkillDescription-Buff");
             case SkillType.Debuff:
-                return color_debuff + "Inflict</color>";
+                return GameManager.instance.GetLocaleString("Battle-SkillDescription-Debuff");
             default:
                 return "";
         }

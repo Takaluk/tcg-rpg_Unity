@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
+using UnityEngine.Localization;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -28,6 +30,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject gameOver;
     int controlBlock = 0;
     int turnCount = 0;
+
+    [SerializeField] GameObject cardManager;
+    [SerializeField] GameObject turnManager;
+    [SerializeField] GameObject battleManager;
+
+    public void StartGame()
+    {
+        cardManager.SetActive(true);
+        turnManager.SetActive(true);
+        battleManager.SetActive(true);
+    }
 
     public int GetEnemyLevel()
     {
@@ -74,5 +87,11 @@ public class GameManager : MonoBehaviour
     public void SetTimeScale(float scale)
     {
         Time.timeScale = scale;
+    }
+
+    public string GetLocaleString(string key)
+    {
+        Locale currentLocale = LocalizationSettings.SelectedLocale;
+        return LocalizationSettings.StringDatabase.GetLocalizedString("LocaleTable", key, currentLocale);
     }
 }

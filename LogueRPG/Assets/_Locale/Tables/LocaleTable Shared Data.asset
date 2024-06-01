@@ -1,0 +1,356 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: LocaleTable Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: LocaleTable
+  m_TableCollectionNameGuidString: 64103a896f9584342861756f1977d54c
+  m_Entries:
+  - m_Id: 309233793011712
+    m_Key: Battle-EquipBroken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 309290671968256
+    m_Key: Battle-Miss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314927480999936
+    m_Key: Battle-NotEnoughMana
+    m_Metadata:
+      m_Items: []
+  - m_Id: 327242083373056
+    m_Key: Battle-SkillDescription-Buff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 327277076451328
+    m_Key: Battle-SkillDescription-Debuff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 326794727297024
+    m_Key: Battle-SkillDescription-Heal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 326475368796160
+    m_Key: Battle-SkillDescription-MgcDamage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 323590279041024
+    m_Key: Battle-SkillDescription-PcsDamage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272771080949760
+    m_Key: Battle-Stat-Acc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 858445253349376
+    m_Key: Battle-Stat-Acc-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266989241274368
+    m_Key: Battle-Stat-Buff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284652092952576
+    m_Key: Battle-Stat-Charge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284503295823872
+    m_Key: Battle-Stat-Critical
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284576872304640
+    m_Key: Battle-Stat-CriticalDamage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 858504405618688
+    m_Key: Battle-Stat-CriticalDamage-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 858476509302784
+    m_Key: Battle-Stat-Critical-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272600272113664
+    m_Key: Battle-Stat-CurrentHP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 861576460668928
+    m_Key: Battle-Stat-CurrentHP-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 267140886335488
+    m_Key: Battle-Stat-Debuff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272712067092480
+    m_Key: Battle-Stat-Dodge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 858462462578688
+    m_Key: Battle-Stat-Dodge-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272352564908032
+    m_Key: Battle-Stat-Int
+    m_Metadata:
+      m_Items: []
+  - m_Id: 858424269246464
+    m_Key: Battle-Stat-Int-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284679011995648
+    m_Key: Battle-Stat-Leech
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272531271618560
+    m_Key: Battle-Stat-MaxHP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 861303566667776
+    m_Key: Battle-Stat-MaxHP-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272676704915456
+    m_Key: Battle-Stat-MDef
+    m_Metadata:
+      m_Items: []
+  - m_Id: 861880656760832
+    m_Key: Battle-Stat-MDef-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272393232879616
+    m_Key: Battle-Stat-MPChargeSpeed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 861642550317056
+    m_Key: Battle-Stat-MPChargeSpeed-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 272640428380160
+    m_Key: Battle-Stat-PDef
+    m_Metadata:
+      m_Items: []
+  - m_Id: 861833227571200
+    m_Key: Battle-Stat-PDef-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284733911240704
+    m_Key: Battle-Stat-Reflect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284764940701696
+    m_Key: Battle-Stat-Resist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 284795869499392
+    m_Key: Battle-Stat-Shild
+    m_Metadata:
+      m_Items: []
+  - m_Id: 861467635257344
+    m_Key: Battle-Stat-Shild-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266716892532736
+    m_Key: Battle-Stat-Status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 267726205652992
+    m_Key: Battle-Stat-Str
+    m_Metadata:
+      m_Items: []
+  - m_Id: 858344879460352
+    m_Key: Battle-Stat-Str-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 354845532000256
+    m_Key: Card-Character-Knight-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 354976457199616
+    m_Key: Card-Character-Knight-Context1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 155867171426304
+    m_Key: Card-Character-Knight-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 850687783243776
+    m_Key: Card-Enemy-Mistweb-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 850492731330560
+    m_Key: Card-Enemy-Mistweb0-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 745576184582144
+    m_Key: Card-Equip-ArmorBrokenDescription
+    m_Metadata:
+      m_Items: []
+  - m_Id: 745604122841088
+    m_Key: Card-Equip-ArtifactBrokenDescription
+    m_Metadata:
+      m_Items: []
+  - m_Id: 853162191917056
+    m_Key: Card-Equip-Name-Hand of Specter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 745514230517760
+    m_Key: Card-Equip-WeaponBrokenDescription
+    m_Metadata:
+      m_Items: []
+  - m_Id: 840484337651712
+    m_Key: Card-Event-Watcher-Main0-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 843007102455808
+    m_Key: Card-Event-Watcher-Main0-Context1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 844106140127232
+    m_Key: Card-Event-Watcher-Main0-Context2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837414614634496
+    m_Key: Card-Event-Watcher-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 679340838916096
+    m_Key: Card-Location-Castle-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 679264288673792
+    m_Key: Card-Location-Castle-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 678985707196416
+    m_Key: Card-Location-Town-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 678886755176448
+    m_Key: Card-Location-Town-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 359965980266496
+    m_Key: Card-Location-Wood-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 360052802359296
+    m_Key: Card-Location-Wood-Context1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 58414564806656
+    m_Key: Card-Location-Wood-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50775604760576
+    m_Key: UI-acceptButton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47341585469440
+    m_Key: UI-equipButton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44093629698048
+    m_Key: UI-selectCharacterButton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42933858504704
+    m_Key: UI-selectCharacterText
+    m_Metadata:
+      m_Items: []
+  - m_Id: 48010660843520
+    m_Key: UI-skillButton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46280929873920
+    m_Key: UI-skipButton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 875961551851520
+    m_Key: Card-Equip-Name-Fog Veil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 876284945272832
+    m_Key: Card-Equip-Name-Fog Core
+    m_Metadata:
+      m_Items: []
+  - m_Id: 878823853953024
+    m_Key: Card-Skill-Name-Black Flame
+    m_Metadata:
+      m_Items: []
+  - m_Id: 878928069824512
+    m_Key: Card-Skill-Name-Magic Claw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 879532779409408
+    m_Key: Card-Skill-Name-Fog Shroud
+    m_Metadata:
+      m_Items: []
+  - m_Id: 991880286474240
+    m_Key: Battle-Equip-Durability
+    m_Metadata:
+      m_Items: []
+  - m_Id: 994758245912576
+    m_Key: Card-Enemy-Mistweb1-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 994943676092416
+    m_Key: Card-Enemy-Mistweb2-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1000443083919360
+    m_Key: Card-Equip-Name-LongSword
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1000498310320128
+    m_Key: Card-Equip-Name-ArmorOfKnight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1000537191518208
+    m_Key: Card-Equip-Name-MetalSheild
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1000792201007104
+    m_Key: Card-Skill-Name-Slash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1000817723346944
+    m_Key: Card-Skill-Name-MurderStrike
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1000841068843008
+    m_Key: Card-Skill-Name-SheildUp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1000861570600960
+    m_Key: Card-Skill-Name-Focus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1000907041050624
+    m_Key: Card-Skill-Name-Heal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1861681003270144
+    m_Key: Battle-Die
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 4999643820734545947
+  references:
+    version: 2
+    RefIds:
+    - rid: 4999643820734545947
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1716808598668
