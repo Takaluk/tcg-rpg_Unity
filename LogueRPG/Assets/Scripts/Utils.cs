@@ -24,6 +24,7 @@ public class Utils : MonoBehaviour
     public static string color_pcsCriticalDamage = "<color=red>";
     public static string color_mgcDamage = "<color=#5864E0>";
     public static string color_mgcCriticalDamage = "<color=#5026FF>";
+    public static string color_trueDamage = "<color=white>";
     public static string color_broken = "<color=#B0B0B0>";
     public static string color_heal = "<color=green>";
     public static string color_mana = "<color=#52B1F9>";
@@ -106,8 +107,16 @@ public class Utils : MonoBehaviour
                 return GameManager.instance.GetLocaleString("Battle-Stat-Reflect");
             case EntityStat.Resist:
                 return GameManager.instance.GetLocaleString("Battle-Stat-Resist");
-            case EntityStat.Shild:
-                return GameManager.instance.GetLocaleString("Battle-Stat-Shild");
+            case EntityStat.Shield:
+                if (withColor)
+                    return color_miss + GameManager.instance.GetLocaleString("Battle-Stat-Shield") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-Shield");
+            case EntityStat.CurrentShield:
+                if (withColor)
+                    return color_miss + GameManager.instance.GetLocaleString("Battle-Stat-CurrentShield") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-CurrentShield");
             default:
                 return "";
         }
@@ -127,6 +136,8 @@ public class Utils : MonoBehaviour
                 return GameManager.instance.GetLocaleString("Battle-SkillDescription-Buff");
             case SkillType.Debuff:
                 return GameManager.instance.GetLocaleString("Battle-SkillDescription-Debuff");
+            case SkillType.SelfDamage:
+                return GameManager.instance.GetLocaleString("Battle-SkillDescription-SelfDamage");
             default:
                 return "";
         }

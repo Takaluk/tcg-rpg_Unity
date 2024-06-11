@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_Text gameOverTurnCountTMP;
     [SerializeField] GameObject gameOver;
     int controlBlock = 0;
-    int turnCount = 0;
+    int turnCount = 0; // 각 맵마다 턴카운트 따로 ( 10 + 2+ 5 = 전체 턴; 각 맵 카운트를 통해서 고정 이벤트 등 고정으로 처리)
 
     [SerializeField] GameObject cardManager;
     [SerializeField] GameObject turnManager;

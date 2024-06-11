@@ -60,6 +60,11 @@ public class Buff : MonoBehaviour
     {
         while (currentTime > 0)
         {
+            if (currentTime < 2f)
+            {
+                icon.color = Color.gray;
+            }
+
             currentTime -= 0.1f;
             yield return delay01;
         }

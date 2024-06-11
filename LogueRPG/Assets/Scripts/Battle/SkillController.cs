@@ -10,7 +10,8 @@ public enum SkillType
     Heal,
     Buff,
     Debuff,
-    DurabilityDamage
+    DurabilityDamage,
+    SelfDamage
 };
 
 public class SkillController : MonoBehaviour
@@ -40,8 +41,14 @@ public class SkillController : MonoBehaviour
                     break;
             }
         }
+        target.TakeDamage(skillEffect.skillType, (int)damage, equipNum, criCheck);//피흡
+    }
 
-        target.TakeDamage(skillEffect.skillType, (int)damage, equipNum, criCheck);
+    void SelfDamageSkill(SkillEffect skillEffect, Entity user)
+    {
+        float damage = skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
+
+        user.TakeDamage(skillEffect.skillType, (int)damage);
     }
 
     void HealSkill(SkillEffect skillEffect, Entity user)
@@ -142,6 +149,12 @@ public class SkillController : MonoBehaviour
                         yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
 
                         //AttackDurabilitySkill(skillEffect, target);
+                        continue;
+
+                    case SkillType.SelfDamage:
+                        yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
+
+                        SelfDamageSkill(skillEffect, user);
                         continue;
                 }
             }

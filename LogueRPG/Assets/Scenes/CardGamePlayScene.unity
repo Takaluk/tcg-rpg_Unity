@@ -1496,6 +1496,14 @@ MonoBehaviour:
     Name: Battle-Stat-MPChargeSpeed
     Description: Battle-Stat-MPChargeSpeed-Description
     sprite: {fileID: 0}
+  - Key: Shield
+    Name: Battle-Stat-Shield
+    Description: Battle-Stat-Shield-Description
+    sprite: {fileID: 0}
+  - Key: CurrentShield
+    Name: Battle-Stat-Shield
+    Description: Battle-Stat-MPChargeSpeed-Shield
+    sprite: {fileID: 0}
   statusDescriptionPanel: {fileID: 1822704737}
   statNameTMP: {fileID: 398146139}
   statDescriptionTMP: {fileID: 681810103}

@@ -152,11 +152,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 284795869499392
-    m_Key: Battle-Stat-Shild
+    m_Key: Battle-Stat-Shield
     m_Metadata:
       m_Items: []
   - m_Id: 861467635257344
-    m_Key: Battle-Stat-Shild-Description
+    m_Key: Battle-Stat-Shield-Description
     m_Metadata:
       m_Items: []
   - m_Id: 266716892532736
@@ -341,6 +341,42 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1861681003270144
     m_Key: Battle-Die
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4046968076800000
+    m_Key: Card-Event-Watcher-HealEffect-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4047692386963456
+    m_Key: Card-Event-Watcher-HealEffect-Context1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4048669643018240
+    m_Key: Card-Event-Watcher-HealEffect-Context2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4049257613135872
+    m_Key: Card-Event-Watcher-HealEffect-Context3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4066508470915072
+    m_Key: Card-Event-Altar-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4066601341194240
+    m_Key: Card-Event-Altar-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4068393114308608
+    m_Key: Card-Event-Altar-Context1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5043989805961216
+    m_Key: Battle-Stat-CurrentShield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5050141247705088
+    m_Key: Battle-Stat-CurrentShield-Description
     m_Metadata:
       m_Items: []
   m_Metadata:

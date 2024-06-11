@@ -16,6 +16,7 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] TMP_Text skillCostTMP;
     [SerializeField] TMP_Text skillCoolTMP;
     [SerializeField] TMP_Text currentHpTMP;
+    [SerializeField] TMP_Text shieldTMP;
     [SerializeField] TMP_Text maxHpTMP;
     [SerializeField] GameObject healthBar;
     [SerializeField] GameObject equipDurability;
@@ -23,6 +24,7 @@ public class CardOnFeild : MonoBehaviour
     [SerializeField] GameObject cardBreakAnimation;
     [SerializeField] Image healthbarSprite;
     [SerializeField] Image durabilitySprite;
+    [SerializeField] Image shieldbarSprite;
     [SerializeField] Image[] manaGageSprites;
     [SerializeField] Image coolDownSprite;
     public SpriteRenderer characterSprite;
@@ -362,12 +364,24 @@ public class CardOnFeild : MonoBehaviour
         healthBar.SetActive(on);
     }
 
-    public void UpdateHealthbar(float maxHealth, float currentHealth)
+    public void UpdateHealthbar(float maxHealth, float currentHealth, float shield)
     {
         maxHpTMP.text = "/ " + maxHealth.ToString();
         currentHpTMP.text = currentHealth.ToString();
         float healthbarAmount = currentHealth / maxHealth;
         healthbarSprite.fillAmount = healthbarAmount;
+
+        if (shield > 1)
+        {
+            shieldTMP.text = currentHealth.ToString() + " <color=grey>+" +shield.ToString();
+            float shieldAmount = shield / maxHealth;
+            shieldbarSprite.fillAmount = shieldAmount;
+        }
+        else
+        {
+            shieldTMP.text = "";
+            shieldbarSprite.fillAmount = 0;
+        }
     }
 
     public void ShowEquipDurability(bool on)

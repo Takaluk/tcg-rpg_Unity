@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using UnityEditor.Localization.Platform.Android;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
@@ -11,19 +12,20 @@ public enum EntityStat
 {
     None = 0,
     MaxHP,//800~500 / 130~60
-    Shild,
-    Resist,
     CurrentHP,
+    Shield,
+    CurrentShield,
     MPChargeSpeed,//20 ~ 40
 
     Str,//70~40 / 5~2
     Int,//70~40 / 5~2
-    PDef,//47~18 / 6~3
-    MDef,//47~18 / 6~3
-    Acc,//~1000
-    Dodge,//~90
     Critical,//~100
     CriticalDamage,
+    PDef,//47~18
+    MDef,//47~18
+    Resist,
+    Acc,//~1000
+    Dodge,//~90 // ~50
     Leech,
     Reflect,
     Charge,
@@ -136,11 +138,11 @@ public class Entity
 
         mana = 0;
         entityStat[EntityStat.CurrentHP] = entityStat[EntityStat.MaxHP];
-        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP], entityStat[EntityStat.CurrentShield]);
     }
 
 
-    public void TakeDamage(SkillType skillType, int damage, int equipNum = 3, bool isCritical = false)
+    public int TakeDamage(SkillType skillType, int damage, int equipNum = 3, bool isCritical = false)
     {
         EntityController.instance.DamageReaction(this);
 
@@ -193,11 +195,30 @@ public class Entity
                     }
                     damageAmount += Utils.color_mgcDamage + ((int)actualDamage).ToString();
                     break;
+
+                case SkillType.SelfDamage:
+                    damageAmount += Utils.color_trueDamage + ((int)actualDamage).ToString();
+                    break;
             }
 
 
         EntityPopUp(damageAmount);
 
+        if (entityStat[EntityStat.CurrentShield] > 0)
+        {
+            int afterShield = entityStat[EntityStat.CurrentShield] - (int)actualDamage;
+
+            if (afterShield > 0)
+            {
+                entityStat[EntityStat.CurrentShield] = afterShield;
+                actualDamage = 0;
+            }
+            else
+            {
+                entityStat[EntityStat.CurrentShield] = 0;
+                actualDamage = 0 - afterShield;
+            }
+        }
         int afterHp = entityStat[EntityStat.CurrentHP] - (int)actualDamage;
 
         if (afterHp <= 0)
@@ -207,7 +228,9 @@ public class Entity
         }
         entityStat[EntityStat.CurrentHP] = afterHp;
 
-        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP], entityStat[EntityStat.CurrentShield]);
+
+        return (int)actualDamage;
     }
 
     public void TakeDurabilityDamage(int equipNum, int damage)
@@ -259,7 +282,7 @@ public class Entity
 
             string healAmount = Utils.color_heal + heal.ToString();
             EntityPopUp(healAmount);
-            entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
+            entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP], entityStat[EntityStat.CurrentShield]);
         }
     }
 
@@ -314,7 +337,7 @@ public class Entity
 
         if (entityStat[EntityStat.CurrentHP] > entityStat[EntityStat.MaxHP])
             entityStat[EntityStat.CurrentHP] = entityStat[EntityStat.MaxHP];
-        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP]);
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP], entityStat[EntityStat.CurrentShield]);
     }
 
     public void IncreaseStat(EntityStat statType, int pow)
@@ -388,6 +411,11 @@ public class Entity
         {
             buff.PauseBuffTimer();
         }
+    }
+
+    public void UpdateHealthbar()
+    {
+        entityCard.UpdateHealthbar(entityStat[EntityStat.MaxHP], entityStat[EntityStat.CurrentHP], entityStat[EntityStat.CurrentShield]);
     }
 }
 
@@ -494,6 +522,10 @@ public class EntityController : MonoBehaviour
         enemy.isEnchanted[2] = false;
         player.manaChargeBlock = false;
         enemy.manaChargeBlock = false;
+        player.IncreaseStat(EntityStat.CurrentShield, player.entityStat[EntityStat.Shield]);
+        player.UpdateHealthbar();
+        enemy.IncreaseStat(EntityStat.CurrentShield, enemy.entityStat[EntityStat.Shield]);
+        enemy.UpdateHealthbar();
         currentEnemySkillCard = null;
 
         player.StartAllBuffTimer();
@@ -645,6 +677,8 @@ public class EntityController : MonoBehaviour
         player.manaChargeBlock = true;
         enemy.manaChargeBlock = true;
         player.StopAllBuffTimer();
+        player.entityStat[EntityStat.CurrentShield] = 0;
+        player.UpdateHealthbar();
         enemy.StopAllBuffTimer();
         enemy.EntityPopUp(GameManager.instance.GetLocaleString("Battle-Die"));
         yield return new WaitForSeconds(1f);
