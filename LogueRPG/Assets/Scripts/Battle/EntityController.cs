@@ -29,7 +29,8 @@ public enum EntityStat
     Leech,
     Reflect,
     Charge,
-    AdditionalHit
+    CurrentCharge,
+    //AdditionalHit
 };
 
 [System.Serializable]
@@ -196,6 +197,10 @@ public class Entity
                     damageAmount += Utils.color_mgcDamage + ((int)actualDamage).ToString();
                     break;
 
+                case SkillType.TrueDamage:
+                    damageAmount += Utils.color_trueDamage + ((int)actualDamage).ToString();
+                    break;
+
                 case SkillType.SelfDamage:
                     damageAmount += Utils.color_trueDamage + ((int)actualDamage).ToString();
                     break;
@@ -343,18 +348,6 @@ public class Entity
     public void IncreaseStat(EntityStat statType, int pow)
     {
         entityStat[statType] += pow;
-
-        switch (statType)
-        {
-            case EntityStat.Critical:
-                if (entityStat[EntityStat.Critical] > 100)
-                    entityStat[EntityStat.Critical] = 100;
-                return;
-            case EntityStat.Dodge:
-                if (entityStat[EntityStat.Dodge] > 90)
-                    entityStat[EntityStat.Dodge] = 90;
-                return;
-        }
     }
 
     public void DecreaseStat(EntityStat statType, int pow)
@@ -522,14 +515,37 @@ public class EntityController : MonoBehaviour
         enemy.isEnchanted[2] = false;
         player.manaChargeBlock = false;
         enemy.manaChargeBlock = false;
-        player.IncreaseStat(EntityStat.CurrentShield, player.entityStat[EntityStat.Shield]);
-        player.UpdateHealthbar();
-        enemy.IncreaseStat(EntityStat.CurrentShield, enemy.entityStat[EntityStat.Shield]);
-        enemy.UpdateHealthbar();
+
+        if (player.entityStat[EntityStat.Shield] > 0)
+        {
+            string popUp = Utils.color_buff + Utils.GetStatName(EntityStat.Shield, false);
+            player.EntityPopUp(popUp);
+            player.IncreaseStat(EntityStat.CurrentShield, player.entityStat[EntityStat.Shield]);
+            player.UpdateHealthbar();
+        }
+        if (player.entityStat[EntityStat.Charge] > 0)
+        {
+            string popUp = Utils.color_buff + Utils.GetStatName(EntityStat.Charge, false);
+            player.EntityPopUp(popUp);
+            player.IncreaseStat(EntityStat.CurrentCharge, player.entityStat[EntityStat.Charge]);
+        }
+
+        if (enemy.entityStat[EntityStat.Shield] > 0)
+        {
+            string popUp = Utils.color_buff + Utils.GetStatName(EntityStat.Shield, false);
+            enemy.EntityPopUp(popUp);
+            enemy.IncreaseStat(EntityStat.CurrentShield, enemy.entityStat[EntityStat.Shield]);
+            enemy.UpdateHealthbar();
+        }
+        if (enemy.entityStat[EntityStat.Charge] > 0)
+        {
+            string popUp = Utils.color_buff + Utils.GetStatName(EntityStat.Charge, false);
+            enemy.EntityPopUp(popUp);
+            enemy.IncreaseStat(EntityStat.CurrentCharge, enemy.entityStat[EntityStat.Charge]);
+        }
+
         currentEnemySkillCard = null;
-
         player.StartAllBuffTimer();
-
         rewardEquips.Clear();
     }
 

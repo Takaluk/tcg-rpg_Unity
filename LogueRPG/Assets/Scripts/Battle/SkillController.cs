@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
 
 public enum SkillType
@@ -11,7 +12,8 @@ public enum SkillType
     Buff,
     Debuff,
     DurabilityDamage,
-    SelfDamage
+    SelfDamage,
+    PermanentBuff
 };
 
 public class SkillController : MonoBehaviour
@@ -29,7 +31,8 @@ public class SkillController : MonoBehaviour
         float damage = 0;
         bool criCheck = user.CriticalCheck();
 
-        damage += skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
+        damage += (user.entityStat[EntityStat.CurrentCharge] + 100f) / 100f * skillEffect.pow / 100f * user.entityStat[skillEffect.skillStatType];
+        user.entityStat[EntityStat.CurrentCharge] = 0;
         if (criCheck)
         {
             switch (skillEffect.skillType)
@@ -41,7 +44,20 @@ public class SkillController : MonoBehaviour
                     break;
             }
         }
-        target.TakeDamage(skillEffect.skillType, (int)damage, equipNum, criCheck);//피흡
+        float actualDamage = target.TakeDamage(skillEffect.skillType, (int)damage, equipNum, criCheck);
+
+        if (target.entityStat[EntityStat.Reflect] > 0)
+        {
+            float reflectDamage = actualDamage * target.entityStat[EntityStat.Reflect] / 100f;
+            user.TakeDamage(SkillType.TrueDamage, (int)reflectDamage);
+            Debug.Log(reflectDamage);
+        }
+
+        if (user.entityStat[EntityStat.Leech] > 0 && actualDamage > 0)
+        {
+            float healAmount = actualDamage * user.entityStat[EntityStat.Leech] / 100f;
+            user.TakeHeal((int)healAmount);
+        }
     }
 
     void SelfDamageSkill(SkillEffect skillEffect, Entity user)
@@ -77,6 +93,13 @@ public class SkillController : MonoBehaviour
 
     }
 
+    void PermanentBuffSkill(SkillEffect buffEffect, Entity user)
+    {
+        string buffPopup = Utils.color_buff + Utils.GetStatName(buffEffect.skillStatType, false);
+        user.EntityPopUp(buffPopup);
+        user.IncreaseStat(buffEffect.skillStatType, buffEffect.pow);
+    }
+
     float SkillVfxTiming(Entity target, GameObject skillPrefeb)
     {
         if (skillPrefeb == null)
@@ -95,8 +118,17 @@ public class SkillController : MonoBehaviour
 
         float accuracyCheck = 100;
         if (TurnManager.instance.currentState == GameState.Battle)
-            accuracyCheck = (skill.acc + user.entityStat[EntityStat.Acc]) * (1 - target.entityStat[EntityStat.Dodge] / 100f);
-        Debug.Log(accuracyCheck);
+        {
+            int targetDodge = target.entityStat[EntityStat.Dodge];
+            if (targetDodge < 0)
+                targetDodge = 0;
+            if (targetDodge > 90)
+                targetDodge = 90;
+
+            accuracyCheck = (skill.acc + user.entityStat[EntityStat.Acc]) * (1f - targetDodge / 100f);
+            Debug.Log(accuracyCheck);
+        }
+
         if (!Utils.CalculateProbability(accuracyCheck))
         {
             user.manaChargeBlock = false;
@@ -152,10 +184,17 @@ public class SkillController : MonoBehaviour
                         continue;
 
                     case SkillType.SelfDamage:
-                        yield return new WaitForSeconds(SkillVfxTiming(target, skillEffect.vfx));
+                        yield return new WaitForSeconds(SkillVfxTiming(user, skillEffect.vfx));
 
                         SelfDamageSkill(skillEffect, user);
                         continue;
+
+                    case SkillType.PermanentBuff:
+                        yield return new WaitForSeconds(SkillVfxTiming(user, skillEffect.vfx));
+
+                        PermanentBuffSkill(skillEffect, user);
+                        continue;
+
                 }
             }
 

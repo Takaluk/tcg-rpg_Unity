@@ -93,14 +93,14 @@ public class Utils : MonoBehaviour
                     return GameManager.instance.GetLocaleString("Battle-Stat-Dodge");
             case EntityStat.Acc:
                 return GameManager.instance.GetLocaleString("Battle-Stat-Acc");
-            case EntityStat.AdditionalHit:
-                return GameManager.instance.GetLocaleString("Battle-Stat-AdditionalHit");
             case EntityStat.Critical:
                 return GameManager.instance.GetLocaleString("Battle-Stat-Critical");
             case EntityStat.CriticalDamage:
                 return GameManager.instance.GetLocaleString("Battle-Stat-CriticalDamage");
             case EntityStat.Charge:
                 return GameManager.instance.GetLocaleString("Battle-Stat-Charge");
+            case EntityStat.CurrentCharge:
+                return GameManager.instance.GetLocaleString("Battle-Stat-CurrentCharge");
             case EntityStat.Leech:
                 return GameManager.instance.GetLocaleString("Battle-Stat-Leech");
             case EntityStat.Reflect:

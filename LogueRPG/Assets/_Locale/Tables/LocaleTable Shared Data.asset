@@ -360,11 +360,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4066508470915072
-    m_Key: Card-Event-Altar-Name
+    m_Key: Card-Event-Altar-Low-Reward-Name
     m_Metadata:
       m_Items: []
   - m_Id: 4066601341194240
-    m_Key: Card-Event-Altar-Context0
+    m_Key: Card-Event-Altar-Low-Context0
     m_Metadata:
       m_Items: []
   - m_Id: 4068393114308608
@@ -377,6 +377,50 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5050141247705088
     m_Key: Battle-Stat-CurrentShield-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707585300893696
+    m_Key: Battle-SkillDescription-SelfDamage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5738124170924032
+    m_Key: Card-Event-Altar-Context2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5739187137581056
+    m_Key: Card-Event-Altar-Failed-Context1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5739357115944960
+    m_Key: Card-Event-Altar-Failed-Context2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5749736470646784
+    m_Key: Card-Event-Altar-Middle-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5750063030767616
+    m_Key: Card-Event-Altar-Hight-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5750693333995520
+    m_Key: Card-Event-Altar-Low-Trap-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5750944350507008
+    m_Key: Card-Event-Altar-Middle-Reward-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5750978676690944
+    m_Key: Card-Event-Altar-Middle-Trap-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5751082489909248
+    m_Key: Card-Event-Altar-Hight-Reward-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5751097807507456
+    m_Key: Card-Event-Altar-Hight-Trap-Name
     m_Metadata:
       m_Items: []
   m_Metadata:

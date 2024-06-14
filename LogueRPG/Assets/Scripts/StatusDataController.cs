@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using TMPro;
+using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
 
 public class StatusDataController : MonoBehaviour
@@ -46,9 +47,23 @@ public class StatusDataController : MonoBehaviour
             entityStatusText += "<b><size=0.55>" + GameManager.instance.GetLocaleString("Battle-Stat-Status") + "</size></b>\n";
             foreach (EntityStat stat in Enum.GetValues(typeof(EntityStat)))
             {
-                if (entity.entityStat[stat] != 0)
+                int pow = entity.entityStat[stat];
+                if (pow != 0)
                 {
-                    entityStatusText += "<link=" + stat.ToString() + ">" + Utils.GetStatName(stat) + ": " + entity.entityStat[stat].ToString() + "</link>\n";
+                    switch (stat)
+                    {
+                        case EntityStat.Critical:
+                            if (pow > 100)
+                                pow = 100;
+                            if (pow < 0)
+                                pow = 0;
+                            break;
+                        case EntityStat.Dodge:
+                            if (pow > 90)
+                                pow = 90;
+                            break;
+                    }
+                    entityStatusText += "<link=" + stat.ToString() + ">" + Utils.GetStatName(stat) + ": " + pow.ToString() + "</link>\n";
                 }
             }
             entityStatusText += "\n";
