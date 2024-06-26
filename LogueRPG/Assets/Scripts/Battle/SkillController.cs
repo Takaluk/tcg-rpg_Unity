@@ -13,7 +13,8 @@ public enum SkillType
     Debuff,
     DurabilityDamage,
     SelfDamage,
-    PermanentBuff
+    GetShield,
+    GetCharge
 };
 
 public class SkillController : MonoBehaviour
@@ -93,11 +94,21 @@ public class SkillController : MonoBehaviour
 
     }
 
-    void PermanentBuffSkill(SkillEffect buffEffect, Entity user)
+    void GetShieldSkill(SkillEffect buffEffect, Entity user)
     {
-        string buffPopup = Utils.color_buff + Utils.GetStatName(buffEffect.skillStatType, false);
+        string buffPopup = Utils.color_buff + Utils.GetStatName(EntityStat.CurrentShield, false);
         user.EntityPopUp(buffPopup);
-        user.IncreaseStat(buffEffect.skillStatType, buffEffect.pow);
+        float shieldAmount = user.entityStat[buffEffect.skillStatType] * buffEffect.pow / 100f;
+        user.IncreaseStat(EntityStat.CurrentShield, (int)shieldAmount);
+        user.UpdateHealthbar();
+    }
+
+
+    void GetChargeSkill(SkillEffect buffEffect, Entity user)
+    {
+        string buffPopup = Utils.color_buff + Utils.GetStatName(EntityStat.CurrentCharge, false);
+        user.EntityPopUp(buffPopup);
+        user.IncreaseStat(EntityStat.CurrentShield, buffEffect.pow);
     }
 
     float SkillVfxTiming(Entity target, GameObject skillPrefeb)
@@ -189,10 +200,16 @@ public class SkillController : MonoBehaviour
                         SelfDamageSkill(skillEffect, user);
                         continue;
 
-                    case SkillType.PermanentBuff:
+                    case SkillType.GetShield:
                         yield return new WaitForSeconds(SkillVfxTiming(user, skillEffect.vfx));
 
-                        PermanentBuffSkill(skillEffect, user);
+                        GetShieldSkill(skillEffect, user);
+                        continue;
+
+                    case SkillType.GetCharge:
+                        yield return new WaitForSeconds(SkillVfxTiming(user, skillEffect.vfx));
+
+                        GetChargeSkill(skillEffect, user);
                         continue;
 
                 }

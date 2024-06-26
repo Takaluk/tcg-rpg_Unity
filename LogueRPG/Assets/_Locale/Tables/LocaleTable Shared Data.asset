@@ -423,6 +423,78 @@ MonoBehaviour:
     m_Key: Card-Event-Altar-Hight-Trap-Name
     m_Metadata:
       m_Items: []
+  - m_Id: 6576962124550144
+    m_Key: Card-Character-Witch-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6577030978244608
+    m_Key: Card-Equip-Name-TwistedWand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6577096719765504
+    m_Key: Card-Equip-Name-LobeOfBlasphemy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6577200407154688
+    m_Key: Card-Equip-Name-ForbiddenGrimoire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6577568365056000
+    m_Key: Card-Character-Witch-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6580919970467840
+    m_Key: Battle-Stat-CurrentCharge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6712012115709952
+    m_Key: Card-Skill-Name-Fireball
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6717577437024256
+    m_Key: Card-Skill-Name-Burning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6722940420919296
+    m_Key: Card-Skill-Name-RuneOfDestruction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6725370206392320
+    m_Key: Card-Skill-Name-MagicBarrier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7533457607659520
+    m_Key: Battle-Stat-CurrentCharge-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7533756472791040
+    m_Key: Battle-Stat-Charge-Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7832483804647424
+    m_Key: Battle-SkillDescription-GetSheild
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8033943918120960
+    m_Key: Battle-SkillDescription-GetCharge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8218933679263744
+    m_Key: Card-Enemy-Antagonist0-Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8219052281597952
+    m_Key: Card-Enemy-Antagonist-Context0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8219163703283712
+    m_Key: Card-Equip-Name-Night Ritual
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8220755936579584
+    m_Key: Card-Equip-Name-Shadow Raiment
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

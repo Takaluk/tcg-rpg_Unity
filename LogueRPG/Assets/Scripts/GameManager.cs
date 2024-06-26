@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
 
     public int GetEnemyLevel()
     {
-        return 1 + turnCount / 2;
+        return 1 + turnCount;
     }
 
     public int GetControlBlockCount()

@@ -18,7 +18,7 @@ public enum EntityStat
     MPChargeSpeed,//20 ~ 40
 
     Str,//70~40 / 5~2
-    Int,//70~40 / 5~2
+    Int,//80~50 / 6~3
     Critical,//~100
     CriticalDamage,
     PDef,//47~18
@@ -32,6 +32,13 @@ public enum EntityStat
     CurrentCharge,
     //AdditionalHit
 };
+
+public enum EntityAbility
+{
+    None = 0,
+    UnyieldingSpirit,
+    ForbiddenKnowledge
+}
 
 [System.Serializable]
 public class Entity
@@ -315,7 +322,11 @@ public class Entity
             return;
 
         if (mana < 4f)
+        {
             mana += (entityStat[EntityStat.MPChargeSpeed] / 60f) * manaCharge;
+            if (mana < 0)
+                mana = 0;
+        }
         else
             mana = 4f;
 
@@ -532,14 +543,14 @@ public class EntityController : MonoBehaviour
 
         if (enemy.entityStat[EntityStat.Shield] > 0)
         {
-            string popUp = Utils.color_buff + Utils.GetStatName(EntityStat.Shield, false);
+            string popUp = Utils.color_buff + Utils.GetStatName(EntityStat.CurrentShield, false);
             enemy.EntityPopUp(popUp);
             enemy.IncreaseStat(EntityStat.CurrentShield, enemy.entityStat[EntityStat.Shield]);
             enemy.UpdateHealthbar();
         }
         if (enemy.entityStat[EntityStat.Charge] > 0)
         {
-            string popUp = Utils.color_buff + Utils.GetStatName(EntityStat.Charge, false);
+            string popUp = Utils.color_buff + Utils.GetStatName(EntityStat.CurrentCharge, false);
             enemy.EntityPopUp(popUp);
             enemy.IncreaseStat(EntityStat.CurrentCharge, enemy.entityStat[EntityStat.Charge]);
         }

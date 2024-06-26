@@ -85,7 +85,10 @@ public class Utils : MonoBehaviour
                 else
                     return GameManager.instance.GetLocaleString("Battle-Stat-PDef");
             case EntityStat.MDef:
-                return color_Int + GameManager.instance.GetLocaleString("Battle-Stat-MDef") + "</color>";
+                if (withColor)
+                    return color_Int + GameManager.instance.GetLocaleString("Battle-Stat-MDef") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-MDef");
             case EntityStat.Dodge:
                 if (withColor)
                     return color_miss + GameManager.instance.GetLocaleString("Battle-Stat-Dodge") + "</color>";
@@ -100,7 +103,10 @@ public class Utils : MonoBehaviour
             case EntityStat.Charge:
                 return GameManager.instance.GetLocaleString("Battle-Stat-Charge");
             case EntityStat.CurrentCharge:
-                return GameManager.instance.GetLocaleString("Battle-Stat-CurrentCharge");
+                if (withColor)
+                    return color_miss + GameManager.instance.GetLocaleString("Battle-Stat-CurrentCharge") + "</color>";
+                else
+                    return GameManager.instance.GetLocaleString("Battle-Stat-CurrentCharge");
             case EntityStat.Leech:
                 return GameManager.instance.GetLocaleString("Battle-Stat-Leech");
             case EntityStat.Reflect:
@@ -108,9 +114,6 @@ public class Utils : MonoBehaviour
             case EntityStat.Resist:
                 return GameManager.instance.GetLocaleString("Battle-Stat-Resist");
             case EntityStat.Shield:
-                if (withColor)
-                    return color_miss + GameManager.instance.GetLocaleString("Battle-Stat-Shield") + "</color>";
-                else
                     return GameManager.instance.GetLocaleString("Battle-Stat-Shield");
             case EntityStat.CurrentShield:
                 if (withColor)
@@ -138,6 +141,10 @@ public class Utils : MonoBehaviour
                 return GameManager.instance.GetLocaleString("Battle-SkillDescription-Debuff");
             case SkillType.SelfDamage:
                 return GameManager.instance.GetLocaleString("Battle-SkillDescription-SelfDamage");
+            case SkillType.GetShield:
+                return GameManager.instance.GetLocaleString("Battle-SkillDescription-GetSheild");
+            case SkillType.GetCharge:
+                return GameManager.instance.GetLocaleString("Battle-SkillDescription-GetCharge");
             default:
                 return "";
         }

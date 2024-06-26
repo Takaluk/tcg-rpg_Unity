@@ -207,6 +207,42 @@ MonoBehaviour:
     m_Localized: Durability
     m_Metadata:
       m_Items: []
+  - m_Id: 6576962124550144
+    m_Localized: Witch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6577030978244608
+    m_Localized: Twisted Wand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6577096719765504
+    m_Localized: Lobe Of Blasphemy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6577200407154688
+    m_Localized: ForbiddenGrimoire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6717577437024256
+    m_Localized: Burning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6722940420919296
+    m_Localized: Rune of Destruction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6725370206392320
+    m_Localized: Magic Barrier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8219163703283712
+    m_Localized: Night Ritual
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8220755936579584
+    m_Localized: Shadow Raiment
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

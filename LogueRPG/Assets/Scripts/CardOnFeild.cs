@@ -107,7 +107,8 @@ public class CardOnFeild : MonoBehaviour
                     skillDescription += "*";
                     skillDescription += Utils.GetSkillTypeDescription(skillEffect.skillType);
                     skillDescription += " (";
-                    skillDescription += Utils.GetStatName(skillEffect.skillStatType);
+                    if (skillEffect.skillStatType != EntityStat.None)
+                        skillDescription += Utils.GetStatName(skillEffect.skillStatType);
 
                     if (skillEffect.pow > 0)
                     {
